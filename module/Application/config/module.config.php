@@ -60,6 +60,9 @@ return array(
         'aliases' => array(
             'translator' => 'MvcTranslator',
         ),
+        'factories' => array(
+            'navigation' => 'Zend\Navigation\Service\DefaultNavigationFactory',
+        ),
     ),
     'translator' => array(
         'locale' => 'en_US',
@@ -68,6 +71,18 @@ return array(
                 'type'     => 'gettext',
                 'base_dir' => __DIR__ . '/../language',
                 'pattern'  => '%s.mo',
+            ),
+        ),
+    ),
+    'navigation' => array(
+        'default' => array(
+            array(
+                'label' => 'Home',
+                'route' => 'home',
+            ),
+            array(
+                'label' => 'Sign up',
+                'route' => 'register',
             ),
         ),
     ),
