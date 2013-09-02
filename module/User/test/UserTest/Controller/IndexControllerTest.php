@@ -26,6 +26,29 @@ class UserControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('user');
     }
     
+    public function testRegisterActionCanBeAccessed()
+    {
+        $this->dispatch('/register');
+        $this->assertResponseStatusCode(200);
+        
+        $this->assertModuleName('User');
+        $this->assertControllerName('User\Controller\User');
+        $this->assertControllerClass('UserController');
+        $this->assertMatchedRouteName('register');
+        
+        // This should has Register title
+        $this->assertQueryContentContains("h3", "Register");
+        $this->assertQueryContentRegex("title", '/Register/');
+        
+        // This should has a form
+        $this->assertQuery("form");
+        $this->assertQuery('input[name="email"]');
+        $this->assertQuery('input[name="password"]');
+        $this->assertQuery('input[name="passwordconfirmation"]');
+        $this->assertQuery('input[type="submit"]');
+        
+    }
+    
     protected static function findParentPath($path)
     {
         $dir = __DIR__;

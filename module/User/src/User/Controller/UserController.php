@@ -3,6 +3,7 @@ namespace User\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
+use User\Form\RegisterForm;
 
 class UserController extends AbstractActionController
 {
@@ -12,6 +13,11 @@ class UserController extends AbstractActionController
 
     public function registerAction()
     {
+        $form = new RegisterForm();
+        
+        return array(
+            'form' => $form,
+        );
     }
 
     public function loginAction()

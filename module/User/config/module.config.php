@@ -21,6 +21,16 @@ return array(
                     ),
                 ),
             ),
+            'register' => array(
+                'type' => 'Literal',
+                'options' => array(
+                    'route' => '/register',
+                    'defaults' => array(
+                        'controller' => 'User\Controller\User',
+                        'action'     => 'register',
+                    ),
+                ),
+            ),
         ),
     ),
     'view_manager' => array(
