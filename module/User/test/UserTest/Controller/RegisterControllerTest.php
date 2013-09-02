@@ -2,8 +2,9 @@
 namespace UserTest\Controller;
 
 use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
+use User\Form\RegisterForm;
 
-class IndexControllerTest extends AbstractHttpControllerTestCase
+class RegisterControllerTest extends AbstractHttpControllerTestCase
 {
     protected $traceError = true;
     
@@ -15,17 +16,6 @@ class IndexControllerTest extends AbstractHttpControllerTestCase
         parent::setUp();
     }
     
-    public function testIndexActionCanBeAccessed()
-    {
-        $this->dispatch('/user');
-        $this->assertResponseStatusCode(200);
-
-        $this->assertModuleName('User');
-        $this->assertControllerName('User\Controller\User');
-        $this->assertControllerClass('UserController');
-        $this->assertMatchedRouteName('user');
-    }
-    
     public function testRegisterActionCanBeAccessed()
     {
         $this->dispatch('/register');
@@ -35,6 +25,11 @@ class IndexControllerTest extends AbstractHttpControllerTestCase
         $this->assertControllerName('User\Controller\User');
         $this->assertControllerClass('UserController');
         $this->assertMatchedRouteName('register');
+    }
+    
+    public function testRegisterLayoutIsRight()
+    {
+        $this->dispatch('/register');
         
         // This should has Register title
         $this->assertQueryContentContains("h3", "Register");
@@ -46,7 +41,32 @@ class IndexControllerTest extends AbstractHttpControllerTestCase
         $this->assertQuery('input[name="password"]');
         $this->assertQuery('input[name="passwordconfirmation"]');
         $this->assertQuery('input[type="submit"]');
+    }
+    
+    public function testRegisterFormValidation()
+    {
+        $form = new RegisterForm();
         
+        // Test valid data
+        $form->setData(array(
+            'email' => 'user@example.com',
+            'password' => 'Lorem Ipsum',
+            'passwordconfirmation' => 'Lorem Ipsum',
+        ));
+        $this->assertTrue($form->isValid());
+        
+        // Test invalid email
+        $form->setData(array(
+            'email' => 'ab c @ example.com'
+        ));
+        $this->assertFalse($form->isValid());
+        
+        $form->setData(array(
+            'email' => 'user@example.com',
+            'password' => 'Lorem Ipsum',
+            'passwordconfirmation' => 'Ipsum Lorem',
+        ));
+        $this->assertFalse($form->isValid());
     }
     
     protected static function findParentPath($path)

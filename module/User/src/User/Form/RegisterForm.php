@@ -2,6 +2,7 @@
 namespace User\Form;
 
 use Zend\Form\Form;
+use User\Filter\RegisterFilter;
 
 class RegisterForm extends Form
 {
@@ -61,5 +62,8 @@ class RegisterForm extends Form
                 'class' => 'btn btn-primary',
             ),
         ));
+        
+        $filter = new RegisterFilter();
+        $this->setInputFilter($filter->getInputFilter());
     }
 }
