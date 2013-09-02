@@ -1,4 +1,12 @@
 <?php $this->headTitle($this->translate('Register'), 'PREPEND'); ?>
+<div class="notification">
+    <?php foreach ($success_messages as $message) { ?>
+    <div class="alert alert-success"><?php echo $message; ?></div>
+    <?php } ?>
+    <?php foreach ($error_messages as $message) { ?>
+    <div class="alert alert-danger"><?php echo $message; ?></div>
+    <?php } ?>
+</div>
 <div class="row">
     <div class="col-md-6 col-md-offset-3">
         <div class="panel panel-default">
