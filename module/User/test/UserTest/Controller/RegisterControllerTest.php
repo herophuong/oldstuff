@@ -8,16 +8,11 @@ class RegisterControllerTest extends AbstractHttpControllerTestCase
 {
     protected $traceError = true;
     protected $tool = null;
+    protected $classes = null;
     
     public function setUp()
     {
         $this->setApplicationConfig(\UserTest\Bootstrap::getConfig());
-        
-        $em = $this->getApplicationServiceLocator()->get('doctrine.entitymanager.orm_default');
-        $tool = new \Doctrine\ORM\Tools\SchemaTool($em);
-        $classes = array($em->getClassMetadata('User\Entity\User'));
-        $tool->dropSchema($classes);
-        $tool->createSchema($classes);
         parent::setUp();
     }
     
@@ -50,6 +45,8 @@ class RegisterControllerTest extends AbstractHttpControllerTestCase
     
     public function testRegisterWithValidInformation()
     {
+        $this->resetSchema();
+        
         /* ---- Valid register information ---- */
         $postData = array(
             'email' => 'user@example.com',
@@ -64,6 +61,8 @@ class RegisterControllerTest extends AbstractHttpControllerTestCase
     
     public function testRegisterWithInvalidEmail()
     {
+        $this->resetSchema();
+        
         /* ---- Invalid email ---- */
         $postData = array(
             'email' => 'abcdef',
@@ -74,5 +73,17 @@ class RegisterControllerTest extends AbstractHttpControllerTestCase
         $this->dispatch('/register', 'POST', $postData);
         // Should show invalid email message
         $this->assertQueryContentRegex("div.alert-danger", '/Please provide a valid email/');
+    }
+    
+    protected function resetSchema()
+    {
+        if ($this->tool == null) {
+            $em = $this->getApplicationServiceLocator()->get('doctrine.entitymanager.orm_default');
+            $this->tool = new \Doctrine\ORM\Tools\SchemaTool($em);
+            $this->classes = array($em->getClassMetadata('User\Entity\User'));
+        }
+        
+        $this->tool->dropSchema($this->classes);
+        $this->tool->createSchema($this->classes);
     }
 }
