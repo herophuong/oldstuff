@@ -61,7 +61,7 @@ class UserController extends AbstractActionController
                     
                     $this->flashMessenger()->addSuccessMessage('Register successfully!');
                     
-                    $form->setData(array()); // clear the form
+                    $form->setData(array('email' => '', 'password' => '', 'passwordconfirmation' => '')); // clear the form
                 } catch (DBALException $e) {
                     switch ($e->getPrevious()->getCode()) {
                         case 23000: // MySQL Duplicate Key
