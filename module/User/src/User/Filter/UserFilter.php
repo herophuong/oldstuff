@@ -4,6 +4,8 @@ namespace User\Filter;
 use Zend\InputFilter\InputFilter;
 use Zend\InputFilter\InputFilterAwareInterface;
 use Zend\InputFilter\InputFilterInterface;
+use Zend\Validator\EmailAddress;
+use Zend\Validator\Identical;
 
 class UserFilter implements InputFilterAwareInterface
 {
@@ -19,7 +21,7 @@ class UserFilter implements InputFilterAwareInterface
         if (!$this->inputFilter) {
             $inputFilter = new InputFilter();
             
-            $emailvalidator = new \Zend\Validator\EmailAddress();
+            $emailvalidator = new EmailAddress();
             $emailvalidator->setMessage("Please provide a valid email");
             $inputFilter->add(array(
                 'name' => 'email',
@@ -34,16 +36,14 @@ class UserFilter implements InputFilterAwareInterface
                 'required' => true,
             ));
             
+            $identicalvalidator = new Identical();
+            $identicalvalidator->setMessage("Your passwords are not matched!", Identical::NOT_SAME);
+            $identicalvalidator->setToken('password');
             $inputFilter->add(array(
                 'name' => 'passwordconfirmation',
                 'required' => true,
                 'validators' => array(
-                    array(
-                    'name' => 'Identical',
-                        'options' => array(
-                            'token' => 'password' //I have tried $_POST['password'], but it doesnt work either
-                        )
-                    )
+                    $identicalvalidator,
                 ),
             ));
             

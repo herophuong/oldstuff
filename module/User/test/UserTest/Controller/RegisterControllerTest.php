@@ -60,9 +60,7 @@ class RegisterControllerTest extends AbstractHttpControllerTestCase
     }
     
     public function testRegisterWithInvalidEmail()
-    {
-        $this->resetSchema();
-        
+    {        
         /* ---- Invalid email ---- */
         $postData = array(
             'email' => 'abcdef',
@@ -73,6 +71,19 @@ class RegisterControllerTest extends AbstractHttpControllerTestCase
         $this->dispatch('/register', 'POST', $postData);
         // Should show invalid email message
         $this->assertQueryContentRegex("div.alert-danger", '/Please provide a valid email/');
+    }
+    
+    public function testRegisterWithUnmatchPassword()
+    {        
+        $postData = array(
+            'email' => 'user@example.com',
+            'password' => 'abc1234',
+            'passwordconfirmation' => '4321cba',
+        );
+        
+        $this->dispatch('/register', 'POST', $postData);
+        // Should show unmatch password message
+        $this->assertQueryContentRegex("div.alert-danger", '/Your passwords are not matched/');
     }
     
     protected function resetSchema()
