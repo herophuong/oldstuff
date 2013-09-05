@@ -5,38 +5,38 @@ use User\Form\RegisterForm;
 
 class RegisterFormTest extends \PHPUnit_Framework_TestCase
 {
-    protected $form = null;
+    protected static $form = null;
     
-    public function setUp() {
-        $this->form = new RegisterForm();
+    public static function setUpBeforeClass() {
+        static::$form = new RegisterForm();
     }
     
     public function testFormWithValidData() {
-        $this->form->setData(array(
+        static::$form->setData(array(
             'email' => 'user@example.com',
             'password' => 'Lorem Ipsum',
             'passwordconfirmation' => 'Lorem Ipsum',
         ));
-        $this->assertTrue($this->form->isValid());
+        $this->assertTrue(static::$form->isValid());
     }
     
     public function testFormWithInvalidEmail() {
-        $this->form->setData(array(
+        static::$form->setData(array(
             'email' => 'abcdef',
             'password' => 'Lorem Ipsum',
             'passwordconfirmation' => 'Lorem Ipsum',
         ));
         
-        $this->assertFalse($this->form->isValid());
+        $this->assertFalse(static::$form->isValid());
     }
     
     public function testFormWithUnmatchPassword()
     {        
-        $this->form->setData(array(
+        static::$form->setData(array(
             'email' => 'user@example.com',
             'password' => 'Lorem Ipsum',
             'passwordconfirmation' => 'Ipsum Lorem',
         ));
-        $this->assertFalse($this->form->isValid());
+        $this->assertFalse(static::$form->isValid());
     }
 }
