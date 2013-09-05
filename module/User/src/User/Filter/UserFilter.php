@@ -21,29 +21,57 @@ class UserFilter implements InputFilterAwareInterface
         if (!$this->inputFilter) {
             $inputFilter = new InputFilter();
             
-            $emailvalidator = new EmailAddress();
-            $emailvalidator->setMessage("Please provide a valid email");
             $inputFilter->add(array(
                 'name' => 'email',
                 'required' => true,
                 'validators' => array(
-                    $emailvalidator,
+                    array(
+                        'name' => 'NotEmpty',
+                        'options' => array(
+                            'message' => 'Please enter your email!',
+                        ),
+                        'break_chain_on_failure' => true,
+                    ),
+                    array(
+                        'name' => 'EmailAddress',
+                        'options' => array(
+                            'message' => 'Please provide a valid email!',
+                        ),
+                    ),
                 ),
             ));
             
             $inputFilter->add(array(
                 'name' => 'password',
                 'required' => true,
+                'validators' => array(
+                    array(
+                        'name' => 'NotEmpty',
+                        'options' => array(
+                            'message' => 'Please enter your password!',
+                        ),
+                    ),
+                ),
             ));
             
-            $identicalvalidator = new Identical();
-            $identicalvalidator->setMessage("Your passwords are not matched!", Identical::NOT_SAME);
-            $identicalvalidator->setToken('password');
             $inputFilter->add(array(
                 'name' => 'passwordconfirmation',
                 'required' => true,
                 'validators' => array(
-                    $identicalvalidator,
+                    array(
+                        'name' => 'NotEmpty',
+                        'options' => array(
+                            'message' => 'Please confirm your password!',
+                        ),
+                        'break_chain_on_failure' => true,
+                    ),
+                    array(
+                        'name' => 'Identical',
+                        'options' => array(
+                            'token' => 'password',
+                            'message' => 'Your password fields are not matched!'
+                        ),
+                    ),
                 ),
             ));
             

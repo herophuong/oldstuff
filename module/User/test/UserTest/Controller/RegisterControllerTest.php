@@ -70,7 +70,7 @@ class RegisterControllerTest extends AbstractHttpControllerTestCase
         
         $this->dispatch('/register', 'POST', $postData);
         // Should show invalid email message
-        $this->assertQueryContentRegex("div.alert-danger", '/Please provide a valid email/');
+        $this->assertQueryContentRegex("div.alert-danger", '/provide a valid email/');
     }
     
     public function testRegisterWithUnmatchPassword()
@@ -83,7 +83,7 @@ class RegisterControllerTest extends AbstractHttpControllerTestCase
         
         $this->dispatch('/register', 'POST', $postData);
         // Should show unmatch password message
-        $this->assertQueryContentRegex("div.alert-danger", '/Your passwords are not matched/');
+        $this->assertQueryContentRegex("div.alert-danger", '/not matched/');
     }
     
     protected function resetSchema()
