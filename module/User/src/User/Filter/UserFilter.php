@@ -5,7 +5,7 @@ use Zend\InputFilter\InputFilter;
 use Zend\InputFilter\InputFilterAwareInterface;
 use Zend\InputFilter\InputFilterInterface;
 
-class RegisterFilter implements InputFilterAwareInterface
+class UserFilter implements InputFilterAwareInterface
 {
     protected $inputFilter;
     
@@ -19,9 +19,14 @@ class RegisterFilter implements InputFilterAwareInterface
         if (!$this->inputFilter) {
             $inputFilter = new InputFilter();
             
+            $emailvalidator = new \Zend\Validator\EmailAddress();
+            $emailvalidator->setMessage("Please provide a valid email");
             $inputFilter->add(array(
                 'name' => 'email',
                 'required' => true,
+                'validators' => array(
+                    $emailvalidator,
+                ),
             ));
             
             $inputFilter->add(array(

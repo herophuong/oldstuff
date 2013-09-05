@@ -64,16 +64,20 @@ class UserController extends AbstractActionController
                     $form->setData(array('email' => '', 'password' => '', 'passwordconfirmation' => '')); // clear the form
                 } catch (DBALException $e) {
                     switch ($e->getPrevious()->getCode()) {
-                        case 23000: // MySQL Duplicate Key
-                            $this->flashMessenger()->addErrorMessage('This email is already registered!');
-                            break;
+//                         case 23000: // MySQL Duplicate Key
+//                             $this->flashMessenger()->addErrorMessage('This email is already registered!');
+//                             break;
                         default:
                             $this->flashMessenger()->addErrorMessage($e->getMessage());
                             break;
                     }
                 }
             } else {
-                $this->flashMessenger()->addErrorMessage($form->getMessages());
+                foreach ($form->getMessages() as $message_array) {
+                    foreach ($message_array as $message) {
+                        $this->flashMessenger()->addErrorMessage($message);
+                    }
+                }
             }
         }
         

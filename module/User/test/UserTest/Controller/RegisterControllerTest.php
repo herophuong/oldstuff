@@ -32,7 +32,7 @@ class RegisterControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('register');
     }
     
-    public function testRegisterLayoutIsRight()
+    public function testRegisterLayout()
     {
         $this->dispatch('/register');
         
@@ -48,14 +48,31 @@ class RegisterControllerTest extends AbstractHttpControllerTestCase
         $this->assertQuery('input[type="submit"]');
     }
     
-    public function testRegisterAction()
+    public function testRegisterWithValidInformation()
     {
-//         $postData = array(
-//             'email' => 'user@example.com',
-//             'password' => 'abcd1234',
-//             'passwordconfirmation' => 'abcd1234',
-//         );
-//         
-//         $this->dispatch('/register', 'POST', $postData);
+        /* ---- Valid register information ---- */
+        $postData = array(
+            'email' => 'user@example.com',
+            'password' => 'abcd1234',
+            'passwordconfirmation' => 'abcd1234',
+        );
+        $this->dispatch('/register', 'POST', $postData);
+        
+        // Should show successful message
+        $this->assertQueryContentRegex("div.alert-success", '/successful/');
+    }
+    
+    public function testRegisterWithInvalidEmail()
+    {
+        /* ---- Invalid email ---- */
+        $postData = array(
+            'email' => 'abcdef',
+            'password' => 'abc1234',
+            'passwordconfirmation' => 'abc1234'
+        );
+        
+        $this->dispatch('/register', 'POST', $postData);
+        // Should show invalid email message
+        $this->assertQueryContentRegex("div.alert-danger", '/Please provide a valid email/');
     }
 }

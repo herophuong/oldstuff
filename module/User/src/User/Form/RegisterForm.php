@@ -2,7 +2,7 @@
 namespace User\Form;
 
 use Zend\Form\Form;
-use User\Filter\RegisterFilter;
+use User\Filter\UserFilter;
 
 class RegisterForm extends Form
 {
@@ -63,7 +63,7 @@ class RegisterForm extends Form
             ),
         ));
         
-        $filter = new RegisterFilter();
+        $filter = new UserFilter();
         $this->setInputFilter($filter->getInputFilter());
     }
 }
