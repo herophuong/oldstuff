@@ -17,7 +17,7 @@ class RegisterForm extends Form
             'options' => array(
                 'label' => 'Email *',
                 'label_attributes' => array(
-                    'class'  => 'control-label col-lg-4 required',
+                    'class'  => 'control-label col-lg-4',
                 ),
             ),
             'attributes' => array(

@@ -1,10 +1,10 @@
 <?php $this->headTitle($this->translate('Register'), 'PREPEND'); ?>
 <div class="notification">
     <?php foreach ($success_messages as $message) { ?>
-    <div class="alert alert-success"><?php echo $message; ?></div>
+    <div class="alert alert-success fade in"><a class="close" data-dismiss="alert" href="#" aria-hidden="true">&times;</a><?php echo $message; ?></div>
     <?php } ?>
     <?php foreach ($error_messages as $message) { ?>
-    <div class="alert alert-danger"><?php echo $message; ?></div>
+    <div class="alert alert-danger fade in"><a class="close" data-dismiss="alert" href="#" aria-hidden="true">&times;</a><?php echo $message; ?></div>
     <?php } ?>
 </div>
 <div class="row">
