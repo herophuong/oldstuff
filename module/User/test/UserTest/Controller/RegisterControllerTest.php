@@ -7,6 +7,7 @@ use User\Form\RegisterForm;
 class RegisterControllerTest extends AbstractHttpControllerTestCase
 {
     protected $traceError = true;
+    protected $tool = null;
     
     public function setUp()
     {
@@ -45,32 +46,6 @@ class RegisterControllerTest extends AbstractHttpControllerTestCase
         $this->assertQuery('input[name="password"]');
         $this->assertQuery('input[name="passwordconfirmation"]');
         $this->assertQuery('input[type="submit"]');
-    }
-    
-    public function testRegisterFormValidation()
-    {
-        $form = new RegisterForm();
-        
-        // Test valid data
-        $form->setData(array(
-            'email' => 'user@example.com',
-            'password' => 'Lorem Ipsum',
-            'passwordconfirmation' => 'Lorem Ipsum',
-        ));
-        $this->assertTrue($form->isValid());
-        
-        // Test invalid email
-        $form->setData(array(
-            'email' => 'ab c @ example.com'
-        ));
-        $this->assertFalse($form->isValid());
-        
-        $form->setData(array(
-            'email' => 'user@example.com',
-            'password' => 'Lorem Ipsum',
-            'passwordconfirmation' => 'Ipsum Lorem',
-        ));
-        $this->assertFalse($form->isValid());
     }
     
     public function testRegisterAction()
