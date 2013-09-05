@@ -10,9 +10,13 @@ class RegisterControllerTest extends AbstractHttpControllerTestCase
     
     public function setUp()
     {
-        $this->setApplicationConfig(
-            include static::findParentPath('module').'/../config/application.config.php'
-        );
+        $this->setApplicationConfig(\UserTest\Bootstrap::getConfig());
+        
+        $em = $this->getApplicationServiceLocator()->get('doctrine.entitymanager.orm_default');
+        $tool = new \Doctrine\ORM\Tools\SchemaTool($em);
+        $classes = array($em->getClassMetadata('User\Entity\User'));
+        $tool->dropSchema($classes);
+        $tool->createSchema($classes);
         parent::setUp();
     }
     
@@ -67,6 +71,17 @@ class RegisterControllerTest extends AbstractHttpControllerTestCase
             'passwordconfirmation' => 'Ipsum Lorem',
         ));
         $this->assertFalse($form->isValid());
+    }
+    
+    public function testRegisterAction()
+    {
+//         $postData = array(
+//             'email' => 'user@example.com',
+//             'password' => 'abcd1234',
+//             'passwordconfirmation' => 'abcd1234',
+//         );
+//         
+//         $this->dispatch('/register', 'POST', $postData);
     }
     
     protected static function findParentPath($path)

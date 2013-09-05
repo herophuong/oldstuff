@@ -16,7 +16,9 @@ chdir(__DIR__);
 class Bootstrap
 {
     protected static $serviceManager;
-
+    protected static $entityManager;
+    protected static $config;
+    
     public static function init()
     {
         $zf2ModulePaths = array(dirname(dirname(__DIR__)));
@@ -30,19 +32,27 @@ class Bootstrap
         static::initAutoloader();
 
         // use ModuleManager to load this module and it's dependencies
-        $config = array(
+        static::$config = array(
             'module_listener_options' => array(
                 'module_paths' => $zf2ModulePaths,
+                'config_glob_paths' => array(
+                    'module/User/test/Bootstrap.config.php',
+                ),
             ),
             'modules' => array(
-                'User'
-            )
+                'Application',
+                'User',
+                'DoctrineModule',
+                'DoctrineORMModule',
+            ),
         );
 
         $serviceManager = new ServiceManager(new ServiceManagerConfig());
-        $serviceManager->setService('ApplicationConfig', $config);
+        $serviceManager->setService('ApplicationConfig', static::$config);
         $serviceManager->get('ModuleManager')->loadModules();
-        static::$serviceManager = $serviceManager;
+        static::$serviceManager = $serviceManager;;
+        
+        static::$entityManager = $serviceManager->get('doctrine.entitymanager.orm_default');
     }
 
     public static function chroot()
@@ -54,6 +64,16 @@ class Bootstrap
     public static function getServiceManager()
     {
         return static::$serviceManager;
+    }
+    
+    public static function getEntityManager()
+    {
+        return static::$entityManager;
+    }
+    
+    public static function getConfig()
+    {
+        return static::$config;
     }
 
     protected static function initAutoloader()
@@ -93,7 +113,7 @@ class Bootstrap
         ));
     }
 
-    protected static function findParentPath($path)
+    public static function findParentPath($path)
     {
         $dir = __DIR__;
         $previousDir = '.';
