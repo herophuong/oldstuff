@@ -15,21 +15,23 @@ class RegisterForm extends Form
             'name' => 'email', 
             'type' => 'Email', 
             'options' => array(
-                'label' => 'Email',
+                'label' => 'Email *',
                 'label_attributes' => array(
-                    'class'  => 'control-label col-lg-4',
+                    'class'  => 'control-label col-lg-4 required',
                 ),
             ),
             'attributes' => array(
                 'id' => 'inputemail',
                 'class' => 'form-control',
+                'aria-required' => 'true',
+                'required' => 'required',
             ),
         ));
         $this->add(array(
             'name' => 'password', 
             'type' => 'Password',
             'options' => array(
-                'label' => 'Password',
+                'label' => 'Password *',
                 'label_attributes' => array(
                     'class'  => 'control-label col-lg-4',
                 ),
@@ -37,13 +39,14 @@ class RegisterForm extends Form
             'attributes' => array(
                 'id' => 'inputpassword',
                 'class' => 'form-control',
+                'required' => 'required',
             ),
         ));
         $this->add(array(
             'name' => 'passwordconfirmation', 
             'type' => 'Password',
             'options' => array(
-                'label' => 'Password Confirmation',
+                'label' => 'Re-type Password *',
                 'label_attributes' => array(
                     'class'  => 'control-label col-lg-4',
                 ),
@@ -51,6 +54,7 @@ class RegisterForm extends Form
             'attributes' => array(
                 'id' => 'inputpasswordconfirm',
                 'class' => 'form-control',
+                'required' => 'required',
             ),
         ));
         $this->add(array(
