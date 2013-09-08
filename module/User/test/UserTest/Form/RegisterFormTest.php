@@ -39,4 +39,15 @@ class RegisterFormTest extends \PHPUnit_Framework_TestCase
         ));
         $this->assertFalse(static::$form->isValid());
     }
+    
+    public function testLowerCaseAndTrimEmail()
+    {
+        static::$form->setData(array('email' => 'UseR@ExamPLe.com '));
+        
+        // Validate data
+        static::$form->isValid();
+        
+        $data = static::$form->getData();
+        $this->assertEquals($data['email'], 'user@example.com');
+    }
 }
