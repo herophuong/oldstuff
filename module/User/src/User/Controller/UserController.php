@@ -93,6 +93,11 @@ class UserController extends AbstractActionController
         return $return;
     }
 
+    public function profileAction()
+    {
+        
+    }
+    
     public function loginAction()
     {
     }
