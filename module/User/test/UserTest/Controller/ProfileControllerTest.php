@@ -4,7 +4,7 @@ namespace UserTest\Controller;
 use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
 use User\Entity\User;
 
-class DetailControllerTest extends AbstractHttpControllerTestCase
+class ProfileControllerTest extends AbstractHttpControllerTestCase
 {
     protected $traceError = true;
     protected $em = null;
