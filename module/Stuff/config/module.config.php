@@ -11,13 +11,14 @@ return array(
 			'stuff' => array(
 				'type' => 'segment',
 				'options' => array(
-					'route' => '/stuff[/][:action][/:id]',
+					'route' => '/stuff[/][:user_id][/:action][/:stuff_id]',
 					'constraints' => array(
 						'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
-						'id' => '[0-9]+',
+						'user_id' => '[0-9]+',
+						'stuff_id' => '[0-9]+',
 					),
 					'defaults' => array(
-						'controllers' => 'Stuff\Controller\Stuff',
+						'controller' => 'Stuff\Controller\Stuff',
 						'action' => 'index',
 					),
 				),
@@ -27,7 +28,7 @@ return array(
 	'view_manager' => array(
 		'template_path_stack' => array(
 			'stuff'=> __DIR__.'/../view',
-		)
+		),
 	),
 	'doctrine' => array(
     	'driver' => array(
