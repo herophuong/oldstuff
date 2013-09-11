@@ -130,8 +130,6 @@ class UserController extends AbstractActionController
         } else {
             // Create a new user form
             $form = new UserForm();
-            $filter = new ProfileFilter();
-            $form->setInputFilter($filter->getInputFilter());
             
             // Find the user whose data need to be modified
             $user = $this->getEntityManager()->find('User\Entity\User', $id);
@@ -147,9 +145,20 @@ class UserController extends AbstractActionController
                 // Get the POST data
                 $data = $request->getPost();
                 
+                // Get input filter 
+                $filter = new ProfileFilter();
+                
+                // Password confirmation filter should be required when password exists
+                if (isset($data['password']) && !empty($data['password'])) {
+                    $filter->getInputFilter()->get('passwordconfirmation')->setRequired(true)->setErrorMessage('Your password fields is not matched!');
+                }
+                
+                // Set the filter into form
+                $form->setInputFilter($filter->getInputFilter());
+                
                 // Populate data into the form 
                 $form->setData($data);
-
+                
                 // Validate data
                 if ($form->isValid()) {
                     // Get filtered and validated data
