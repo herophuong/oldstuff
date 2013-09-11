@@ -71,6 +71,9 @@ class EditControllerTest extends AbstractHttpControllerTestCase
         
         // Make sure the name is changed
         $this->assertEquals($data['display_name'], $user->display_name);
+        
+        // And redirect to the profile page on success
+        $this->assertRedirectTo('/user/profile/'.$user->user_id);
     }
     
     public function testChangePassword()

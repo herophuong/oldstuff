@@ -128,6 +128,17 @@ class UserController extends AbstractActionController
         if (!$id) {
             $this->getResponse()->setStatusCode(404);
         } else {
+            // Create a new user form
+            $form = new UserForm();
+            $filter = new ProfileFilter();
+            $form->setInputFilter($filter->getInputFilter());
+            
+            // Find the user whose data need to be modified
+            $user = $this->getEntityManager()->find('User\Entity\User', $id);
+            
+            // Put some data into our current form
+            $form->setData(array('display_name' => $user->display_name));
+            
             // Get the request
             $request = $this->getRequest();
             
@@ -136,19 +147,13 @@ class UserController extends AbstractActionController
                 // Get the POST data
                 $data = $request->getPost();
                 
-                // Create a new user form and populate data into it
-                $form = new UserForm();
-                $filter = new ProfileFilter();
-                $form->setInputFilter($filter->getInputFilter());
+                // Populate data into the form 
                 $form->setData($data);
 
                 // Validate data
                 if ($form->isValid()) {
                     // Get filtered and validated data
                     $validData = $form->getData();
-                    
-                    // Find the user whose data need to be modified
-                    $user = $this->getEntityManager()->find('User\Entity\User', $id);
                     
                     // Change user display name
                     $user->display_name = $validData['display_name'];
@@ -162,8 +167,17 @@ class UserController extends AbstractActionController
                     // Now store user data
                     $this->getEntityManager()->persist($user);
                     $this->getEntityManager()->flush();
+                    
+                    // Add success message
+                    $this->flashMessenger()->addSuccessMessage('Your profile is updated successfully!');
+                    $this->redirect()->toRoute('user', array('action' => 'profile', 'id' => $user->user_id));
                 }
             }
+            
+            return array(
+                'form' => $form,
+                'user_id' => $id,
+            );
         }
     }
     
