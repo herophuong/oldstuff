@@ -2,14 +2,13 @@
 namespace User\Form;
 
 use Zend\Form\Form;
-use User\Filter\UserFilter;
 
 class UserForm extends Form
 {
     public function __construct($name = null)
     {
         // Ignore all names passing here
-        parent::__construct('register');
+        parent::__construct($name);
         
         $this->add(array(
             'name' => 'display_name',
@@ -26,9 +25,9 @@ class UserForm extends Form
         ));
         $this->add(array(
             'name' => 'email', 
-            'type' => 'Email', 
+            'type' => 'Text', 
             'options' => array(
-                'label' => 'Email *',
+                'label' => 'Email',
                 'label_attributes' => array(
                     'class'  => 'control-label col-lg-4',
                 ),
@@ -36,7 +35,6 @@ class UserForm extends Form
             'attributes' => array(
                 'id' => 'inputemail',
                 'class' => 'form-control',
-                'aria-required' => 'true',
                 'required' => 'required',
             ),
         ));
@@ -77,8 +75,5 @@ class UserForm extends Form
                 'class' => 'btn btn-primary',
             ),
         ));
-        
-        $filter = new UserFilter();
-        $this->setInputFilter($filter->getInputFilter());
     }
 }

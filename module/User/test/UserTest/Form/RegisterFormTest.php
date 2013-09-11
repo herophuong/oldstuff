@@ -1,14 +1,17 @@
 <?php
 namespace UserTest\Form;
 
-use User\Form\RegisterForm;
+use User\Form\UserForm;
+use User\Filter\RegisterFilter;
 
 class RegisterFormTest extends \PHPUnit_Framework_TestCase
 {
     protected static $form = null;
     
     public static function setUpBeforeClass() {
-        static::$form = new RegisterForm();
+        static::$form = new UserForm();
+        $filter = new RegisterFilter();
+        static::$form->setInputFilter($filter->getInputFilter());
     }
     
     public function testFormWithValidData() {

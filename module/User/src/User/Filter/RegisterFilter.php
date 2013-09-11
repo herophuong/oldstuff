@@ -4,10 +4,8 @@ namespace User\Filter;
 use Zend\InputFilter\InputFilter;
 use Zend\InputFilter\InputFilterAwareInterface;
 use Zend\InputFilter\InputFilterInterface;
-use Zend\Validator\EmailAddress;
-use Zend\Validator\Identical;
 
-class UserFilter implements InputFilterAwareInterface
+class RegisterFilter implements InputFilterAwareInterface
 {
     protected $inputFilter;
     
@@ -22,12 +20,11 @@ class UserFilter implements InputFilterAwareInterface
             $inputFilter = new InputFilter();
             
             $this->inputFilter = $inputFilter;
+            $this->addEmailFilter();
+            $this->addPasswordFilter();
+            $this->addPasswordConfirmFilter();
+            $this->addDisplayNameFilter();
         }
-        
-        $this->addEmailFilter();
-        $this->addPasswordFilter();
-        $this->addPasswordConfirmFilter();
-        $this->addDisplayNameFilter();
         
         return $this->inputFilter;
     }

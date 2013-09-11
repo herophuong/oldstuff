@@ -9,6 +9,7 @@ class EditControllerTest extends AbstractHttpControllerTestCase
     protected $traceError = true;
     protected $em = null;
     protected $user = null;
+    protected $bcrypt = null;
     public function setUp()
     {
         $this->setApplicationConfig(\UserTest\Bootstrap::getConfig());
@@ -23,6 +24,11 @@ class EditControllerTest extends AbstractHttpControllerTestCase
             $tool->createSchema($classes);
         }
         
+        // Create a bcrypt object
+        if ($this->bcrypt == null) {
+            $this->bcrypt = new \Zend\Crypt\Password\Bcrypt();
+        }
+        
         // Create a new user once
         if ($this->user == null) {
             $this->user = new User();
@@ -30,7 +36,7 @@ class EditControllerTest extends AbstractHttpControllerTestCase
                 'user_id' => 1,
                 'display_name' => 'User',
                 'email' => 'user@example.com',
-                'password' => 'test',
+                'password' => $this->bcrypt->create('test'),
                 'state' => 1,
             ));
             $this->em->persist($this->user);
@@ -54,10 +60,33 @@ class EditControllerTest extends AbstractHttpControllerTestCase
     
     public function testChangeDisplayName()
     {
-        $this->user->display_name = 'Another User';
-        $this->dispatch('/user/edit/'.$this->user->user_id, 'POST', $this->user->getArrayCopy());
+        $data['display_name'] = 'Another User';
+        $this->dispatch('/user/edit/'.$this->user->user_id, 'POST', $data);
         
-//         $this->assertQuery('input[name="display_name"][value="'.$this->user->display_name.'"]');
+        // Clear identity map
+        $this->em->clear();
+        
+        // Get the user from the database
+        $user = $this->em->find('User\Entity\User', $this->user->user_id);
+        
+        // Make sure the name is changed
+        $this->assertEquals($data['display_name'], $user->display_name);
+    }
+    
+    public function testChangePassword()
+    {
+        $data['password'] = 'New Password';
+        $data['passwordconfirmation'] = 'New Password';
+        $this->dispatch('/user/edit/'.$this->user->user_id, 'POST', $data);
+        
+        // Clear identity map
+        $this->em->clear();
+        
+        // Get the user from the database
+        $user = $this->em->find('User\Entity\User', $this->user->user_id);
+        
+        // Make sure the password is changed
+        $this->assertTrue($this->bcrypt->verify($data['password'], $user->password));
     }
     
     public function testUnspecifiedIdPage()

@@ -3,7 +3,9 @@ namespace User\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
-use User\Form\RegisterForm;
+use User\Filter\RegisterFilter;
+use User\Filter\ProfileFilter;
+use User\Form\UserForm;
 use Doctrine\ORM\EntityManager;
 use Doctrine\DBAL\DBALException;
 use User\Entity\User;
@@ -17,11 +19,22 @@ class UserController extends AbstractActionController
      */
     protected $em;
     
+    /**
+     * Set the entity manager
+     *
+     * @param EntityManager $em
+     * @return void
+     */
     public function setEntityManager(EntityManager $em)
     {
         $this->em = $em;
     }
  
+    /**
+     * Get the entity manager
+     *
+     * @return EntityManager
+     */
     public function getEntityManager()
     {
         if (null === $this->em) {
@@ -36,17 +49,18 @@ class UserController extends AbstractActionController
 
     public function registerAction()
     {
-        $form = new RegisterForm();
+        $form = new UserForm();
+        $filter = new RegisterFilter();
+        $form->setInputFilter($filter->getInputFilter());
         
         $request = $this->getRequest();
         
         if ($request->isPost()) {
-            $user = new User();
-            
             $form->setData($request->getPost());
             
             if ($form->isValid()) {
                 $formdata = $form->getData();
+                $user     = new User();
                 $data     = $user->getArrayCopy();
                 $bcrypt   = new Bcrypt();
                 $data['email']      = $formdata['email'];
@@ -114,12 +128,42 @@ class UserController extends AbstractActionController
         if (!$id) {
             $this->getResponse()->setStatusCode(404);
         } else {
-//             $user = $this->getEntityManager()->getRepository('User\Entity\User')->find(array('user_id' => $id));
-//             
-//             if (!$user)
-//                 $this->getResponse()->setStatusCode(404);
-//             else 
-//                 return array('user' => $user);
+            // Get the request
+            $request = $this->getRequest();
+            
+            // We only accept POST data
+            if ($request->isPost()) {
+                // Get the POST data
+                $data = $request->getPost();
+                
+                // Create a new user form and populate data into it
+                $form = new UserForm();
+                $filter = new ProfileFilter();
+                $form->setInputFilter($filter->getInputFilter());
+                $form->setData($data);
+
+                // Validate data
+                if ($form->isValid()) {
+                    // Get filtered and validated data
+                    $validData = $form->getData();
+                    
+                    // Find the user whose data need to be modified
+                    $user = $this->getEntityManager()->find('User\Entity\User', $id);
+                    
+                    // Change user display name
+                    $user->display_name = $validData['display_name'];
+                    
+                    // Change user password
+                    if (isset($validData['password']) && !empty($validData['password'])) {
+                        $bcrypt = new BCrypt();
+                        $user->password = $bcrypt->create($validData['password']);
+                    }
+                    
+                    // Now store user data
+                    $this->getEntityManager()->persist($user);
+                    $this->getEntityManager()->flush();
+                }
+            }
         }
     }
     
