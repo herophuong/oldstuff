@@ -1,11 +1,23 @@
 <?php $this->headTitle($this->translate('Profile'), 'PREPEND'); ?>
 <h1 class="text-center"><?php echo $this->translate('Your Profile'); ?></h1>
+<?php
+// Prepare the flash messenger
+use \Zend\Mvc\Controller\Plugin\FlashMessenger as PluginFlashMessenger;
+$this->flashMessenger()->setMessageOpenFormat('<div%s>');
+$this->flashMessenger()->setMessageSeparatorString('');
+$this->flashMessenger()->setMessageCloseString('</div>');
+?>
 <div class="row">
+    <?php echo $this->flashMessenger()->render(PluginFlashMessenger::NAMESPACE_SUCCESS, array('alert', 'alert-success', 'col-md-8', 'col-md-offset-2')); ?>
     <div class="col-md-2 col-md-offset-2">
         <img class="img-thumbnail" src="http://www.gravatar.com/avatar/<?php echo md5(trim($user->email)); ?>?s=200" />
     </div>
     <div class="col-md-6">
         <blockquote><?php echo $user->display_name; ?></blockquote>
         <span class="glyphicon glyphicon-envelope"></span>&nbsp;<?php echo $user->email; ?>
+        <br /><br />
+        <a href="<?php echo $this->url('user', array('action' => 'edit', 'id' => $user->user_id));?>" class="btn btn-primary">
+        <?php echo $this->translate('Edit Profile'); ?>
+        </a>
     </div>
 </div>
