@@ -94,7 +94,40 @@ class StuffController extends AbstractActionController {
  	}
 	
 	public function deleteAction(){
+            $user_id = (int) $this->params()->fromroute('user_id',0);
+
+            if(!$user_id){
+                    return $this->redirect()->toRoute('user',array('action' => 'register'));
+            }
+            $stuff_id = (int) $this->params()->fromroute('stuff_id',0);
+            if (!$stuff_id) {
+                return $this->redirect()->toRoute('stuff', array('action'=>'add'));
+            } 
+
+            $stuff = $this->getEntityManager()->find('Stuff\Entity\Stuff', $stuff_id);          
+                    
+            $request = $this->getRequest();
 		
+		if($request->isPost()){
+                    if ($user_id != $stuff->__get($user_id)) 
+                    {                        
+                         $this->flashMessenger()->addErrorMessage("Invalid delete parameters.");
+                         $return = array('error_messages' => $this->flashMessenger()->getCurrentErrorMessages());
+                         return $return;
+                    }
+                    $data = $stuff->getArrayCopy();
+                    $data['state'] = -1;
+                    $stuff->populate($data);
+                    $this->getEntityManager()->flush();
+                    $this->flashMessenger()->addSuccessMessage("Delete stuff successfully.");                    
+                    }$return = array(           
+            'success_messages' => $this->flashMessenger()->getCurrentSuccessMessages(),
+            'error_messages' => $this->flashMessenger()->getCurrentErrorMessages(),
+        );
+        
+        $this->flashMessenger()->clearCurrentMessagesFromNamespace(FlashMessenger::NAMESPACE_SUCCESS);
+        $this->flashMessenger()->clearCurrentMessagesFromNamespace(FlashMessenger::NAMESPACE_ERROR);
+        return $return;
 	}
 	
 	public function editAction(){
