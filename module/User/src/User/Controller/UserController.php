@@ -3,14 +3,26 @@ namespace User\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
+
+// Form and filters
+use User\Form\UserForm;
 use User\Filter\RegisterFilter;
 use User\Filter\ProfileFilter;
-use User\Form\UserForm;
+use User\Filter\LoginFilter;
+
+// Doctrin and entity
 use Doctrine\ORM\EntityManager;
 use Doctrine\DBAL\DBALException;
 use User\Entity\User;
+
+// Encryption
 use Zend\Crypt\Password\Bcrypt;
+
+// Messenger plugin for passing messages between pages
 use Zend\Mvc\Controller\Plugin\FlashMessenger;
+
+// Authentication Result class
+use Zend\Authentication\Result;
 
 class UserController extends AbstractActionController
 {
@@ -192,6 +204,55 @@ class UserController extends AbstractActionController
     
     public function loginAction()
     {
+        $form = new UserForm();
+        
+        $request = $this->getRequest();
+        
+        if ($request->isPost()) {
+            $data = $request->getPost();
+            
+            // Filter the login form
+            $filter = new LoginFilter();
+            $form->setInputFilter($filter->getInputFilter());
+            
+            // Populate form data
+            $form->setData($data);
+            
+            if ($form->isValid()) {
+                // Get back the validated data
+                $data = $form->getData();
+                
+                // Get the authentication service created by doctrine
+                $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
+                
+                // Get the doctrine adapter
+                $adapter = $authService->getAdapter();
+                $adapter->setIdentityValue($data['email']);
+                $adapter->setCredentialValue($data['password']);
+                $authResult = $authService->authenticate();
+                
+                if ($authResult->isValid()) {
+                    $this->flashMessenger()->addSuccessMessage('You have successfully logged in!');
+                    $this->redirect()->toRoute('user', array('action' => 'profile', 'id' => $authService->getIdentity()->user_id));
+                } else {
+                    switch($authResult->getCode()) {
+                        case Result::FAILURE_IDENTITY_NOT_FOUND:
+                            $this->flashMessenger()->addErrorMessage('This email isn\'t signed up yet!');
+                            break;
+                        case Result::FAILURE_CREDENTIAL_INVALID:
+                            $this->flashMessenger()->addErrorMessage('The password is not valid. Please try again!');
+                            break;
+                        default:
+                            $this->flashMessenger()->addErrorMessage('Your email and/or password is not valid!');
+                            break;
+                    }
+                }
+            }
+        }
+        
+        return array(
+            'form' => $form,
+        );
     }
 
     public function deleteAction()

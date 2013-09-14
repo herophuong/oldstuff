@@ -61,6 +61,18 @@ return array(
                     __NAMESPACE__ . '\Entity' => __NAMESPACE__ . '_driver'
                 )
             )
-        )
+        ),
+        'authentication' => array(
+            'orm_default' => array(
+                'object_manager' => 'doctrine.entitymanager.orm_default',
+                'identity_class' => 'User\Entity\User',
+                'identity_property' => 'email',
+                'credential_property' => 'password',
+                'credential_callable' => function(\User\Entity\User $user, $passwordGiven) {
+                    $bcrypt = new \Zend\Crypt\Password\Bcrypt();
+                    return $bcrypt->verify($passwordGiven, $user->password);
+                },
+            ),
+        ),
     ),
 );
