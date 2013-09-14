@@ -36,7 +36,7 @@ return array(
     ),
     'view_manager' => array(
         'template_path_stack' => array(
-            'album' => __DIR__.'/../view',
+            'user' => __DIR__.'/../view',
         ),
     ),
     'doctrine' => array(
