@@ -9,6 +9,11 @@ use \Zend\Mvc\Controller\Plugin\FlashMessenger as PluginFlashMessenger;
     <?php if (!empty($messages)) { ?>
     <div class="alert alert-danger"><?php echo implode('<br />', $messages); ?></div>
     <?php } ?>
+    <?php
+    // Remember to clear messages after displaying them
+    use Zend\Mvc\Controller\Plugin\FlashMessenger;
+    $this->flashMessenger()->clearCurrentMessagesFromNamespace(FlashMessenger::NAMESPACE_ERROR);
+    ?>
     <div class="col-md-6 col-md-offset-3">
         <div class="panel panel-default">
             <div class="panel-heading">

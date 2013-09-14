@@ -98,25 +98,12 @@ class UserController extends AbstractActionController
                             break;
                     }
                 }
-            } else {
-                foreach ($form->getMessages() as $message_array) {
-                    foreach ($message_array as $message) {
-                        $this->flashMessenger()->addErrorMessage($message);
-                    }
-                }
             }
         }
         
-        $return = array(
+        return array(
             'form' => $form,
-            'success_messages' => $this->flashMessenger()->getCurrentSuccessMessages(),
-            'error_messages' => $this->flashMessenger()->getCurrentErrorMessages(),
         );
-        
-        $this->flashMessenger()->clearCurrentMessagesFromNamespace(FlashMessenger::NAMESPACE_SUCCESS);
-        $this->flashMessenger()->clearCurrentMessagesFromNamespace(FlashMessenger::NAMESPACE_ERROR);
-        
-        return $return;
     }
 
     public function profileAction()
