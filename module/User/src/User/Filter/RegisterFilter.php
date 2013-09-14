@@ -1,37 +1,26 @@
 <?php
 namespace User\Filter;
 
-use Zend\InputFilter\InputFilter;
-use Zend\InputFilter\InputFilterAwareInterface;
-use Zend\InputFilter\InputFilterInterface;
+use User\Filter\AbstractUserFilter;
 
-class RegisterFilter implements InputFilterAwareInterface
+class RegisterFilter extends AbstractUserFilter
 {
-    protected $inputFilter;
-    
-    public function setInputFilter(InputFilterInterface $inputFilter)
+    protected function getDisplayNameFilter()
     {
-        throw new Exception("Not used");
+        return array(
+            'name' => 'display_name',
+            'required' => false,
+            'filters' => array(
+                array(
+                    'name' => 'StripTags',
+                ),
+            ),
+        );
     }
     
-    public function getInputFilter()
+    protected function getEmailFilter()
     {
-        if (!$this->inputFilter) {
-            $inputFilter = new InputFilter();
-            
-            $this->inputFilter = $inputFilter;
-            $this->addEmailFilter();
-            $this->addPasswordFilter();
-            $this->addPasswordConfirmFilter();
-            $this->addDisplayNameFilter();
-        }
-        
-        return $this->inputFilter;
-    }
-    
-    protected function addEmailFilter()
-    {
-        $this->inputFilter->add(array(
+        return array(
             'name' => 'email',
             'required' => true,
             'filters' => array(
@@ -57,12 +46,12 @@ class RegisterFilter implements InputFilterAwareInterface
                     ),
                 ),
             ),
-        ));
+        );
     }
     
-    protected function addPasswordFilter()
+    protected function getPasswordFilter()
     {
-        $this->inputFilter->add(array(
+        return array(
             'name' => 'password',
             'required' => true,
             'validators' => array(
@@ -73,12 +62,12 @@ class RegisterFilter implements InputFilterAwareInterface
                     ),
                 ),
             ),
-        ));
+        );
     }
     
-    protected function addPasswordConfirmFilter()
+    protected function getPasswordConfirmationFilter()
     {
-        $this->inputFilter->add(array(
+        return array(
             'name' => 'passwordconfirmation',
             'required' => true,
             'validators' => array(
@@ -97,19 +86,6 @@ class RegisterFilter implements InputFilterAwareInterface
                     ),
                 ),
             ),
-        ));
-    }
-    
-    protected function addDisplayNameFilter()
-    {
-        $this->inputFilter->add(array(
-            'name' => 'display_name',
-            'required' => false,
-            'filters' => array(
-                array(
-                    'name' => 'StripTags',
-                ),
-            ),
-        ));
+        );
     }
 }

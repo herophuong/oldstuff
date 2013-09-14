@@ -1,36 +1,26 @@
 <?php
 namespace User\Filter;
 
-use Zend\InputFilter\InputFilter;
-use Zend\InputFilter\InputFilterAwareInterface;
-use Zend\InputFilter\InputFilterInterface;
+use User\Filter\AbstractUserFilter;
 
-class ProfileFilter implements InputFilterAwareInterface
-{
-    protected $inputFilter;
-    
-    public function setInputFilter(InputFilterInterface $inputFilter)
+class ProfileFilter extends AbstractUserFilter
+{  
+    protected function getDisplayNameFilter()
     {
-        throw new Exception("Not used");
+        return array(
+            'name' => 'display_name',
+            'required' => false,
+            'filters' => array(
+                array(
+                    'name' => 'StripTags',
+                ),
+            ),
+        );
     }
     
-    public function getInputFilter()
+    protected function getEmailFilter()
     {
-        if (!$this->inputFilter) {
-            $inputFilter = new InputFilter();
-            
-            $this->inputFilter = $inputFilter;
-            $this->addEmailFilter();
-            $this->addPasswordConfirmFilter();
-            $this->addDisplayNameFilter();
-        }
-        
-        return $this->inputFilter;
-    }
-    
-    protected function addEmailFilter()
-    {
-        $this->inputFilter->add(array(
+        return array(
             'name' => 'email',
             'required' => false,
             'filters' => array(
@@ -40,12 +30,17 @@ class ProfileFilter implements InputFilterAwareInterface
             'validators' => array(
                 array('name' => 'EmailAddress'),
             ),
-        ));
+        );
     }
     
-    protected function addPasswordConfirmFilter()
+    protected function getPasswordFilter()
     {
-        $this->inputFilter->add(array(
+        return null;
+    }
+    
+    protected function getPasswordConfirmationFilter()
+    {
+        return array(
             'name' => 'passwordconfirmation',
             'required' => false,
             'validators' => array(
@@ -57,19 +52,6 @@ class ProfileFilter implements InputFilterAwareInterface
                     ),
                 ),
             ),
-        ));
-    }
-    
-    protected function addDisplayNameFilter()
-    {
-        $this->inputFilter->add(array(
-            'name' => 'display_name',
-            'required' => false,
-            'filters' => array(
-                array(
-                    'name' => 'StripTags',
-                ),
-            ),
-        ));
+        );
     }
 }
