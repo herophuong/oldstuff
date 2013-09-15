@@ -61,6 +61,11 @@ class UserController extends AbstractActionController
 
     public function registerAction()
     {
+        // Auto redirect logged in user to his profile page
+        if ($user = $this->identity()) {
+            $this->redirect()->toRoute('user', array('action' => 'profile', 'id' => $user->user_id));
+        }
+        
         $form = new UserForm();
         $filter = new RegisterFilter();
         $form->setInputFilter($filter->getInputFilter());

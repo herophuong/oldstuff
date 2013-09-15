@@ -12,6 +12,7 @@ class RegisterControllerTest extends AbstractUserControllerTest
         // Mark transaction
         $this->em->beginTransaction();
     }
+    
     public function testRegisterActionCanBeAccessed()
     {
         $this->dispatch('/register');
@@ -21,6 +22,20 @@ class RegisterControllerTest extends AbstractUserControllerTest
         $this->assertControllerName('User\Controller\User');
         $this->assertControllerClass('UserController');
         $this->assertMatchedRouteName('register');
+    }
+    
+    public function testRegisterActionShouldNotBeAccessedByLoggedInUser()
+    {
+        // Log user in 
+        $this->authService = $this->getApplicationServiceLocator()->get('Zend\Authentication\AuthenticationService');
+        $adapter = $this->authService->getAdapter();
+        $adapter->setIdentityValue(self::EMAIL);
+        $adapter->setCredentialValue(self::PASSWORD);
+        $this->authService->authenticate();
+        
+        // Make sure response is redirect
+        $this->dispatch('/register');
+        $this->assertRedirect();
     }
     
     public function testRegisterLayout()
@@ -43,7 +58,7 @@ class RegisterControllerTest extends AbstractUserControllerTest
     {        
         /* ---- Valid register information ---- */
         $postData = array(
-            'email' => self::EMAIL,
+            'email' => 'user2@example.com',
             'password' => self::PASSWORD,
             'passwordconfirmation' => self::PASSWORD,
         );
