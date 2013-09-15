@@ -1,21 +1,17 @@
 <?php
 namespace UserTest\Controller;
 
-use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
-use User\Form\RegisterForm;
+use UserTest\Controller\AbstractUserControllerTest;
 
-class RegisterControllerTest extends AbstractHttpControllerTestCase
+class RegisterControllerTest extends AbstractUserControllerTest
 {
-    protected $traceError = true;
-    protected $tool = null;
-    protected $classes = null;
-    
     public function setUp()
     {
-        $this->setApplicationConfig(\UserTest\Bootstrap::getConfig());
         parent::setUp();
+        
+        // Mark transaction
+        $this->em->beginTransaction();
     }
-    
     public function testRegisterActionCanBeAccessed()
     {
         $this->dispatch('/register');
@@ -44,19 +40,22 @@ class RegisterControllerTest extends AbstractHttpControllerTestCase
     }
     
     public function testRegisterWithValidInformation()
-    {
-        $this->resetSchema();
-        
+    {        
         /* ---- Valid register information ---- */
         $postData = array(
-            'email' => 'user@example.com',
-            'password' => 'abcd1234',
-            'passwordconfirmation' => 'abcd1234',
+            'email' => self::EMAIL,
+            'password' => self::PASSWORD,
+            'passwordconfirmation' => self::PASSWORD,
         );
         $this->dispatch('/register', 'POST', $postData);
         
         // Should show successful message
         $this->assertQueryContentRegex("div.alert-success", '/successful/');
+        
+        // Make sure the user is stored
+        $repository = $this->em->getRepository('User\Entity\User');
+        $user = $repository->findOneBy(array('email' => self::EMAIL));
+        $this->assertTrue($user instanceof \User\Entity\User);
     }
     
     public function testRegisterWithInvalidEmail()
@@ -86,15 +85,9 @@ class RegisterControllerTest extends AbstractHttpControllerTestCase
         $this->assertQueryContentRegex("div.alert-danger", '/not matched/');
     }
     
-    protected function resetSchema()
+    public function tearDown()
     {
-        if ($this->tool == null) {
-            $em = $this->getApplicationServiceLocator()->get('doctrine.entitymanager.orm_default');
-            $this->tool = new \Doctrine\ORM\Tools\SchemaTool($em);
-            $this->classes = array($em->getClassMetadata('User\Entity\User'));
-        }
-        
-        $this->tool->dropSchema($this->classes);
-        $this->tool->createSchema($this->classes);
+        // Roll back all changes
+        $this->em->rollback();
     }
 }

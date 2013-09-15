@@ -1,52 +1,10 @@
 <?php
 namespace UserTest\Controller;
 
-use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
-use User\Entity\User;
+use UserTest\Controller\AbstractUserControllerTest;
 
-class LoginControllerTest extends AbstractHttpControllerTestCase
-{
-    protected $traceError = true;
-    protected $em = null;
-    protected $user = null;
-    protected $authService = null;
-    
-    public function setUp()
-    {
-        $this->setApplicationConfig(\UserTest\Bootstrap::getConfig());
-        parent::setUp();
-        
-        // Load the entity manager once
-        if ($this->em == null) {
-            $this->em = $this->getApplicationServiceLocator()->get('doctrine.entitymanager.orm_default');
-            $tool = new \Doctrine\ORM\Tools\SchemaTool($this->em);
-            $classes = array($this->em->getClassMetadata('User\Entity\User'));
-            $tool->dropSchema($classes);
-            $tool->createSchema($classes);
-        }
-        
-        // Create a new user once
-        if ($this->user == null) {
-            $this->user = new User();
-            $bcrypt = new \Zend\Crypt\Password\Bcrypt();
-            $bcrypt->setCost(4); // lower cost for faster test
-            $this->user->populate(array(
-                'user_id' => 1,
-                'display_name' => 'User',
-                'email' => 'user@example.com',
-                'password' => $bcrypt->create('test'),
-                'state' => 1,
-            ));
-            $this->em->persist($this->user);
-            $this->em->flush();
-        }
-        
-        // Get the authentication service
-        if ($this->authService == null) {
-            $this->authService = $this->getApplicationServiceLocator()->get('Zend\Authentication\AuthenticationService');
-        }
-    }
-    
+class LoginControllerTest extends AbstractUserControllerTest
+{    
     public function testLoginLayout()
     {
         $this->dispatch('/login');
@@ -58,8 +16,8 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
     
     public function testLoginWithValidCredential()
     {
-        $data['email'] = 'user@example.com';
-        $data['password'] = 'test';
+        $data['email'] = self::EMAIL;
+        $data['password'] = self::PASSWORD;
         $this->dispatch('/login', 'POST', $data);
         
         // Make sure the system has identity
@@ -69,7 +27,7 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
     public function testLoginWithUnsignedEmail()
     {
         $data['email'] = 'abcdef@example.com';
-        $data['password'] = 'test';
+        $data['password'] = self::PASSWORD;
         $this->dispatch('/login', 'POST', $data);
         
         // Make sure some error messages appear
@@ -79,7 +37,7 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
     public function testLoginWithInvalidEmail()
     {
         $data['email'] = 'abcdef';
-        $data['password'] = 'test';
+        $data['password'] = self::PASSWORD;
         $this->dispatch('/login', 'POST', $data);
         
         // Make sure some error messages appear
@@ -88,7 +46,7 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
     
     public function testLoginWithInvalidPassword()
     {
-        $data['email'] = 'user@example.com';
+        $data['email'] = self::EMAIL;
         $data['password'] = 'testtest';
         $this->dispatch('/login', 'POST', $data);
         
@@ -110,8 +68,8 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
     public function testLoginActionShouldRedirectIfAlreadyLoggedIn()
     {
         $adapter = $this->authService->getAdapter();
-        $adapter->setIdentityValue('user@example.com');
-        $adapter->setCredentialValue('test');
+        $adapter->setIdentityValue(self::EMAIL);
+        $adapter->setCredentialValue(self::PASSWORD);
         $this->authService->authenticate();
         
         $this->dispatch('/login');

@@ -1,43 +1,10 @@
 <?php
 namespace UserTest\Controller;
 
-use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
-use User\Entity\User;
+use UserTest\Controller\AbstractUserControllerTest;
 
-class ProfileControllerTest extends AbstractHttpControllerTestCase
-{
-    protected $traceError = true;
-    protected $em = null;
-    protected $user = null;
-    public function setUp()
-    {
-        $this->setApplicationConfig(\UserTest\Bootstrap::getConfig());
-        parent::setUp();
-        
-        // Load the entity manager once
-        if ($this->em == null) {
-            $this->em = $this->getApplicationServiceLocator()->get('doctrine.entitymanager.orm_default');
-            $tool = new \Doctrine\ORM\Tools\SchemaTool($this->em);
-            $classes = array($this->em->getClassMetadata('User\Entity\User'));
-            $tool->dropSchema($classes);
-            $tool->createSchema($classes);
-        }
-        
-        // Create a new user once
-        if ($this->user == null) {
-            $this->user = new User();
-            $this->user->populate(array(
-                'user_id' => 1,
-                'display_name' => 'User',
-                'email' => 'user@example.com',
-                'password' => 'test',
-                'state' => 1,
-            ));
-            $this->em->persist($this->user);
-            $this->em->flush();
-        }
-    }
-    
+class ProfileControllerTest extends AbstractUserControllerTest
+{    
     public function testProfilePage()
     {
         $this->dispatch('/user/profile/'.$this->user->user_id);
