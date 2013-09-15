@@ -191,6 +191,12 @@ class UserController extends AbstractActionController
     
     public function loginAction()
     {
+        // Prevent login page from accessing by logged in user
+        if ($this->identity()) {
+            $user = $this->identity();
+            $this->redirect()->toRoute('user', array('action' => 'profile', 'id' => $user->user_id));
+        }
+        
         $form = new UserForm();
         
         $request = $this->getRequest();

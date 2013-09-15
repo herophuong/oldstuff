@@ -32,7 +32,7 @@ class RegisterControllerTest extends AbstractHttpControllerTestCase
         $this->dispatch('/register');
         
         // This should has Register title
-        $this->assertQueryContentContains("h3", "Register");
+        $this->assertQueryContentRegex("h3", "/Register/");
         $this->assertQueryContentRegex("title", '/Register/');
         
         // This should has a form

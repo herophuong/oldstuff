@@ -9,6 +9,7 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
     protected $traceError = true;
     protected $em = null;
     protected $user = null;
+    protected $authService = null;
     
     public function setUp()
     {
@@ -39,9 +40,12 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
             $this->em->persist($this->user);
             $this->em->flush();
         }
+        
+        // Get the authentication service
+        if ($this->authService == null) {
+            $this->authService = $this->getApplicationServiceLocator()->get('Zend\Authentication\AuthenticationService');
+        }
     }
-    
-    
     
     public function testLoginLayout()
     {
@@ -59,8 +63,7 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
         $this->dispatch('/login', 'POST', $data);
         
         // Make sure the system has identity
-        $authService = $this->getApplicationServiceLocator()->get('Zend\Authentication\AuthenticationService');
-        $this->assertTrue($authService->getIdentity() !== null);
+        $this->assertTrue($this->authService->getIdentity() !== null);
     }
     
     public function testLoginWithUnsignedEmail()
@@ -102,6 +105,17 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
         $this->assertControllerName('User\Controller\User');
         $this->assertControllerClass('UserController');
         $this->assertMatchedRouteName('login');
+    }
+    
+    public function testLoginActionShouldRedirectIfAlreadyLoggedIn()
+    {
+        $adapter = $this->authService->getAdapter();
+        $adapter->setIdentityValue('user@example.com');
+        $adapter->setCredentialValue('test');
+        $this->authService->authenticate();
+        
+        $this->dispatch('/login');
+        $this->assertRedirect();
     }
 }
     
