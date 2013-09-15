@@ -9,6 +9,7 @@ class EditControllerTest extends AbstractHttpControllerTestCase
     protected $traceError = true;
     protected $em = null;
     protected $user = null;
+    protected $authService = null;
     
     public function setUp()
     {
@@ -27,16 +28,25 @@ class EditControllerTest extends AbstractHttpControllerTestCase
         // Create a new user once
         if ($this->user == null) {
             $this->user = new User();
+            $bcrypt = new \Zend\Crypt\Password\Bcrypt();
+            $bcrypt->setCost(4); // lower cost for faster test
             $this->user->populate(array(
                 'user_id' => 1,
                 'display_name' => 'User',
                 'email' => 'user@example.com',
-                'password' => 'test',
+                'password' => $bcrypt->create('test'),
                 'state' => 1,
             ));
             $this->em->persist($this->user);
             $this->em->flush();
         }
+        
+        // Log user in 
+        $this->authService = $this->getApplicationServiceLocator()->get('Zend\Authentication\AuthenticationService');
+        $adapter = $this->authService->getAdapter();
+        $adapter->setIdentityValue('user@example.com');
+        $adapter->setCredentialValue('test');
+        $this->authService->authenticate();
         
         // Mark transaction
         $this->em->beginTransaction();
@@ -54,6 +64,43 @@ class EditControllerTest extends AbstractHttpControllerTestCase
         
         // Make sure an edit form exists
         $this->assertQuery('form');
+    }
+    
+    public function testEditPageShouldNotBeAccessByAnonymous()
+    {
+        // Clear the identity
+        $this->authService->clearIdentity();
+        
+        // Make sure we have redirect anonymous user from this route
+        $this->dispatch('/user/edit/'.$this->user->user_id);
+        $this->assertRedirect();
+    }
+    
+    public function testEditPageShouldNotBeAccessByAnotherUser()
+    {
+        // Create new user
+        $user = new User();
+        $bcrypt = new \Zend\Crypt\Password\Bcrypt();
+        $bcrypt->setCost(4); // lower cost for faster test
+        $user->populate(array(
+            'user_id' => 2,
+            'display_name' => 'User 2',
+            'email' => 'user2@example.com',
+            'password' => $bcrypt->create('test'),
+            'state' => 1,
+        ));
+        $this->em->persist($user);
+        $this->em->flush();
+        
+        // Log in as new user
+        $adapter = $this->authService->getAdapter();
+        $adapter->setIdentityValue('user2@example.com');
+        $adapter->setCredentialValue('test');
+        $this->authService->authenticate();
+        
+        // Now test
+        $this->dispatch('/user/edit/'.$this->user->user_id);
+        $this->assertRedirect();
     }
     
     public function testChangeDisplayName()

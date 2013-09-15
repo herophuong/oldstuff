@@ -126,12 +126,17 @@ class UserController extends AbstractActionController
         $id = $this->getEvent()->getRouteMatch()->getParam('id');
         if (!$id) {
             $this->getResponse()->setStatusCode(404);
-        } else {
-            // Create a new user form
-            $form = new UserForm();
-            
+        } else {            
             // Find the user whose data need to be modified
             $user = $this->getEntityManager()->find('User\Entity\User', $id);
+            
+            // Preven anonymous or other users from accessing this page
+            if ($this->identity() != $user) {
+                $this->redirect()->toRoute('home');
+            }
+            
+            // Create a new user form
+            $form = new UserForm();
             
             // Put some data into our current form
             $form->setData(array('display_name' => $user->display_name));
