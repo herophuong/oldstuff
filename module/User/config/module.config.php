@@ -49,6 +49,11 @@ return array(
             'user' => __DIR__.'/../view',
         ),
     ),
+    'view_helpers' => array(
+        'invokables' => array(
+            'formField' => 'User\View\Helper\FormField',
+        ),
+    ),
     'doctrine' => array(
         'driver' => array(
             __NAMESPACE__ . '_driver' => array(
@@ -73,6 +78,13 @@ return array(
                     return $bcrypt->verify($passwordGiven, $user->password);
                 },
             ),
+        ),
+    ),
+    'service_manager' => array(
+        'factories' => array(
+            'Zend\Authentication\AuthenticationService' => function($serviceManager) {
+                return $serviceManager->get('doctrine.authenticationservice.orm_default');
+            }
         ),
     ),
 );
