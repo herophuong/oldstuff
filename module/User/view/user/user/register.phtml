@@ -1,4 +1,5 @@
 <?php $this->headTitle($this->translate('Register'), 'PREPEND'); ?>
+<h1 class="text-center"><?php echo $this->translate('Old Stuff Trade System'); ?></h1>
 <div class="row">
     <?php $messages = $this->flashMessenger()->getCurrentSuccessMessages();?>
     <?php if (!empty($messages)) { ?>
@@ -24,33 +25,11 @@
                 <?php $form->setAttribute('action', $this->url('register')); ?>
                 <?php $form->setAttribute('class', 'form-horizontal'); ?>
                 <?php echo $this->form()->openTag($form); ?>
-                <div class="form-group">
-                    <?php echo $this->formLabel($form->get('email')); ?>
-                    <div class="col-lg-8">
-                        <?php echo $this->formInput($form->get('email')); ?>
-                        <?php if (isset($messages['email'])) { ?>
-                        <br /><div class="alert alert-danger"><?php echo implode('<br />', $messages['email']); ?></div>
-                        <?php } ?>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <?php echo $this->formLabel($form->get('password')); ?>
-                    <div class="col-lg-8">
-                        <?php echo $this->formInput($form->get('password')); ?>
-                        <?php if (isset($messages['password'])) { ?>
-                        <br /><div class="alert alert-danger"><?php echo implode('<br />', $messages['password']); ?></div>
-                        <?php } ?>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <?php echo $this->formLabel($form->get('passwordconfirmation')); ?>
-                    <div class="col-lg-8">
-                        <?php echo $this->formInput($form->get('passwordconfirmation')); ?>
-                        <?php if (isset($messages['passwordconfirmation'])) { ?>
-                        <br /><div class="alert alert-danger"><?php echo implode('<br />', $messages['passwordconfirmation']); ?></div>
-                        <?php } ?>
-                    </div>
-                </div>
+                
+                <?php echo $this->formField($form, 'email'); ?>
+                <?php echo $this->formField($form, 'password'); ?>
+                <?php echo $this->formField($form, 'passwordconfirmation'); ?>
+                
                 <div class="form-group">
                     <div class="col-lg-8 col-lg-offset-4">
                         <?php echo $this->formInput($form->get('submit')); ?>

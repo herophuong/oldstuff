@@ -15,12 +15,6 @@ class UserForm extends Form
             'type' => 'Text',
             'options' => array(
                 'label' => 'Display Name',
-                'label_attributes' => array(
-                    'class' => 'control-label col-lg-4',
-                ),
-            ),
-            'attributes' => array(
-                'class' => 'form-control',
             ),
         ));
         $this->add(array(
@@ -28,13 +22,9 @@ class UserForm extends Form
             'type' => 'Text', 
             'options' => array(
                 'label' => 'Email',
-                'label_attributes' => array(
-                    'class'  => 'control-label col-lg-4',
-                ),
             ),
             'attributes' => array(
                 'id' => 'inputemail',
-                'class' => 'form-control',
                 'required' => 'required',
             ),
         ));
@@ -43,13 +33,9 @@ class UserForm extends Form
             'type' => 'Password',
             'options' => array(
                 'label' => 'Password',
-                'label_attributes' => array(
-                    'class'  => 'control-label col-lg-4',
-                ),
             ),
             'attributes' => array(
                 'id' => 'inputpassword',
-                'class' => 'form-control',
             ),
         ));
         $this->add(array(
@@ -57,13 +43,9 @@ class UserForm extends Form
             'type' => 'Password',
             'options' => array(
                 'label' => 'Re-type Password',
-                'label_attributes' => array(
-                    'class'  => 'control-label col-lg-4',
-                ),
             ),
             'attributes' => array(
                 'id' => 'inputpasswordconfirm',
-                'class' => 'form-control',
             ),
         ));
         $this->add(array(
