@@ -27,11 +27,7 @@ class RegisterControllerTest extends AbstractUserControllerTest
     public function testRegisterActionShouldNotBeAccessedByLoggedInUser()
     {
         // Log user in 
-        $this->authService = $this->getApplicationServiceLocator()->get('Zend\Authentication\AuthenticationService');
-        $adapter = $this->authService->getAdapter();
-        $adapter->setIdentityValue(self::EMAIL);
-        $adapter->setCredentialValue(self::PASSWORD);
-        $this->authService->authenticate();
+        $this->login();
         
         // Make sure response is redirect
         $this->dispatch('/register');
@@ -68,7 +64,7 @@ class RegisterControllerTest extends AbstractUserControllerTest
         $this->assertQueryContentRegex("div.alert-success", '/successful/');
         
         // Make sure the user is stored
-        $repository = $this->em->getRepository('User\Entity\User');
+        $repository = $this->getEntityManager()->getRepository('User\Entity\User');
         $user = $repository->findOneBy(array('email' => self::EMAIL));
         $this->assertTrue($user instanceof \User\Entity\User);
     }

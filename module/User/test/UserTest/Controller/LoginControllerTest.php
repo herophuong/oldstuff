@@ -21,7 +21,7 @@ class LoginControllerTest extends AbstractUserControllerTest
         $this->dispatch('/login', 'POST', $data);
         
         // Make sure the system has identity
-        $this->assertTrue($this->authService->getIdentity() !== null);
+        $this->assertTrue($this->getAuthService()->getIdentity() !== null);
     }
     
     public function testLoginWithUnsignedEmail()
@@ -67,7 +67,7 @@ class LoginControllerTest extends AbstractUserControllerTest
     
     public function testLoginActionShouldRedirectIfAlreadyLoggedIn()
     {
-        $adapter = $this->authService->getAdapter();
+        $adapter = $this->getAuthService()->getAdapter();
         $adapter->setIdentityValue(self::EMAIL);
         $adapter->setCredentialValue(self::PASSWORD);
         $this->authService->authenticate();

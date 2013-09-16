@@ -10,12 +10,7 @@ class EditControllerTest extends AbstractUserControllerTest
     {
         parent::setUp();
         
-        // Log user in 
-        $this->authService = $this->getApplicationServiceLocator()->get('Zend\Authentication\AuthenticationService');
-        $adapter = $this->authService->getAdapter();
-        $adapter->setIdentityValue(self::EMAIL);
-        $adapter->setCredentialValue(self::PASSWORD);
-        $this->authService->authenticate();
+        $this->login();
         
         // Mark transaction
         $this->em->beginTransaction();
@@ -37,8 +32,8 @@ class EditControllerTest extends AbstractUserControllerTest
     
     public function testEditPageShouldNotBeAccessByAnonymous()
     {
-        // Clear the identity
-        $this->authService->clearIdentity();
+        // Log out first
+        $this->logout();
         
         // Make sure we have redirect anonymous user from this route
         $this->dispatch('/user/edit/'.$this->user->user_id);
@@ -58,30 +53,30 @@ class EditControllerTest extends AbstractUserControllerTest
             'password' => $bcrypt->create('test'),
             'state' => 1,
         ));
-        $this->em->persist($user);
-        $this->em->flush();
+        $this->getEntityManager()->persist($user);
+        $this->getEntityManager()->flush();
         
         // Log in as new user
-        $adapter = $this->authService->getAdapter();
+        $adapter = $this->getAuthService()->getAdapter();
         $adapter->setIdentityValue('user2@example.com');
         $adapter->setCredentialValue('test');
-        $this->authService->authenticate();
+        $this->getAuthService()->authenticate();
         
         // Now test
-        $this->dispatch('/user/edit/'.$this->user->user_id);
+        $this->dispatch('/user/edit/'.$this->getUser()->user_id);
         $this->assertRedirect();
     }
     
     public function testChangeDisplayName()
     {
         $data['display_name'] = 'Another User';
-        $this->dispatch('/user/edit/'.$this->user->user_id, 'POST', $data);
+        $this->dispatch('/user/edit/'.$this->getUser()->user_id, 'POST', $data);
         
         // Clear identity map
-        $this->em->clear();
+        $this->getEntityManager()->clear();
         
         // Get the user from the database
-        $user = $this->em->find('User\Entity\User', $this->user->user_id);
+        $user = $this->getEntityManager()->find('User\Entity\User', $this->getUser()->user_id);
         
         // Make sure the name is changed
         $this->assertEquals($data['display_name'], $user->display_name);
@@ -95,13 +90,13 @@ class EditControllerTest extends AbstractUserControllerTest
         $oldpassword = $this->user->password;
         $data['password'] = 'New Password';
         $data['passwordconfirmation'] = 'New Password';
-        $this->dispatch('/user/edit/'.$this->user->user_id, 'POST', $data);
+        $this->dispatch('/user/edit/'.$this->getUser()->user_id, 'POST', $data);
         
         // Clear identity map
-        $this->em->clear();
+        $this->getEntityManager()->clear();
         
         // Get the user from the database
-        $user = $this->em->find('User\Entity\User', $this->user->user_id);
+        $user = $this->getEntityManager()->find('User\Entity\User', $this->getUser()->user_id);
         
         // Make sure the password is changed
         $this->assertNotEquals($oldpassword, $user->password);
@@ -109,16 +104,16 @@ class EditControllerTest extends AbstractUserControllerTest
     
     public function testEmptyPasswordConfirmationBug()
     {
-        $oldpassword = $this->user->password;
+        $oldpassword = $this->getUser()->password;
         $data['password'] = 'New Password';
         $data['passwordconfirmation'] = '';
-        $this->dispatch('/user/edit/'.$this->user->user_id, 'POST', $data);
+        $this->dispatch('/user/edit/'.$this->getUser()->user_id, 'POST', $data);
         
         // Clear identity map
-        $this->em->clear();
+        $this->getEntityManager()->clear();
         
         // Get the user from the database
-        $user = $this->em->find('User\Entity\User', $this->user->user_id);
+        $user = $this->getEntityManager()->find('User\Entity\User', $this->getUser()->user_id);
         
         // Make sure the password is unchanged
         $this->assertEquals($oldpassword, $user->password);

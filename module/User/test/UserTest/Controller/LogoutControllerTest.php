@@ -10,18 +10,14 @@ class LogoutControllerTest extends AbstractUserControllerTest
         parent::setUp();
         
         // Log user in 
-        $this->authService = $this->getApplicationServiceLocator()->get('Zend\Authentication\AuthenticationService');
-        $adapter = $this->authService->getAdapter();
-        $adapter->setIdentityValue(self::EMAIL);
-        $adapter->setCredentialValue(self::PASSWORD);
-        $this->authService->authenticate();
+        $this->login();
     }
     
     public function testLogoutAction()
     {
         $this->dispatch('/logout');
         
-        $this->assertNull($this->authService->getIdentity());
+        $this->assertNull($this->getAuthService()->getIdentity());
         $this->assertRedirect(); // Should redirect after logout
     }
 }

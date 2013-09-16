@@ -16,9 +16,21 @@ class ProfileControllerTest extends AbstractUserControllerTest
         $this->assertMatchedRouteName('user');
         
         // Search for user information in the body
-        $this->assertQueryContentRegex('body', '/'.$this->user->email.'/');
-        $this->assertQueryContentRegex('body', '/'.$this->user->display_name.'/');
+        $this->assertQueryContentRegex('body', '/'.$this->getUser()->email.'/');
+        $this->assertQueryContentRegex('body', '/'.$this->getUser()->display_name.'/');
     }
+    
+//     public function testAutoUseCurrentIdentityForProfilePageIfLoggedIn()
+//     {
+//         // Log user in
+//         $this->login();
+//         
+//         $this->dispatch('/user/profile');
+//         
+//         // Search for user information in the body
+//         $this->assertQueryContentRegex('body', '/'.$this->getUser()->email.'/');
+//         $this->assertQueryContentRegex('body', '/'.$this->getUser()->display_name.'/');
+//     }
     
     public function testUnspecifiedIdPage()
     {
