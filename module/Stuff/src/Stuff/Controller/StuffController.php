@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Stuff\Form\AddStuffForm;
 use Stuff\Entity\Stuff;
 use Zend\Mvc\Controller\Plugin\FlashMessenger;
-
+use Stuff\Filter\AddStuffFilter;
 /**
  * 
  */
@@ -32,22 +32,22 @@ class StuffController extends AbstractActionController {
 	}
 	
 	public function addAction(){
-		$form = new AddStuffForm();
 		$user_id = (int) $this->params()->fromroute('user_id',0);
 		
 		if(!$user_id){
 			return $this->redirect()->toRoute('user',array('action' => 'register'));
 		}
-		
+		$form = new AddStuffForm();
+		$filter = new AddStuffFilter();
+		$form->setInputFilter($filter->getInputFilter());
 		$request = $this->getRequest();
 		
 		if($request->isPost()){
-			$stuff = new Stuff();
-			
 			$form->setData($request->getPost());
 			
 			if($form->isValid()){
 				$formdata = $form->getData();
+				$stuff = new Stuff();
 				$data = $stuff->getArrayCopy();
 				$data['stuff_name'] = $formdata['stuffname'];
 				$data['description'] = $formdata['description'];
@@ -60,10 +60,10 @@ class StuffController extends AbstractActionController {
 				try{
 					$this->getEntityManager()->persist($stuff);
 					$this->getEntityManager()->flush();
-					$this->flashMessenger()->addSuccessMessage("New stuff has been added successfully");
-					return $this->redirect()->toRoute('stuff',array('user_id' => $user_id,
-																	'action' => 'index',
-					));
+					$this->flashMessenger()->addSuccessMessage("Add new stuff successfully");
+					//return $this->redirect()->toRoute('stuff',array('user_id' => $user_id,
+					//												'action' => 'index',
+					//));
 				}
 				catch(DBALException $e){
 					switch ($e->getPrevious()->getCode()) {
