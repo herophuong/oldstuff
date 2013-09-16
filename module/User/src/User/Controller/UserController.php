@@ -258,6 +258,21 @@ class UserController extends AbstractActionController
         );
     }
 
+    public function logoutAction()
+    {
+        if ($this->identity()) {
+            $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
+            $authService->clearIdentity();
+            $this->flashMessenger()->addSuccessMessage('You have been successfully logged out!');
+        }
+        
+        $this->redirect()->toRoute('login');
+        
+        $response = $this->getResponse();
+        $response->setStatusCode(303);
+        return $response;
+    }
+    
     public function deleteAction()
     {
     }

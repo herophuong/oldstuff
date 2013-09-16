@@ -37,10 +37,15 @@
                     <a class="navbar-brand" href="<?php echo $this->url('home') ?>"><?php echo $this->translate('Old Stuff Trade System') ?></a>
                 </div>
                 <div class="collapse navbar-collapse">
-                    <!--<ul class="nav navbar-nav">
-                        <li class="active"><a href="<?php echo $this->url('home') ?>"><?php echo $this->translate('Home') ?></a></li>
-                    </ul>-->
-                    <?php echo $this->navigation('navigation')->menu()->setUlClass('nav navbar-nav'); ?>
+                    <?php echo $this->navigation()->menu('navigation')->setUlClass('nav navbar-nav'); ?>
+                    
+                    <?php 
+                    if ($user = $this->identity()) { 
+                        echo $this->navigation()->menu('signedin_user_navigation')->setUlClass('nav navbar-nav pull-right');
+                    } else {
+                        echo $this->navigation()->menu('anonymous_user_navigation')->setUlClass('nav navbar-nav pull-right');
+                    } 
+                    ?>
                 </div><!--/.nav-collapse -->
             </div>
         </nav>

@@ -42,6 +42,16 @@ return array(
                     ),
                 ),
             ),
+            'logout' => array(
+                'type' => 'Literal',
+                'options' => array(
+                    'route' => '/logout',
+                    'defaults' => array(
+                        'controller' => 'User\Controller\User',
+                        'action'     => 'logout',
+                    ),
+                ),
+            ),
         ),
     ),
     'view_manager' => array(
@@ -84,7 +94,32 @@ return array(
         'factories' => array(
             'Zend\Authentication\AuthenticationService' => function($serviceManager) {
                 return $serviceManager->get('doctrine.authenticationservice.orm_default');
-            }
+            },
+            'anonymous_user_navigation' => 'User\Navigation\Service\AnonymousUserNavigationFactory',
+            'signedin_user_navigation' => 'User\Navigation\Service\SignedInUserNavigationFactory',
+        ),
+    ),
+    'navigation' => array(
+        'anonymous_user' => array(
+            array(
+                'label' => 'Log in',
+                'route' => 'login',
+            ),
+            array(
+                'label' => 'Sign up',
+                'route' => 'register',
+            ),
+        ),
+        'signedin_user' => array(
+            array(
+                'label' => 'Profile',
+                'route' => 'user',
+                'action' => 'profile',
+            ),
+            array(
+                'label' => 'Logout',
+                'route' => 'logout',
+            ),
         ),
     ),
 );

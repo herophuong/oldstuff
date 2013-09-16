@@ -80,10 +80,6 @@ return array(
                 'label' => 'Home',
                 'route' => 'home',
             ),
-            array(
-                'label' => 'Sign up',
-                'route' => 'register',
-            ),
         ),
     ),
     'controllers' => array(

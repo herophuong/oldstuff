@@ -3,8 +3,12 @@
 <?php
 // Prepare the flash messenger
 use \Zend\Mvc\Controller\Plugin\FlashMessenger as PluginFlashMessenger;
+$this->flashMessenger()->setMessageOpenFormat('<div%s>');
+$this->flashMessenger()->setMessageSeparatorString('');
+$this->flashMessenger()->setMessageCloseString('</div>');
 ?>
 <div class="row">
+    <?php echo $this->flashMessenger()->render(PluginFlashMessenger::NAMESPACE_SUCCESS, array('alert', 'alert-success', 'col-md-6', 'col-md-offset-3')); ?>
     <?php $messages = $this->flashMessenger()->getCurrentErrorMessages();?>
     <?php if (!empty($messages)) { ?>
     <div class="alert alert-danger"><?php echo implode('<br />', $messages); ?></div>
