@@ -114,11 +114,15 @@ class UserController extends AbstractActionController
     public function profileAction()
     {
         $id = $this->getEvent()->getRouteMatch()->getParam('id');
+
         if (!$id) {
-            $this->getResponse()->setStatusCode(404);
+            if ($user = $this->identity())
+                $this->redirect()->toRoute('user', array('action' => 'profile', 'id' => $user->user_id));
+            else 
+                $this->getResponse()->setStatusCode(404);
         } else {
             $user = $this->getEntityManager()->getRepository('User\Entity\User')->find(array('user_id' => $id));
-            
+
             if (!$user)
                 $this->getResponse()->setStatusCode(404);
             else 
