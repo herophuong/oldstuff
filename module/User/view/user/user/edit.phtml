@@ -1,0 +1,32 @@
+<?php $this->headTitle('Edit Profile', 'PREPEND'); ?>
+<h1 class="text-center">Edit Profile</h1>
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+    </div>
+    <div class="col-md-6 col-md-offset-3">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title text-center"><?php echo $this->translate('Update Information'); ?></h3>
+            </div>
+            <div class="panel-body">
+                <?php $messages = $form->getMessages(); ?>
+                <?php $form->setAttribute('action', $this->url('user', array('action' => 'edit', 'id' => $user_id))); ?>
+                <?php $form->setAttribute('class', 'form-horizontal'); ?>
+                <?php echo $this->form()->openTag($form); ?>
+                
+                <?php echo $this->formField($form, 'display_name'); ?>
+                <br />
+                <span class="help-block"><?php echo $this->translate('Optionally, you can modify your existing password by filling the fields below:'); ?></span>
+                <?php echo $this->formField($form, 'password'); ?>
+                <?php echo $this->formField($form, 'passwordconfirmation'); ?>
+                
+                <div class="form-group">
+                    <div class="col-lg-8 col-lg-offset-4">
+                        <?php echo $this->formInput($form->get('submit')->setValue('Save')); ?>
+                    </div>
+                </div>
+                <?php echo $this->form()->closeTag(); ?>
+            </div>
+        </div>
+    </div>
+</div>

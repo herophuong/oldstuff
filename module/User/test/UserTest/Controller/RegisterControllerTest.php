@@ -1,19 +1,16 @@
 <?php
 namespace UserTest\Controller;
 
-use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
-use User\Form\RegisterForm;
+use UserTest\Controller\AbstractUserControllerTest;
 
-class RegisterControllerTest extends AbstractHttpControllerTestCase
+class RegisterControllerTest extends AbstractUserControllerTest
 {
-    protected $traceError = true;
-    protected $tool = null;
-    protected $classes = null;
-    
     public function setUp()
     {
-        $this->setApplicationConfig(\UserTest\Bootstrap::getConfig());
         parent::setUp();
+        
+        // Mark transaction
+        $this->em->beginTransaction();
     }
     
     public function testRegisterActionCanBeAccessed()
@@ -27,12 +24,22 @@ class RegisterControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('register');
     }
     
+    public function testRegisterActionShouldNotBeAccessedByLoggedInUser()
+    {
+        // Log user in 
+        $this->login();
+        
+        // Make sure response is redirect
+        $this->dispatch('/register');
+        $this->assertRedirect();
+    }
+    
     public function testRegisterLayout()
     {
         $this->dispatch('/register');
         
         // This should has Register title
-        $this->assertQueryContentContains("h3", "Register");
+        $this->assertQueryContentRegex("h3", "/Register/");
         $this->assertQueryContentRegex("title", '/Register/');
         
         // This should has a form
@@ -44,25 +51,26 @@ class RegisterControllerTest extends AbstractHttpControllerTestCase
     }
     
     public function testRegisterWithValidInformation()
-    {
-        $this->resetSchema();
-        
+    {        
         /* ---- Valid register information ---- */
         $postData = array(
-            'email' => 'user@example.com',
-            'password' => 'abcd1234',
-            'passwordconfirmation' => 'abcd1234',
+            'email' => 'user2@example.com',
+            'password' => self::PASSWORD,
+            'passwordconfirmation' => self::PASSWORD,
         );
         $this->dispatch('/register', 'POST', $postData);
         
         // Should show successful message
         $this->assertQueryContentRegex("div.alert-success", '/successful/');
+        
+        // Make sure the user is stored
+        $repository = $this->getEntityManager()->getRepository('User\Entity\User');
+        $user = $repository->findOneBy(array('email' => self::EMAIL));
+        $this->assertTrue($user instanceof \User\Entity\User);
     }
     
     public function testRegisterWithInvalidEmail()
-    {
-        $this->resetSchema();
-        
+    {        
         /* ---- Invalid email ---- */
         $postData = array(
             'email' => 'abcdef',
@@ -72,18 +80,25 @@ class RegisterControllerTest extends AbstractHttpControllerTestCase
         
         $this->dispatch('/register', 'POST', $postData);
         // Should show invalid email message
-        $this->assertQueryContentRegex("div.alert-danger", '/Please provide a valid email/');
+        $this->assertQueryContentRegex("div.alert-danger", '/provide a valid email/');
     }
     
-    protected function resetSchema()
-    {
-        if ($this->tool == null) {
-            $em = $this->getApplicationServiceLocator()->get('doctrine.entitymanager.orm_default');
-            $this->tool = new \Doctrine\ORM\Tools\SchemaTool($em);
-            $this->classes = array($em->getClassMetadata('User\Entity\User'));
-        }
+    public function testRegisterWithUnmatchPassword()
+    {        
+        $postData = array(
+            'email' => 'user@example.com',
+            'password' => 'abc1234',
+            'passwordconfirmation' => '4321cba',
+        );
         
-        $this->tool->dropSchema($this->classes);
-        $this->tool->createSchema($this->classes);
+        $this->dispatch('/register', 'POST', $postData);
+        // Should show unmatch password message
+        $this->assertQueryContentRegex("div.alert-danger", '/not matched/');
+    }
+    
+    public function tearDown()
+    {
+        // Roll back all changes
+        $this->em->rollback();
     }
 }

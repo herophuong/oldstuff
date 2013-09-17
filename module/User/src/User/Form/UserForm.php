@@ -2,27 +2,30 @@
 namespace User\Form;
 
 use Zend\Form\Form;
-use User\Filter\UserFilter;
 
-class RegisterForm extends Form
+class UserForm extends Form
 {
     public function __construct($name = null)
     {
         // Ignore all names passing here
-        parent::__construct('register');
+        parent::__construct($name);
         
         $this->add(array(
+            'name' => 'display_name',
+            'type' => 'Text',
+            'options' => array(
+                'label' => 'Display Name',
+            ),
+        ));
+        $this->add(array(
             'name' => 'email', 
-            'type' => 'Email', 
+            'type' => 'Text', 
             'options' => array(
                 'label' => 'Email',
-                'label_attributes' => array(
-                    'class'  => 'control-label col-lg-4',
-                ),
             ),
             'attributes' => array(
                 'id' => 'inputemail',
-                'class' => 'form-control',
+                'required' => 'required',
             ),
         ));
         $this->add(array(
@@ -30,27 +33,19 @@ class RegisterForm extends Form
             'type' => 'Password',
             'options' => array(
                 'label' => 'Password',
-                'label_attributes' => array(
-                    'class'  => 'control-label col-lg-4',
-                ),
             ),
             'attributes' => array(
                 'id' => 'inputpassword',
-                'class' => 'form-control',
             ),
         ));
         $this->add(array(
             'name' => 'passwordconfirmation', 
             'type' => 'Password',
             'options' => array(
-                'label' => 'Password Confirmation',
-                'label_attributes' => array(
-                    'class'  => 'control-label col-lg-4',
-                ),
+                'label' => 'Re-type Password',
             ),
             'attributes' => array(
                 'id' => 'inputpasswordconfirm',
-                'class' => 'form-control',
             ),
         ));
         $this->add(array(
@@ -62,8 +57,5 @@ class RegisterForm extends Form
                 'class' => 'btn btn-primary',
             ),
         ));
-        
-        $filter = new UserFilter();
-        $this->setInputFilter($filter->getInputFilter());
     }
 }
