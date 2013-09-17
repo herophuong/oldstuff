@@ -1,6 +1,6 @@
 <?php
 
-namespace UserTest;
+namespace StuffTest;
 
 use Zend\Loader\AutoloaderFactory;
 use Zend\Mvc\Service\ServiceManagerConfig;
@@ -36,12 +36,13 @@ class Bootstrap
             'module_listener_options' => array(
                 'module_paths' => $zf2ModulePaths,
                 'config_glob_paths' => array(
-                    'module/User/test/Bootstrap.config.php',
+                    'module/Stuff/test/Bootstrap.config.php',
                 ),
             ),
             'modules' => array(
                 'Application',
                 'User',
+                'Stuff',
                 'DoctrineModule',
                 'DoctrineORMModule',
             ),
