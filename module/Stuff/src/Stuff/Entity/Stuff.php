@@ -9,9 +9,13 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity
  * @ORM\Table(name="stuff")
  * @property int    $stuff_id
- * @property int	$user_id
- * @property int	$cat_id
+ * @property User	$user
+ * @property string $stuff_name
+ * @property string $category
  * @property float	$price
+ * @property string $image
+ * @property string $purpose
+ * @property string $desired_stuff
  * @property string $description
  * @property int    $state
  */
@@ -25,14 +29,20 @@ class Stuff
     protected $stuff_id;
     
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\ManyToOne(targetEntity="User")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="user_id")
      */
-    protected $user_id;
+    protected $user;
     
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string")
      */
-    protected $cat_id;
+    protected $stuff_name;
+    
+    /**
+     * @ORM\Column(type="string")
+     */
+    protected $category;
     
     /**
      * @ORM\Column(type="float")
@@ -43,9 +53,24 @@ class Stuff
 	 * @ORM\Column(type="string")
 	 */
 	protected $description;
-	
+    
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string")
+     */
+     protected $image;
+    
+	/**
+     * @ORM\Column(type="string")
+     */
+    protected $purpose; 
+     
+    /**
+     *@ORM\Column(type="string") 
+     */
+    protected $desired_stuff;
+     
+    /**
+     * @ORM\Column(type="smallint")
      */
     protected $state;
     
@@ -89,10 +114,14 @@ class Stuff
     public function populate($data = array()) 
     {
     	$this->stuff_id = $data['stuff_id'];
-        $this->user_id = $data['user_id'];
-		$this->cat_id = $data['cat_id'];
+        $this->user = $data['user'];
+		$this->category = $data['category'];
+        $this->stuff_name = $data['stuff_name'];
         $this->price = $data['price'];
+        $this->image = $data['image'];
         $this->description = $data['description'];
+        $this->desired_stuff = $data['desired_stuff'];
+        $this->purpose = $data['purpose'];
         $this->state = $data['state'];
     }
 }
