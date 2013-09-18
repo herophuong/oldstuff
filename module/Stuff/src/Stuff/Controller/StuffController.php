@@ -49,12 +49,13 @@ class StuffController extends AbstractActionController {
 				$formdata = $form->getData();
 				$stuff = new Stuff();
 				$data = $stuff->getArrayCopy();
+                $user = $this->getEntityManager()->find('User\Entity\User',$user_id);
 				$data['stuff_name'] = $formdata['stuffname'];
 				$data['description'] = $formdata['description'];
 				$data['price'] = $formdata['price'];
-				$data['cat_id']= 1;
-				$data['user_id'] = $user_id;
-				$data['state'] = 0;
+				$data['category']= 1;
+				$data['user'] = $user;
+				$data['state'] = 1;
 				
 				$stuff->populate($data);
 				try{
