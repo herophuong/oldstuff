@@ -98,6 +98,9 @@ return array(
             'anonymous_user_navigation' => 'User\Navigation\Service\AnonymousUserNavigationFactory',
             'signedin_user_navigation' => 'User\Navigation\Service\SignedInUserNavigationFactory',
         ),
+        'invokables' => array(
+            'User\Service\User' => 'User\Service\User',
+        ),
     ),
     'navigation' => array(
         'anonymous_user' => array(
