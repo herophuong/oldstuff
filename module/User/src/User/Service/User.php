@@ -5,6 +5,9 @@ namespace User\Service;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
 use Zend\ServiceManager\ServiceManager;
 
+// Doctrine
+use Doctrine\DBAL\DBALException;
+
 // Encryption
 use Zend\Crypt\Password\Bcrypt;
 
@@ -124,9 +127,12 @@ class User implements ServiceManagerAwareInterface
             
             $user->populate($userData);
             
-            $this->getEntityManager()->persist($user);
-            $this->getEntityManager()->flush();
-            
+            try {
+                $this->getEntityManager()->persist($user);
+                $this->getEntityManager()->flush();
+            } catch (DBALException $e) {
+                throw $e; // Rethrow this
+            }
             return $user;
         }
         

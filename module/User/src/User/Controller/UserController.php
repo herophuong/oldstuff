@@ -10,7 +10,7 @@ use User\Filter\RegisterFilter;
 use User\Filter\ProfileFilter;
 use User\Filter\LoginFilter;
 
-// Doctrin and entity
+// Doctrine and entity
 use Doctrine\ORM\EntityManager;
 use Doctrine\DBAL\DBALException;
 use User\Entity\User;
@@ -95,7 +95,7 @@ class UserController extends AbstractActionController
                     $form = $this->getUserService()->getForm();
                 }
             } catch (DBALException $e) {
-                if (strpos('Duplicate', $e->getMessage())) {
+                if (strpos($e->getMessage(), 'Duplicate')) {
                     $this->flashMessenger()->addErrorMessage('This email has already been registered!');
                 } else {
                     $this->flashMessenger()->addErrorMessage($e->getMessage());
