@@ -101,9 +101,9 @@ return array(
         'invokables' => array(
             'User\Service\User' => 'User\Service\User',
             'UserForm'          => 'User\Form\UserForm',
-            'LoginFilter'       => 'User\Filter\LoginFilter',
-            'ProfileFilter'     => 'User\Filter\ProfileFilter',
-            'RegisterFilter'    => 'User\Filter\RegisterFilter',
+            'User\Filter\LoginFilter'   => 'User\Filter\LoginFilter',
+            'User\Filter\ProfileFilter' => 'User\Filter\ProfileFilter',
+            'User\Filter\RegisterFilter'=> 'User\Filter\RegisterFilter',
         ),
         'shared' => array(
             'UserForm' => false,

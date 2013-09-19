@@ -26,6 +26,11 @@ class User implements ServiceManagerAwareInterface
     protected $em;
     
     /**
+     * @var AuthenticationService
+     */
+    protected $authService;
+    
+    /**
      * Set service manager instance
      *
      * @param ServiceManager $serviceManager
@@ -72,6 +77,20 @@ class User implements ServiceManagerAwareInterface
     }
     
     /**
+     * Get authentication service
+     *
+     * @return AuthenticationService
+     */
+    public function getAuthenticationService()
+    {
+        if ($this->authService === null) {
+            $this->authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+        }
+        
+        return $this->authService;
+    }
+    
+    /**
      * Register service
      *
      * @param array Array of email, password and passwordconfirmation
@@ -83,7 +102,7 @@ class User implements ServiceManagerAwareInterface
     {
         // Create registration form instance
         $form = $this->serviceManager->get('UserForm');
-        $form->setInputFilter($this->serviceManager->get('RegisterFilter')->getInputFilter());
+        $form->setInputFilter($this->serviceManager->get('User\Filter\RegisterFilter')->getInputFilter());
         
         // Populate data
         $form->setData($data);
@@ -112,5 +131,57 @@ class User implements ServiceManagerAwareInterface
         }
         
         return null;
+    }
+    
+    /**
+     * Authenticate service
+     *
+     * @param array Array of email, password
+     *
+     * @return null|\Zend\Authentication\Result the authentication result
+     */
+    public function authenticate($data)
+    {
+        // Create login form instance
+        $form = $this->serviceManager->get('UserForm');
+        $form->setInputFilter($this->serviceManager->get('User\Filter\LoginFilter')->getInputFilter());
+        
+        // Populate data
+        $form->setData($data);
+        
+        // Validate data
+        $result = $form->isValid();
+        
+        // Store current form
+        $this->form = $form;
+        
+        if ($result) {
+            
+            // Get back the validated data
+            $data = $form->getData();
+            
+            // Get the authentication service created by doctrine
+            $authService = $this->getAuthenticationService();
+            
+            // Get the doctrine adapter
+            $adapter = $authService->getAdapter();
+            $adapter->setIdentityValue($data['email']);
+            $adapter->setCredentialValue($data['password']);
+            $authResult = $authService->authenticate();
+            
+            return $authResult;
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Convienient proxy to clearIdentity() method of authentication service
+     *
+     * @return void
+     */
+    public function clearIdentity()
+    {
+        return $this->getAuthenticationService()->clearIdentity();
     }
 }

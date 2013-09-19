@@ -10,6 +10,7 @@ class UserServiceTest extends AbstractHttpControllerTestCase
     protected $em = null;
     protected $user = null;
     protected $userService = null;
+    protected $authService = null;
     
     const EMAIL = 'user@example.com';
     const PASSWORD = 'test';
@@ -52,6 +53,37 @@ class UserServiceTest extends AbstractHttpControllerTestCase
         $this->assertNull($this->getUserService()->register($data));
     }
     
+    public function testAuthenticate()
+    {
+        $data['email'] = self::EMAIL;
+        $data['password'] = self::PASSWORD;
+        
+        // Make sure upon successfully register, the service return the logged in identity 
+        $this->assertEquals($this->getUser(), $this->getUserService()->authenticate($data)->getIdentity());
+        
+        // There is an identity from the authentication service
+        $this->assertEquals($this->getUser(), $this->getAuthService()->getIdentity());
+    }
+    
+    public function testInvalidAuthenticate()
+    {
+        $data['email'] = self::EMAIL;
+        $data['password'] = self::PASSWORD.self::PASSWORD;
+        
+        $this->assertFalse($this->getUserService()->authenticate($data)->isValid());
+    }
+    
+    public function testClearIdentity()
+    {
+        $data['email'] = self::EMAIL;
+        $data['password'] = self::PASSWORD;
+        
+        $this->getUserService()->authenticate($data);
+        $this->getUserService()->clearIdentity();
+        
+        // Make sure authentication service return null identity
+        $this->assertEquals(null, $this->getAuthService()->getIdentity());
+    }
     protected function getEntityManager()
     {
         if ($this->em === null) {
