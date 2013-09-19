@@ -11,22 +11,22 @@ use Zend\Crypt\Password\Bcrypt;
 class User implements ServiceManagerAwareInterface
 {
     /**
-     * @var ServiceManager
+     * @var Zend\ServiceManager\ServiceManager
      */
     protected $serviceManager;
     
     /**
-     * @var UserForm
+     * @var User\Form\UserForm
      */
     protected $form;
     
     /**
-     * @var EntityManager
+     * @var Doctrine\ORM\EntityManager
      */
     protected $em;
     
     /**
-     * @var AuthenticationService
+     * @var Zend\Authentication\AuthenticationService
      */
     protected $authService;
     
