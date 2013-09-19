@@ -1,9 +1,9 @@
 <?php
 namespace User\Navigation\Service;
 
-use Zend\Navigation\Service\DefaultNavigationFactory;
+use Zend\Navigation\Service\AbstractNavigationFactory;
 
-class AnonymousUserNavigationFactory extends DefaultNavigationFactory
+class AnonymousUserNavigationFactory extends AbstractNavigationFactory
 {
     protected function getName()
     {
