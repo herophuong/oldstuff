@@ -1,8 +1,12 @@
 <?php
 namespace User\Service;
 
+// Service Manager
 use Zend\ServiceManager\ServiceManagerAwareInterface;
 use Zend\ServiceManager\ServiceManager;
+
+// Encryption
+use Zend\Crypt\Password\Bcrypt;
 
 class User implements ServiceManagerAwareInterface
 {
@@ -10,6 +14,16 @@ class User implements ServiceManagerAwareInterface
      * @var ServiceManager
      */
     protected $serviceManager;
+    
+    /**
+     * @var UserForm
+     */
+    protected $form;
+    
+    /**
+     * @var EntityManager
+     */
+    protected $em;
     
     /**
      * Set service manager instance
@@ -32,5 +46,71 @@ class User implements ServiceManagerAwareInterface
     {
         return $this->serviceManager;
     }
-     
+    
+    /**
+     * Get current form
+     *
+     * @return UserForm
+     */
+    public function getForm()
+    {
+        return $this->form;
+    }
+    
+    /**
+     * Get the entity manager
+     *
+     * @return EntityManager
+     */
+    public function getEntityManager()
+    {
+        if ($this->em === null) {
+            $this->em = $this->serviceManager->get('doctrine.entitymanager.orm_default');
+        }
+        
+        return $this->em;
+    }
+    
+    /**
+     * Register service
+     *
+     * @param array Array of email, password and passwordconfirmation
+     *
+     * @return null|\User\Entity\User null on failure, upon created entity on success
+     * @throw DBALException
+     */
+    public function register($data)
+    {
+        // Create registration form instance
+        $form = $this->serviceManager->get('UserForm');
+        $form->setInputFilter($this->serviceManager->get('RegisterFilter')->getInputFilter());
+        
+        // Populate data
+        $form->setData($data);
+        
+        // Validate data
+        $result = $form->isValid();
+        
+        // Store current form
+        $this->form = $form;
+        
+        if ($result) {
+            $formData = $form->getData();
+            $user     = new \User\Entity\User();
+            $userData     = $user->getArrayCopy();
+            $bcrypt   = new Bcrypt();
+            $userData['email']      = $formData['email'];
+            $userData['password']   = $bcrypt->create($formData['password']);
+            $userData['state']      = 1;
+            
+            $user->populate($userData);
+            
+            $this->getEntityManager()->persist($user);
+            $this->getEntityManager()->flush();
+            
+            return $user;
+        }
+        
+        return null;
+    }
 }

@@ -26,8 +26,30 @@ class UserServiceTest extends AbstractHttpControllerTestCase
     
     public function testInitiliazation()
     {
-        $this->assertTrue(null !== $this->getUserService());
-        $this->assertTrue($this->getUserService()->getServiceManager() instanceof \Zend\ServiceManager\ServiceManager);
+        $this->assertInstanceOf('User\Service\User', $this->getUserService());
+        $this->assertInstanceOf('Zend\ServiceManager\ServiceManager', $this->getUserService()->getServiceManager());
+    }
+    
+    public function testValidRegister()
+    {
+        $data['email'] = 'user2@example.com';
+        $data['password'] = 'test';
+        $data['passwordconfirmation'] = 'test';
+        
+        // Make sure upon successfully register, the service return the created entity 
+        $this->assertInstanceOf('User\Entity\User', $this->getUserService()->register($data));
+        
+        // Make sure the created entity is stored into the database
+        $this->assertInstanceOf('User\Entity\User', $this->getEntityManager()->getRepository('User\Entity\User')->findOneBy(array('email' => $data['email'])));
+    }
+    
+    public function testInvalidRegister()
+    {
+        $data['email'] = 'user2@example.com';
+        $data['password'] = 'test';
+        $data['passwordconfirmation'] = 'tset';
+        
+        $this->assertNull($this->getUserService()->register($data));
     }
     
     protected function getEntityManager()
