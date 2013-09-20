@@ -10,7 +10,7 @@ use User\Filter\RegisterFilter;
 use User\Filter\ProfileFilter;
 use User\Filter\LoginFilter;
 
-// Doctrin and entity
+// Doctrine and entity
 use Doctrine\ORM\EntityManager;
 use Doctrine\DBAL\DBALException;
 use User\Entity\User;
@@ -30,6 +30,11 @@ class UserController extends AbstractActionController
      * @var Doctrine\ORM\EntityManager
      */
     protected $em;
+    
+    /**
+     * @var User\Service\User
+     */
+    protected $userService;
     
     /**
      * Set the entity manager
@@ -55,6 +60,15 @@ class UserController extends AbstractActionController
         return $this->em;
     }
     
+    public function getUserService()
+    {
+        if ($this->userService === null) {
+            $this->userService = $this->getServiceLocator()->get('User\Service\User');
+        }
+        
+        return $this->userService;
+    }
+    
     public function indexAction()
     {
     }
@@ -67,41 +81,24 @@ class UserController extends AbstractActionController
         }
         
         $form = new UserForm();
-        $filter = new RegisterFilter();
-        $form->setInputFilter($filter->getInputFilter());
         
         $request = $this->getRequest();
         
         if ($request->isPost()) {
-            $form->setData($request->getPost());
-            
-            if ($form->isValid()) {
-                $formdata = $form->getData();
-                $user     = new User();
-                $data     = $user->getArrayCopy();
-                $bcrypt   = new Bcrypt();
-                $data['email']      = $formdata['email'];
-                $data['password']   = $bcrypt->create($formdata['password']);
-                $data['state']      = 1;
-                
-                $user->populate($data);
-                
-                try {
-                    $this->getEntityManager()->persist($user);
-                    $this->getEntityManager()->flush();
-                    
+            try {
+                // Register with the data submitted
+                $user = $this->getUserService()->register($request->getPost());
+                if ($user instanceof \User\Entity\User) {
                     $this->flashMessenger()->addSuccessMessage('Register successfully!');
-                    
-                    $form->setData(array('email' => '', 'password' => '', 'passwordconfirmation' => '')); // clear the form
-                } catch (DBALException $e) {
-                    switch ($e->getPrevious()->getCode()) {
-//                         case 23000: // MySQL Duplicate Key
-//                             $this->flashMessenger()->addErrorMessage('This email is already registered!');
-//                             break;
-                        default:
-                            $this->flashMessenger()->addErrorMessage($e->getMessage());
-                            break;
-                    }
+                } else  {
+                    // Invalid data submitted so we get the form from the service
+                    $form = $this->getUserService()->getForm();
+                }
+            } catch (DBALException $e) {
+                if (strpos($e->getMessage(), 'Duplicate')) {
+                    $this->flashMessenger()->addErrorMessage('This email has already been registered!');
+                } else {
+                    $this->flashMessenger()->addErrorMessage($e->getMessage());
                 }
             }
         }
@@ -216,31 +213,13 @@ class UserController extends AbstractActionController
         $request = $this->getRequest();
         
         if ($request->isPost()) {
-            $data = $request->getPost();
+            // Authenticate with the submitted data
+            $authResult = $this->getUserService()->authenticate($request->getPost());
             
-            // Filter the login form
-            $filter = new LoginFilter();
-            $form->setInputFilter($filter->getInputFilter());
-            
-            // Populate form data
-            $form->setData($data);
-            
-            if ($form->isValid()) {
-                // Get back the validated data
-                $data = $form->getData();
-                
-                // Get the authentication service created by doctrine
-                $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
-                
-                // Get the doctrine adapter
-                $adapter = $authService->getAdapter();
-                $adapter->setIdentityValue($data['email']);
-                $adapter->setCredentialValue($data['password']);
-                $authResult = $authService->authenticate();
-                
+            if ($authResult instanceof \Zend\Authentication\Result) {
                 if ($authResult->isValid()) {
                     $this->flashMessenger()->addSuccessMessage('You have successfully logged in!');
-                    $this->redirect()->toRoute('user', array('action' => 'profile', 'id' => $authService->getIdentity()->user_id));
+                    $this->redirect()->toRoute('user', array('action' => 'profile', 'id' => $authResult->getIdentity()->user_id));
                 } else {
                     switch($authResult->getCode()) {
                         case Result::FAILURE_IDENTITY_NOT_FOUND:
@@ -254,6 +233,9 @@ class UserController extends AbstractActionController
                             break;
                     }
                 }
+            } else {
+                // Invalid data submitted so we get the form from the service
+                $form = $this->getUserService()->getForm();
             }
         }
         
@@ -265,8 +247,7 @@ class UserController extends AbstractActionController
     public function logoutAction()
     {
         if ($this->identity()) {
-            $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
-            $authService->clearIdentity();
+            $this->getUserService()->clearIdentity();
             $this->flashMessenger()->addSuccessMessage('You have been successfully logged out!');
         }
         

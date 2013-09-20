@@ -39,7 +39,6 @@ class RegisterControllerTest extends AbstractUserControllerTest
         $this->dispatch('/register');
         
         // This should has Register title
-        $this->assertQueryContentRegex("h3", "/Register/");
         $this->assertQueryContentRegex("title", '/Register/');
         
         // This should has a form
@@ -81,6 +80,19 @@ class RegisterControllerTest extends AbstractUserControllerTest
         $this->dispatch('/register', 'POST', $postData);
         // Should show invalid email message
         $this->assertQueryContentRegex("div.alert-danger", '/provide a valid email/');
+    }
+    
+    public function testRegisterWithDuplicatedEmail()
+    {
+        $postData = array(
+            'email' => self::EMAIL,
+            'password' => self::PASSWORD,
+            'passwordconfirmation' => self::PASSWORD,
+        );
+        
+        $this->dispatch('/register', 'POST', $postData);
+        // Should show invalid message
+        $this->assertQuery("div.alert-danger");
     }
     
     public function testRegisterWithUnmatchPassword()

@@ -62,6 +62,7 @@ return array(
     'view_helpers' => array(
         'invokables' => array(
             'formField' => 'User\View\Helper\FormField',
+            'alertBlock' => 'User\View\Helper\AlertBlock',
         ),
     ),
     'doctrine' => array(
@@ -97,6 +98,16 @@ return array(
             },
             'anonymous_user_navigation' => 'User\Navigation\Service\AnonymousUserNavigationFactory',
             'signedin_user_navigation' => 'User\Navigation\Service\SignedInUserNavigationFactory',
+        ),
+        'invokables' => array(
+            'User\Service\User' => 'User\Service\User',
+            'UserForm'          => 'User\Form\UserForm',
+            'User\Filter\LoginFilter'   => 'User\Filter\LoginFilter',
+            'User\Filter\ProfileFilter' => 'User\Filter\ProfileFilter',
+            'User\Filter\RegisterFilter'=> 'User\Filter\RegisterFilter',
+        ),
+        'shared' => array(
+            'UserForm' => false,
         ),
     ),
     'navigation' => array(
