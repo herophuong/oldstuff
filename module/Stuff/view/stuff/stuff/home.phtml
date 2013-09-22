@@ -5,11 +5,9 @@
         </div>
         <ul class="nav nav-tabs nav-stacked">
             <li class="active"><a href="#">All</a></li>
-            <li><a href="#">Books</a></li>
-            <li><a href="#">Clothes</a></li>
-            <li><a href="#">Electronics</a></li>
-            <li><a href="#">Jewelry</a></li>
-            <li><a href="#">Toys</a></li>
+            <?php foreach ($categories as $category) { ?>
+            <li><a href="#"><?php echo $category->cat_name; ?></a></li>
+            <?php } ?>
         </ul>
     </div>
     

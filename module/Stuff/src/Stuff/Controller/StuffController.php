@@ -195,6 +195,7 @@ class StuffController extends AbstractActionController {
     
     public function homeAction()
     {
+        // Get stuffs
         $repository = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff');
         $queryBuilder = $this->getEntityManager()->createQueryBuilder();
         $queryBuilder->select('s')
@@ -206,9 +207,10 @@ class StuffController extends AbstractActionController {
         if ($page) 
             $paginator->setCurrentPageNumber($page);
         
-        $stuffs = $repository->findBy(array(), array('stuff_id' => 'DESC'));
+        // Get categories
+        $categories = $this->getEntityManager()->getRepository('Category\Entity\Category')->findBy(array(), array('cat_name' => 'ASC'));
         return array(
-            'stuffs' => $stuffs,
+            'categories' => $categories,
             'paginator' => $paginator,
         );
     }
