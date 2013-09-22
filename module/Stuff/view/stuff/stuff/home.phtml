@@ -1,0 +1,20 @@
+<div class="row" id="gallery-container">
+    <div class="span3 item">
+        <div class="nav-headers">
+            <h4>Find some interesting stuffs or submit your own things. You will never know what you can find here!</h4>
+        </div>
+        <ul class="nav nav-tabs nav-stacked">
+            <li class="active"><a href="#">All</a></li>
+            <li><a href="#">Books</a></li>
+            <li><a href="#">Clothes</a></li>
+            <li><a href="#">Electronics</a></li>
+            <li><a href="#">Jewelry</a></li>
+            <li><a href="#">Toys</a></li>
+        </ul>
+    </div>
+    
+    <?php 
+        $this->partialLoop()->setObjectKey('object');
+        echo $this->partialLoop('partial/stuff.phtml', $paginator->getCurrentItems()); ?>
+</div>
+<?php $this->partial()->setObjectKey('object'); echo $this->partial('partial/pagination.phtml', $paginator); ?>

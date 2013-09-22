@@ -1,6 +1,6 @@
 <?php
 namespace Stuff\Controller;
-
+use Category\Entity\Category;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Doctrine\ORM\EntityManager;
@@ -8,7 +8,11 @@ use Stuff\Form\StuffForm;
 use Stuff\Entity\Stuff;
 use Zend\Mvc\Controller\Plugin\FlashMessenger;
 use Stuff\Filter\AddStuffFilter;
-use Category\Entity\Category;
+// Paginator
+use DoctrineORMModule\Paginator\Adapter\DoctrinePaginator as PaginatorAdapter;
+use Doctrine\ORM\Tools\Pagination\Paginator as ORMPaginator;
+use Zend\Paginator\Paginator;
+
 /**
  * 
  */
@@ -188,4 +192,24 @@ class StuffController extends AbstractActionController {
         
         return $return;
 	}
+    
+    public function homeAction()
+    {
+        $repository = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff');
+        $queryBuilder = $this->getEntityManager()->createQueryBuilder();
+        $queryBuilder->select('s')
+                     ->from('Stuff\Entity\Stuff', 's')
+                     ->orderBy('s.stuff_id', 'DESC');
+        $paginator = new Paginator(new PaginatorAdapter(new ORMPaginator($queryBuilder)));
+        $paginator->setItemCountPerPage(11);
+        $page = (int) $this->params()->fromQuery('page');
+        if ($page) 
+            $paginator->setCurrentPageNumber($page);
+        
+        $stuffs = $repository->findBy(array(), array('stuff_id' => 'DESC'));
+        return array(
+            'stuffs' => $stuffs,
+            'paginator' => $paginator,
+        );
+    }
 }
