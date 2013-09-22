@@ -30,6 +30,12 @@ return array(
 			'stuff'=> __DIR__.'/../view',
 		),
 	),
+	'view_helpers' => array(
+        'invokables' => array(
+            'formField' => 'User\View\Helper\FormField',
+            'alertBlock' => 'User\View\Helper\AlertBlock',
+        ),
+    ),
 	'doctrine' => array(
     	'driver' => array(
             __NAMESPACE__ . '_driver' => array(

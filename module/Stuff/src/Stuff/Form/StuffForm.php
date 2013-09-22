@@ -4,7 +4,7 @@ namespace Stuff\Form;
 use Zend\Form\Form;
 
 
-class AddStuffForm extends Form {
+class StuffForm extends Form {
 	
 	public function __construct($name = null) {
 		parent::__construct('stuff');

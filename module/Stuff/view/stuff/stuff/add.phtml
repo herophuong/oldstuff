@@ -1,47 +1,58 @@
 <?php $this->headTitle($this->translate('Add Stuff'), 'PREPEND'); ?>
-<div class="notification">
-    <?php foreach ($success_messages as $message) { ?>
-    <div class="alert alert-success"><?php echo $message; ?></div>
-    <?php } ?>
-    <?php foreach ($error_messages as $message) { ?>
-    <div class="alert alert-danger"><?php echo $message; ?></div>
-    <?php } ?>
-</div>
-<div class="row">
-    <div class="col-md-6 col-md-offset-3">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title text-center"><?php echo $this->translate('Add Stuff'); ?></h3>
-            </div>
-            <div class="panel-body">
-                <?php $form->setAttribute('action', ''); ?>
-                <?php $form->setAttribute('class', 'form-horizontal'); ?>
-                <?php echo $this->form()->openTag($form); ?>
-                <div class="form-group">
-                    <?php echo $this->formLabel($form->get('stuffname')); ?>
-                    <div class="col-lg-8">
-                        <?php echo $this->formText($form->get('stuffname')); ?>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <?php echo $this->formLabel($form->get('description')); ?>
-                    <div class="col-lg-8">
-                        <?php echo $this->formTextArea($form->get('description')); ?>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <?php echo $this->formLabel($form->get('price')); ?>
-                    <div class="col-lg-8">
-                        <?php echo $this->formText($form->get('price')); ?>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-lg-8 col-lg-offset-4">
-                        <?php echo $this->formSubmit($form->get('submit')); ?>
-                    </div>
-                </div>
-                <?php echo $this->form()->closeTag(); ?>
-            </div>
+<div class="account-container btm10">
+    <div class="form-content clearfix">
+        <h1><i class="iconbig-note-write"></i>&nbsp;<?php echo $this->translate('Add New Stuff'); ?></h1>
+        
+        <?php $messages = $this->flashMessenger()->getCurrentSuccessMessages();?>
+        <?php if (!empty($messages)) { 
+            echo $this->alertBlock(implode('<br />', $messages), 'alert-success'); 
+        } ?>
+        <?php $messages = $this->flashMessenger()->getCurrentErrorMessages();?>
+        <?php if (!empty($messages)) { 
+            echo $this->alertBlock(implode('<br />', $messages), 'alert-danger'); 
+        } ?>
+        <?php
+        // Remember to clear messages after displaying them
+        use Zend\Mvc\Controller\Plugin\FlashMessenger;
+        $this->flashMessenger()->clearCurrentMessagesFromNamespace(FlashMessenger::NAMESPACE_ERROR);
+        $this->flashMessenger()->clearCurrentMessagesFromNamespace(FlashMessenger::NAMESPACE_SUCCESS);
+        ?>
+        <?php $messages = $form->getMessages(); // Error messages ?>
+        <?php $form->setAttribute('action', ''); ?>
+        <?php $form->setAttribute('class', 'form-horizontal'); ?>
+        <?php echo $this->form()->openTag($form); ?>
+        
+        <div class="login-fields">
+            <?php 
+                echo $this->partial('partial/field.phtml', array(
+                    'form' => $form,
+                    'field' => 'stuffname',
+                    'inputAttributes' => array('placeholder' => 'Name', 'class' => 'login username-field')
+                )); 
+            ?>
+            
+            <!--<?php 
+                echo $this->partial('partial/field.phtml', array(
+                    'form' => $form,
+                    'field' => 'description',
+                    'inputAttributes' => array('placeholder' => 'Description', 'class' => 'login password-field')
+                )); 
+            ?>-->
+            <?php echo $this->formTextArea($form->get('description')->setAttributes(array('placeholder' => 'Description', 'class' => ''))); ?>       
+            
+            <?php 
+                echo $this->partial('partial/field.phtml', array(
+                    'form' => $form,
+                    'field' => 'price',
+                    'inputAttributes' => array('placeholder' => 'Price', 'class' => 'login password-field')
+                )); 
+            ?>
         </div>
+        <div class="login-actions">
+        <?php echo $this->formInput($form->get('submit')->setAttributes(array('value' => 'Add', 'class' => 'btn btn-primary pull-right btn-signin'))); ?>       
+        </div>
+
+        <?php echo $this->form()->closeTag(); ?>
+            
     </div>
 </div>

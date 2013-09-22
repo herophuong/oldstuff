@@ -40,13 +40,6 @@ class AddStuffFilter extends AbstractStuffFilter {
 	                    ),
 	                    'break_chain_on_failure' => true,
 	                ),
-					array(
-						'name' => 'string_length',
-						'options' => array(
-							'max' => 300,
-							'message' => 'Description should not longer than 300 characters',
-						),
-					),
 				)
 			);
 	}

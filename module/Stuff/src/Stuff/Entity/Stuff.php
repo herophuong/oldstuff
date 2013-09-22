@@ -4,14 +4,14 @@ namespace Stuff\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * A user
+ * Stuff
  *
  * @ORM\Entity
  * @ORM\Table(name="stuff")
  * @property int    $stuff_id
  * @property User	$user
  * @property string $stuff_name
- * @property string $category
+ * @property Category $category
  * @property float	$price
  * @property string $image
  * @property string $purpose
@@ -40,7 +40,8 @@ class Stuff
     protected $stuff_name;
     
     /**
-     * @ORM\Column(type="string")
+     * @ORM\ManyToOne(targetEntity="Category\Entity\Category")
+     * @ORM\JoinColumn(name="cat_id", referencedColumnName="cat_id")
      */
     protected $category;
     
@@ -50,12 +51,12 @@ class Stuff
     protected $price;
     
 	/**
-	 * @ORM\Column(type="string")
+	 * @ORM\Column(type="text")
 	 */
 	protected $description;
     
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="simple_array")
      */
      protected $image;
     

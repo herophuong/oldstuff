@@ -4,10 +4,11 @@ namespace Stuff\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Doctrine\ORM\EntityManager;
-use Stuff\Form\AddStuffForm;
+use Stuff\Form\StuffForm;
 use Stuff\Entity\Stuff;
 use Zend\Mvc\Controller\Plugin\FlashMessenger;
 use Stuff\Filter\AddStuffFilter;
+use Category\Entity\Category;
 /**
  * 
  */
@@ -37,7 +38,7 @@ class StuffController extends AbstractActionController {
 		if(!$user_id){
 			return $this->redirect()->toRoute('user',array('action' => 'register'));
 		}
-		$form = new AddStuffForm();
+		$form = new StuffForm();
 		$filter = new AddStuffFilter();
 		$form->setInputFilter($filter->getInputFilter());
 		$request = $this->getRequest();
@@ -47,17 +48,20 @@ class StuffController extends AbstractActionController {
 			
 			if($form->isValid()){
 				$formdata = $form->getData();
-				$stuff = new Stuff();
-				$data = $stuff->getArrayCopy();
+                $stuff = new Stuff();
+                $data = $stuff->getArrayCopy();
                 $user = $this->getEntityManager()->find('User\Entity\User',$user_id);
-				$data['stuff_name'] = $formdata['stuffname'];
-				$data['description'] = $formdata['description'];
-				$data['price'] = $formdata['price'];
-				$data['category']= 1;
-				$data['user'] = $user;
-				$data['state'] = 1;
-				
-				$stuff->populate($data);
+                $category = $this->getEntityManager()->find('Category\Entity\Category',1);
+                $data['stuff_name']    = $formdata['stuffname'];
+                //$data['purpose']       = $formdata['purpose'];
+                $data['description']   = $formdata['description'];
+                $data['price']         = $formdata['price'];
+                $data['category']      = $category;
+                //$data['desired_stuff'] = $formdata['desiredstuff'];
+                $data['user']          = $user;
+                $data['state']         = 1;
+                
+                $stuff->populate($data);
 				try{
 					$this->getEntityManager()->persist($stuff);
 					$this->getEntityManager()->flush();
@@ -65,33 +69,17 @@ class StuffController extends AbstractActionController {
 					//return $this->redirect()->toRoute('stuff',array('user_id' => $user_id,
 					//												'action' => 'index',
 					//));
+					$form = new StuffForm();
+					return array('form' => $form);
 				}
 				catch(DBALException $e){
-					switch ($e->getPrevious()->getCode()) {
-                        default:
-                            $this->flashMessenger()->addErrorMessage($e->getMessage());
-                        break;
-					}
+                    $this->flashMessenger()->addErrorMessage($e->getMessage());
 				}
-			}
-			else {
-				foreach ($form->getMessages() as $message_array) {
-                    foreach ($message_array as $message) {
-                        $this->flashMessenger()->addErrorMessage($message);
-                    }
-                }
-			}
-				
-		}$return = array(
+			}	
+		}
+		return array(
             'form' => $form,
-            'success_messages' => $this->flashMessenger()->getCurrentSuccessMessages(),
-            'error_messages' => $this->flashMessenger()->getCurrentErrorMessages(),
         );
-        
-        $this->flashMessenger()->clearCurrentMessagesFromNamespace(FlashMessenger::NAMESPACE_SUCCESS);
-        $this->flashMessenger()->clearCurrentMessagesFromNamespace(FlashMessenger::NAMESPACE_ERROR);
-        
-        return $return;
  	}
 	
 	public function deleteAction(){
