@@ -1,7 +1,9 @@
 $(document).ready(function () {
     
+    /* TOOLTIP */
     $("[rel=tooltip]").tooltip();
     
+    /* IMAGE POPUP */
     $("a.group").fancybox({
         'titleShow'     : false,
         openEffect : 'elastic',
@@ -11,6 +13,7 @@ $(document).ready(function () {
         closeClick : true,
     });
     
+    /* ISOTOPE */
     $container = $("#gallery-container");
     
     $container.isotope({
@@ -24,5 +27,13 @@ $(document).ready(function () {
             // update columnWidth to a percentage of container width
             masonry: { columnWidth: $container.width() / 4 }
         });
+    });
+    
+    /* FILTER BAR */
+    $("#category-select").on('change', function() {
+        $("#filter-category").val(jQuery(this).val());
+    });
+    $("#purpose-select > button").on('click', function() {
+        $("#filter-purpose").val(jQuery(this).data('value'));
     });
 });

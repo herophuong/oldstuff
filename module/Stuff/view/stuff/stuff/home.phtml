@@ -1,14 +1,32 @@
+<?php 
+    $this->headLink()->prependStylesheet($this->basePath() . '/css/bootstrap-select.css');
+    $this->headScript()->prependFile($this->basePath() . '/js/bootstrap-select.min.js')
+                       ->prependScript('jQuery(document).ready(function(){jQuery(".selectpicker").selectpicker()})');
+?>
+<div class="row">
+    <div class="filter-bar span12">
+        <form id="filter-form" method="POST">
+            <select class="selectpicker" id="category-select">
+                <option value=""><?php echo $this->translate('All Category'); ?></option>
+                 <?php foreach ($categories as $category) { ?>
+                <option value="<?php echo $category->cat_id; ?>"><?php echo $category->cat_name; ?></option>
+                <?php } ?>
+            </select>
+            <input type="hidden" id="filter-category" value="" />
+            <div class="btn-group" id="purpose-select" data-toggle="buttons-radio">
+                <button type="button" class="btn active" data-value=""><?php echo $this->translate('Any Purpose'); ?></button>
+                <button type="button" class="btn" data-value="sell"><?php echo $this->translate('For Sale'); ?></button>
+                <button type="button" class="btn" data-value="trade"><?php echo $this->translate('For Trade'); ?></button>
+            </div>
+            <input type="hidden" id="filter-purpose" value="" />
+        </form>
+    </div>
+</div>
 <div class="row" id="gallery-container">
-    <div class="span3 item">
+    <div class="span3 item gallery">
         <div class="nav-headers">
-            <h4>Find some interesting stuffs or submit your own things. You will never know what you can find here!</h4>
+            <blockquote><h4>Find some interesting stuffs or submit your own things. You will never know what you can find here!</h4></blockquote>
         </div>
-        <ul class="nav nav-tabs nav-stacked">
-            <li class="active"><a href="#">All</a></li>
-            <?php foreach ($categories as $category) { ?>
-            <li><a href="#"><?php echo $category->cat_name; ?></a></li>
-            <?php } ?>
-        </ul>
     </div>
     
     <?php 
