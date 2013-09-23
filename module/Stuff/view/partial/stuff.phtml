@@ -16,7 +16,7 @@
             <?php if ($this->object->purpose == 'sell') { ?>
             <li><i rel="tooltip" data-title="<?php echo $this->translate('Price'); ?>" class="icon-tags"></i> <span class="price"><?php echo $this->object->price; ?></span> VND</li>
             <?php } else if ($this->object->purpose == 'trade') { ?>
-            <li><i rel="tooltip" data-title="<?php echo $this->translate('Desired Stuff'); ?>" class="icon-refresh"></i> <?php echo $this->object->desired_stuff; ?></li>
+            <li><i rel="tooltip" data-title="<?php echo $this->translate('Desired Stuff'); ?>" class="icon-random"></i> <?php echo $this->object->desired_stuff; ?></li>
             <?php } ?>
             <li><i rel="tooltip" data-title="<?php echo $this->translate('Category'); ?>" class="icon-bookmark"></i> <a href="#"><?php echo $this->object->category->cat_name; ?></a></li>
             <li><i rel="tooltip" data-title="<?php echo $this->translate('Owner'); ?>" class="icon-user"></i>&nbsp;<a href="#"><?php echo ($this->object->user->display_name != "") ? $this->object->user->display_name : $this->object->user->email; ?></a></li>

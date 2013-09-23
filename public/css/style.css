@@ -316,6 +316,15 @@
 .filter-bar input, .filter-bar .btn {
     border-radius: 0px !important;
 }
+
+.filter-bar .btn {
+    background-color: #ffffff;
+    background-image: none;
+}
+.filter-bar .btn.active {
+    color: #333333;
+    background-color: #eeeeef;
+}
 /* .: TYPHOGRAPHY :. */
 
 hr.alt{
