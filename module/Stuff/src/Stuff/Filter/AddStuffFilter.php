@@ -2,7 +2,7 @@
 namespace Stuff\Filter;
 
 use Stuff\Filter\AbstractStuffFilter;
-
+use Zend\InputFilter\FileInput;
 
 class AddStuffFilter extends AbstractStuffFilter {
 	protected function getStuffNameFilter(){
@@ -81,9 +81,11 @@ class AddStuffFilter extends AbstractStuffFilter {
     }
     
     protected function getImageFilter(){
-        return array(
-            'name' => 'image',
-            'required' => 'true',
-        );
+        $fileinput = new FileInput("image");
+        $fileinput->setRequired("true");
+        $fileinput->getValidatorChain()->attachByName("filesize", array("max" => "2MB"))
+                                       ->attachByName("fileisimage")
+                                       ->attachByName("fileuploadfile");
+        return $fileinput;                                     
     }
 }
