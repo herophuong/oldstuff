@@ -2,7 +2,7 @@
 namespace Stuff\Filter;
 
 use Stuff\Filter\AbstractStuffFilter;
-
+use Zend\InputFilter\FileInput;
 
 class AddStuffFilter extends AbstractStuffFilter {
 	protected function getStuffNameFilter(){
@@ -65,4 +65,27 @@ class AddStuffFilter extends AbstractStuffFilter {
 				)
 			);
 	}
+
+    protected function getCategoryFilter(){
+        return array(
+            'name' => 'category',
+            'required' => 'true',
+        );
+    }
+
+    protected function getDesiredStuffFilter(){
+        return array(
+            'name' => 'desiredstuff',
+            'required' => 'true',
+        );
+    }
+    
+    protected function getImageFilter(){
+        $fileinput = new FileInput("image");
+        $fileinput->setRequired("true");
+        $fileinput->getValidatorChain()->attachByName("filesize", array("max" => "2MB"))
+                                       ->attachByName("fileisimage")
+                                       ->attachByName("fileuploadfile");
+        return $fileinput;                                     
+    }
 }
