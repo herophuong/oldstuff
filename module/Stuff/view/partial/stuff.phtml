@@ -7,7 +7,7 @@
         </ul>
     </div>
     <?php if ($this->object->image !== "") { ?>
-    <div class="image-gallery"><a class="group" rel="group1" href="<?php echo $this->basePath() . '/' . $this->object->image; ?>"><img src="<?php echo $this->basePath() . '/' . $this->object->image[0]; ?>"></a></div>
+    <div class="image-gallery"><a class="group" rel="group1" href="<?php echo $this->basePath() . '/' . $this->object->image[0]; ?>"><img src="<?php echo $this->basePath() . '/' . $this->object->image[0]; ?>"></a></div>
     <?php } else { ?>
     <div class="image-gallery"><img src="holder.js/225x210/gray/text:[<?php echo $this->translate("Old Stuff Trade System"); ?>]"></div>
     <?php } ?>
