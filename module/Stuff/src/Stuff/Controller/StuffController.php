@@ -65,8 +65,7 @@ class StuffController extends AbstractActionController {
                 $stuff = new Stuff();
                 $data = $stuff->getArrayCopy();
                 $data['stuff_name']    = $formdata['stuffname'];
-                //$data['purpose']       = $formdata['purpose'];
-                $data['purpose']       = 'sell';
+                $data['purpose']       = $formdata['purpose'];
                 $images[0]= substr($image['tmp_name'],8);
                 $data['image']         = $images;
                 $data['description']   = $formdata['description'];
@@ -183,12 +182,11 @@ class StuffController extends AbstractActionController {
                 }
                 $data = $stuff->getArrayCopy();
                 $data['stuff_name']    = $formdata['stuffname'];
-                //$data['purpose']       = $formdata['purpose'];
+                $data['purpose']       = $formdata['purpose'];
                 $data['description']   = $formdata['description'];
                 $data['price']         = $formdata['price'];
                 $category = $this->getEntityManager()->getRepository('Category\Entity\Category')->findOneBy(array('cat_name' => $formdata['category']));
                 $data['category']      = $category;
-                $data['purpose']       = 'sell';
                 $data['desired_stuff'] = $formdata['desiredstuff'];
                 $stuff->populate($data);
                 try{
