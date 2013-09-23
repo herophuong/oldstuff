@@ -2,6 +2,9 @@
     $this->headLink()->prependStylesheet($this->basePath() . '/css/bootstrap-select.css');
     $this->headScript()->prependFile($this->basePath() . '/js/bootstrap-select.min.js')
                        ->prependScript('jQuery(document).ready(function(){jQuery(".selectpicker").selectpicker()})');
+    $session = new Zend\Session\Container('stuff');
+    $filter_category = $session->offsetGet('filter.category');
+    $filter_purpose = $session->offsetGet('filter.purpose');
 ?>
 <div class="row">
     <div class="filter-bar span12">
@@ -9,16 +12,16 @@
             <select class="selectpicker" id="category-select">
                 <option value=""><?php echo $this->translate('All Category'); ?></option>
                  <?php foreach ($categories as $category) { ?>
-                <option value="<?php echo $category->cat_id; ?>"><?php echo $category->cat_name; ?></option>
+                <option value="<?php echo $category->cat_id; ?>"<?php echo ($category->cat_id == $filter_category) ? ' selected="selected"' : ''; ?>><?php echo $category->cat_name; ?></option>
                 <?php } ?>
             </select>
-            <input type="hidden" id="filter-category" value="" />
+            <input type="hidden" id="filter-category" name="filter_category" value="<?php echo (int) $filter_category; ?>" />
             <div class="btn-group" id="purpose-select" data-toggle="buttons-radio">
-                <button type="button" class="btn active" data-value=""><?php echo $this->translate('Any Purpose'); ?></button>
-                <button type="button" class="btn" data-value="sell"><?php echo $this->translate('For Sale'); ?></button>
-                <button type="button" class="btn" data-value="trade"><?php echo $this->translate('For Trade'); ?></button>
+                <button type="button" class="btn<?php echo empty($filter_purpose) ? ' active' : ''; ?>" data-value=""><?php echo $this->translate('Any Purpose'); ?></button>
+                <button type="button" class="btn<?php echo ($filter_purpose == 'sell') ? ' active' : ''; ?>" data-value="sell"><?php echo $this->translate('For Sale'); ?></button>
+                <button type="button" class="btn<?php echo ($filter_purpose == 'trade') ? ' active' : ''; ?>" data-value="trade"><?php echo $this->translate('For Trade'); ?></button>
             </div>
-            <input type="hidden" id="filter-purpose" value="" />
+            <input type="hidden" id="filter-purpose" name="filter_purpose" value="<?php echo (string) $filter_purpose; ?>" />
         </form>
     </div>
 </div>

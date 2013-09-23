@@ -8,10 +8,16 @@ use Stuff\Form\StuffForm;
 use Stuff\Entity\Stuff;
 use Zend\Mvc\Controller\Plugin\FlashMessenger;
 use Stuff\Filter\AddStuffFilter;
+
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Query\Parameter;
 // Paginator
 use DoctrineORMModule\Paginator\Adapter\DoctrinePaginator as PaginatorAdapter;
 use Doctrine\ORM\Tools\Pagination\Paginator as ORMPaginator;
 use Zend\Paginator\Paginator;
+
+// Container
+use Zend\Session\Container;
 
 /**
  * 
@@ -195,12 +201,47 @@ class StuffController extends AbstractActionController {
     
     public function homeAction()
     {
+        // Get request
+        $request = $this->getRequest()->getPost();
+        $filter_category = $request->get('filter_category');
+        $filter_purpose = $request->get('filter_purpose');
+        
+        // Store request into session
+        $session = new Container('stuff');
+        if ($filter_category !== null) {
+            $session->offsetSet('filter.category', $filter_category);
+        } else {
+            $filter_category = $session->offsetGet('filter.category');
+        }
+        if ($filter_purpose !== null) {
+            $session->offsetSet('filter.purpose', $filter_purpose);
+        } else {
+            $filter_purpose = $session->offsetGet('filter.purpose');
+        }
+
         // Get stuffs
         $repository = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff');
         $queryBuilder = $this->getEntityManager()->createQueryBuilder();
         $queryBuilder->select('s')
                      ->from('Stuff\Entity\Stuff', 's')
                      ->orderBy('s.stuff_id', 'DESC');
+        
+        // Build the filter expression
+        $and = $queryBuilder->expr()->andX();
+        $parameters = new ArrayCollection();
+        if ($filter_category) {
+            $and->add($queryBuilder->expr()->eq('s.category', ':cat_id'));
+            $parameters->add(new Parameter('cat_id', $filter_category, 'integer'));
+        }
+        if ($filter_purpose) {
+            $and->add($queryBuilder->expr()->eq('s.purpose', ':purpose'));
+            $parameters->add(new Parameter('purpose', $filter_purpose, 'string'));
+        }
+        $parts = $and->getParts();
+        if (!empty($parts))
+            $queryBuilder->where($and)->setParameters($parameters);
+        
+        // Create a paginator
         $paginator = new Paginator(new PaginatorAdapter(new ORMPaginator($queryBuilder)));
         $paginator->setItemCountPerPage(11);
         $page = (int) $this->params()->fromQuery('page');

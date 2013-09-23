@@ -32,8 +32,10 @@ $(document).ready(function () {
     /* FILTER BAR */
     $("#category-select").on('change', function() {
         $("#filter-category").val(jQuery(this).val());
+        $("#filter-form")[0].submit();
     });
     $("#purpose-select > button").on('click', function() {
         $("#filter-purpose").val(jQuery(this).data('value'));
+        $("#filter-form")[0].submit();
     });
 });
