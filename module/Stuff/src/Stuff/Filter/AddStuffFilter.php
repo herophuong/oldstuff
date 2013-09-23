@@ -65,4 +65,25 @@ class AddStuffFilter extends AbstractStuffFilter {
 				)
 			);
 	}
+
+    protected function getCategoryFilter(){
+        return array(
+            'name' => 'category',
+            'required' => 'true',
+        );
+    }
+
+    protected function getDesiredStuffFilter(){
+        return array(
+            'name' => 'desiredstuff',
+            'required' => 'true',
+        );
+    }
+    
+    protected function getImageFilter(){
+        return array(
+            'name' => 'image',
+            'required' => 'true',
+        );
+    }
 }
