@@ -28,12 +28,19 @@
 <div class="row" id="gallery-container">
     <div class="span3 item gallery">
         <div class="nav-headers">
-            <blockquote><h4>Find some interesting stuffs or submit your own things. You will never know what you can find here!</h4></blockquote>
+            <blockquote><h4><?php echo $this->translate('Find some interesting stuffs with amazing prices or submit your own things. You will never know what you can find here!'); ?></h4></blockquote>
+            <div class="clearfix"></div>
         </div>
     </div>
-    
+    <?php if ($paginator->getTotalItemCount()) { ?>
     <?php 
         $this->partialLoop()->setObjectKey('object');
         echo $this->partialLoop('partial/stuff.phtml', $paginator->getCurrentItems()); ?>
+    <?php } else { ?>
+    <div class="span9 item gallery text-center">
+        <h2 class="muted"><?php echo $this->translate('No items here'); ?></h2>
+        <h5><?php echo $this->translate('You can change your search criteria to get more items!'); ?></h5>
+    </div>
+    <?php } ?>
 </div>
 <?php $this->partial()->setObjectKey('object'); echo $this->partial('partial/pagination.phtml', $paginator); ?>
