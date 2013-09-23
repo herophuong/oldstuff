@@ -8,11 +8,12 @@
     $filter_search      = $session->offsetGet('filter.search');
 ?>
 <div class="row">
-    <div class="filter-bar span12">
+    <div class="filter-bar span12 text-center">
         <form id="filter-form" method="POST">
+            <div class="pull-left">
             <div class="input-append">
-                <input class="span2" type="text" name="filter_search" value="<?php echo $filter_search; ?>"/>
-                <button class="btn" type="submit"><?php echo $this->translate('Search'); ?></button>
+                <input class="span3" type="text" name="filter_search" value="<?php echo $filter_search; ?>"/>
+                <button class="btn" type="submit"><i class="icon-search"></i>&nbsp;<?php echo $this->translate('Search'); ?></button>
             </div>
             <select class="selectpicker" id="category-select">
                 <option value=""><?php echo $this->translate('All Category'); ?></option>
@@ -21,12 +22,15 @@
                 <?php } ?>
             </select>
             <input type="hidden" id="filter-category" name="filter_category" value="<?php echo (int) $filter_category; ?>" />
+            </div>
+            <div class="pull-right">
             <div class="btn-group" id="purpose-select" data-toggle="buttons-radio">
                 <button type="button" class="btn<?php echo empty($filter_purpose) ? ' active' : ''; ?>" data-value=""><?php echo $this->translate('Any Purpose'); ?></button>
-                <button type="button" class="btn<?php echo ($filter_purpose == 'sell') ? ' active' : ''; ?>" data-value="sell"><?php echo $this->translate('For Sale'); ?></button>
-                <button type="button" class="btn<?php echo ($filter_purpose == 'trade') ? ' active' : ''; ?>" data-value="trade"><?php echo $this->translate('For Trade'); ?></button>
+                <button type="button" class="btn<?php echo ($filter_purpose == 'sell') ? ' active' : ''; ?>" data-value="sell"><i class="icon-shopping-cart"></i>&nbsp;<?php echo $this->translate('For Sale'); ?></button>
+                <button type="button" class="btn<?php echo ($filter_purpose == 'trade') ? ' active' : ''; ?>" data-value="trade"><i class="icon-random"></i>&nbsp;<?php echo $this->translate('For Trade'); ?></button>
             </div>
             <input type="hidden" id="filter-purpose" name="filter_purpose" value="<?php echo (string) $filter_purpose; ?>" />
+            </div>
         </form>
     </div>
 </div>

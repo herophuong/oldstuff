@@ -39,6 +39,7 @@
 .bootstrap-select {
     /*width: 220px\9; IE8 and below*/
     width: 220px\0; /*IE9 and below*/
+    text-align: left;
 }
 
 .bootstrap-select > .btn {

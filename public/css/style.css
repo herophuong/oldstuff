@@ -312,6 +312,10 @@
 .filter-bar .input-append {
     margin-bottom: 0px;
 }
+
+.filter-bar input, .filter-bar .btn {
+    border-radius: 0px !important;
+}
 /* .: TYPHOGRAPHY :. */
 
 hr.alt{
