@@ -201,23 +201,10 @@ class StuffController extends AbstractActionController {
     
     public function homeAction()
     {
-        // Get request
-        $request = $this->getRequest()->getPost();
-        $filter_category = $request->get('filter_category');
-        $filter_purpose = $request->get('filter_purpose');
-        
-        // Store request into session
-        $session = new Container('stuff');
-        if ($filter_category !== null) {
-            $session->offsetSet('filter.category', $filter_category);
-        } else {
-            $filter_category = $session->offsetGet('filter.category');
-        }
-        if ($filter_purpose !== null) {
-            $session->offsetSet('filter.purpose', $filter_purpose);
-        } else {
-            $filter_purpose = $session->offsetGet('filter.purpose');
-        }
+        // Get filter request
+        $filter_category    = $this->_getStateFromPostRequest('filter.category', 'filter_category');
+        $filter_purpose     = $this->_getStateFromPostRequest('filter.purpose', 'filter_purpose');
+        $filter_search      = $this->_getStateFromPostRequest('filter.search', 'filter_search');
 
         // Get stuffs
         $repository = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff');
@@ -237,6 +224,10 @@ class StuffController extends AbstractActionController {
             $and->add($queryBuilder->expr()->eq('s.purpose', ':purpose'));
             $parameters->add(new Parameter('purpose', $filter_purpose, 'string'));
         }
+        if ($filter_search) {
+            $and->add($queryBuilder->expr()->like('s.stuff_name', ':search'));
+            $parameters->add(new Parameter('search', '%'.$filter_search.'%', 'string'));
+        }
         $parts = $and->getParts();
         if (!empty($parts))
             $queryBuilder->where($and)->setParameters($parameters);
@@ -254,5 +245,31 @@ class StuffController extends AbstractActionController {
             'categories' => $categories,
             'paginator' => $paginator,
         );
+    }
+    
+    /**
+     * Get a value from post request or session if request not available
+     * Auto save value into session when the value has been changed
+     *
+     * @param string $key       Key to get the value from session
+     * @param string $parameter The parameter name of the value to get from POST request
+     * @param mixed  $default   Default value if value is not available
+     *
+     * @return mixed|null
+     */
+    private function _getStateFromPostRequest($key, $parameter, $default = null)
+    {
+        $request = $this->getRequest()->getPost();
+        $value = $request->get($parameter, $default);
+        
+        // Exchange request value with session value
+        $session = new Container('stuff');
+        if ($value !== null) {
+            $session->offsetSet($key, $value);
+        } else {
+            $value = $session->offsetGet($key);
+        }
+        
+        return $value;
     }
 }

@@ -308,6 +308,10 @@
 .filter-bar form {
     margin: 0px;
 }
+
+.filter-bar .input-append {
+    margin-bottom: 0px;
+}
 /* .: TYPHOGRAPHY :. */
 
 hr.alt{

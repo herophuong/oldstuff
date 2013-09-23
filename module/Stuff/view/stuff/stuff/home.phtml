@@ -3,12 +3,17 @@
     $this->headScript()->prependFile($this->basePath() . '/js/bootstrap-select.min.js')
                        ->prependScript('jQuery(document).ready(function(){jQuery(".selectpicker").selectpicker()})');
     $session = new Zend\Session\Container('stuff');
-    $filter_category = $session->offsetGet('filter.category');
-    $filter_purpose = $session->offsetGet('filter.purpose');
+    $filter_category    = $session->offsetGet('filter.category');
+    $filter_purpose     = $session->offsetGet('filter.purpose');
+    $filter_search      = $session->offsetGet('filter.search');
 ?>
 <div class="row">
     <div class="filter-bar span12">
         <form id="filter-form" method="POST">
+            <div class="input-append">
+                <input class="span2" type="text" name="filter_search" value="<?php echo $filter_search; ?>"/>
+                <button class="btn" type="submit"><?php echo $this->translate('Search'); ?></button>
+            </div>
             <select class="selectpicker" id="category-select">
                 <option value=""><?php echo $this->translate('All Category'); ?></option>
                  <?php foreach ($categories as $category) { ?>
@@ -38,8 +43,8 @@
         echo $this->partialLoop('partial/stuff.phtml', $paginator->getCurrentItems()); ?>
     <?php } else { ?>
     <div class="span9 item gallery text-center">
-        <h2 class="muted"><?php echo $this->translate('No items here'); ?></h2>
-        <h5><?php echo $this->translate('You can change your search criteria to get more items!'); ?></h5>
+        <h2 class="muted"><?php echo $this->translate('No stuffs here'); ?></h2>
+        <h5><?php echo $this->translate('You can change your search criteria to get more stuffs!'); ?></h5>
     </div>
     <?php } ?>
 </div>
