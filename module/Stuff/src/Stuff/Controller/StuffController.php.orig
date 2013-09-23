@@ -8,8 +8,6 @@ use Stuff\Form\StuffForm;
 use Stuff\Entity\Stuff;
 use Zend\Mvc\Controller\Plugin\FlashMessenger;
 use Stuff\Filter\AddStuffFilter;
-use Zend\Session\Container;
-use Zend\Filter\File\Rename;
 // Paginator
 use DoctrineORMModule\Paginator\Adapter\DoctrinePaginator as PaginatorAdapter;
 use Doctrine\ORM\Tools\Pagination\Paginator as ORMPaginator;
