@@ -211,7 +211,6 @@ class UserController extends AbstractActionController
         $form = new UserForm();
         
         $request = $this->getRequest();
-        
         if ($request->isPost()) {
             // Authenticate with the submitted data
             $authResult = $this->getUserService()->authenticate($request->getPost());
@@ -219,7 +218,10 @@ class UserController extends AbstractActionController
             if ($authResult instanceof \Zend\Authentication\Result) {
                 if ($authResult->isValid()) {
                     $this->flashMessenger()->addSuccessMessage('You have successfully logged in!');
-                    $this->redirect()->toRoute('user', array('action' => 'profile', 'id' => $authResult->getIdentity()->user_id));
+                    if ($redirectUrl = $request->getQuery('redirect'))
+                        $this->redirect()->toUrl($redirectUrl);
+                    else
+                        $this->redirect()->toRoute('user', array('action' => 'profile', 'id' => $authResult->getIdentity()->user_id));
                 } else {
                     switch($authResult->getCode()) {
                         case Result::FAILURE_IDENTITY_NOT_FOUND:
