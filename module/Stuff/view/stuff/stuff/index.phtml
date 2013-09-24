@@ -41,18 +41,11 @@ $filter_tab = $session->offsetGet('filter.'.$user->user_id.'.tab');
     </div>
 </div>
 
-<div class="row" style="margin: 0 auto;">
+<div class="row">
+    <div class="gallery span8 offset2 user-stuff-list">
     <?php 
         $this->partialLoop()->setObjectKey('object');
         echo $this->partialLoop('partial/indexstuff.phtml', $paginator->getCurrentItems()); ?>
-       <div style="clear:both"></div>
-
-<?php $this->partial()->setObjectKey('object'); echo $this->partial('partial/pagination.phtml', $paginator); ?>
-        
+    </div>
 </div>
-
-<script type="text/javascript" language="javascript">
-    if ((document.URL).indexOf("inventory") !== -1) $("#inventory").addClass("active");
-    if ((document.URL).indexOf("done") !== -1) $("#done").addClass("active");
-    if ((document.URL).indexOf("request") !== -1) $("#request").addClass("active");
-</script>
+<?php $this->partial()->setObjectKey('object'); echo $this->partial('partial/pagination.phtml', $paginator); ?>  

@@ -318,17 +318,21 @@
     margin-bottom: 0px;
 }
 
-.filter-bar input, .filter-bar .btn {
+/* FLAT BUTTON */
+input, .btn {
     border-radius: 0px !important;
 }
 
-.filter-bar .btn {
+.btn {
     background-color: #ffffff;
     background-image: none;
 }
-.filter-bar .btn.active {
+.btn.active {
     color: #333333;
     background-color: #eeeeef;
+}
+.btn.btn-primary {
+    background-color: #006dcc;
 }
 /* .: TYPHOGRAPHY :. */
 
@@ -1051,4 +1055,29 @@ span.login-checkbox > input[type='checkbox']:checked + label {
 }
 .form-link .btn-link {
     padding: 0px;
+}
+
+/* USER STUFF LIST */
+
+.stuff-item {
+    border-bottom: 1px dashed #ccc;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+}
+.stuff-item:last-child {
+    border-bottom: none;
+}
+.stuff-buttons {
+    padding: 10px 10px 0px 0px;
+}
+.stuff-buttons .btn {
+    margin: 5px;
+    margin-left: 0px !important;
+}
+
+@media (max-width: 767px) {
+.stuff-item {
+    padding: 20px;
+    box-sizing: border-box;
+}
 }
