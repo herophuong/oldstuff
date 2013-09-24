@@ -1,11 +1,18 @@
+<?php $authorized = ($this->identity() == $this->object->user); ?>
 <div class="row item gallery" style="width:700px;margin: 0 auto;" >
    
         <div class="tags-gallery" style="padding-left:125px;float:left;width:450px;">
-            <h4><?php echo $this->object->stuff_name; ?>
-            <?php if ($this->object->state == 1) echo '(Published)' ; ?></h4>         
+            <h4>
+                <?php echo $this->object->stuff_name; ?>
+            <?php if ($this->object->state == 1) { ?>
+            <label class="label label-success"><?php echo $this->translate('published'); ?></label>
+            <?php } else if ($this->object->state == 0) { ?>
+            <label class="label label-inverse"><?php echo $this->translate('unpublished'); ?></label>
+            <?php } ?>
+            </h4>
             <hr class="alt">
         </div>
-    
+    <?php if ($authorized) { ?>
     <div class="span1" style="float:right;padding-top:15px;padding-right:15px;">
         <a href="<?php echo $this->url('stuff', array( 'action' => 'edit', 
                                                         'user_id' => $this->object->user->user_id, 
@@ -19,6 +26,7 @@
             <?php echo $this->translate('Delete'); ?>
         </a>
     </div>
+    <?php } ?>
     <div style="clear:both"></div>
     <?php if ($this->object->image !== "") { ?>
     <div class="image-gallery" style="height:80px;width:80px;float:left;padding: 0 20px 0 20px;display:block;margin-top: -55px;">

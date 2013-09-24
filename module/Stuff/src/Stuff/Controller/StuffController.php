@@ -48,51 +48,56 @@ class StuffController extends AbstractActionController {
 		$this->em = $em;
 	}
 	
-	public function indexAction(){
+	public function indexAction()
+    {                 
+        $user_id = (int) $this->params()->fromroute('user_id', 0);
+        if (!$user_id) {
+            // Redirect on invalid request
+            $this->redirect()->toRoute('home');
+        }
         
-        $container = new Container('user');      
-              
-        $user_id_param = (int) $this->params()->fromroute('user_id',0);        
-		$tab_param = $this->getRequest()->getQuery()->tab;        
-        if ($tab_param)
-            $container->offsetSet('tab',$tab_param);
+        $filter_tab = $this->_getStateFromPostRequest('filter.'.$user_id.'.tab', 'filter_tab', 'inventory', 'userstuff');
                 
-//         if (!($user = $this->identity()) || ($user->__get('user_id') != $user_id_param) || (!$user_id_param))
-//             return $this->redirect()->toRoute('user',array('action' => 'login'));
-        $user = $this->getEntityManager()->getRepository('User\Entity\User')->findOneBy(array('user_id' => $user_id_param));       
+        $user = $this->getEntityManager()->getRepository('User\Entity\User')->findOneBy(array('user_id' => $user_id));       
         $repository = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff');
         $queryBuilder = $this->getEntityManager()->createQueryBuilder();
+        $queryBuilder->select('s');
+        $queryBuilder->from('Stuff\Entity\Stuff', 's');
         
-        if ($container->tab == "inventory" || $container->tab == "")
-        {
-            $queryBuilder->select('s')
-                         ->from('Stuff\Entity\Stuff', 's')
-                         ->where('s.user = '.$user_id_param.' and s.state != -1')
-                         ->orderBy('s.stuff_id', 'DESC');
-           
-        }
-        else if ($container->tab == "done")
-        {
-            $queryBuilder->select('s')
-                         ->from('Stuff\Entity\Stuff', 's')
-                         ->where('s.user = '.$user_id_param.' and s.state = 2')
-                         ->orderBy('s.stuff_id', 'DESC'); 
-        }      
-        else if ($container->tab == "request")
-        {            
-            
+        switch ($filter_tab) {
+            case 'inventory':
+                $queryBuilder->where('s.user = :user_id and s.state != :state')
+                             ->orderBy('s.stuff_id', 'DESC')
+                             ->setParameters(new ArrayCollection(array(
+                                new Parameter('user_id', $user_id, 'integer'),
+                                new Parameter('state', -1),
+                             )));
+                break;
+            case 'done':
+                $queryBuilder->where('s.user = :user_id and s.state = :state')
+                             ->orderBy('s.stuff_id', 'DESC')
+                             ->setParameters(new ArrayCollection(array(
+                                new Parameter('user_id', $user_id, 'integer'),
+                                new Parameter('state', 2),
+                             )));
+                break;
+            case 'request':
+                // TODO Implement get request from this user here
+            default:
+                // Prevent error by select nothing in query builder
+                $queryBuilder->where('s.stuff_id = 0');
+                break;
         }
         
-            $paginator = new Paginator(new PaginatorAdapter(new ORMPaginator($queryBuilder)));
-            $paginator->setItemCountPerPage(10);
-            $page = (int) $this->params()->fromQuery('page');
-            if ($page) 
-                $paginator->setCurrentPageNumber($page);
-            return array(
-                'user' => $user,       
-                'paginator' => $paginator,
-                'tab'=> '&'.$container->tab,
-            );
+        $paginator = new Paginator(new PaginatorAdapter(new ORMPaginator($queryBuilder)));
+        $paginator->setItemCountPerPage(10);
+        $page = (int) $this->params()->fromQuery('page');
+        if ($page) 
+            $paginator->setCurrentPageNumber($page);
+        return array(
+            'user' => $user,       
+            'paginator' => $paginator,
+        );
 	}
 	
 	public function addAction(){
@@ -337,18 +342,22 @@ class StuffController extends AbstractActionController {
      * @param string $key       Key to get the value from session
      * @param string $parameter The parameter name of the value to get from POST request
      * @param mixed  $default   Default value if value is not available
+     * @param string $namespace The namespace to initialize the session container
      *
      * @return mixed|null
      */
-    private function _getStateFromPostRequest($key, $parameter, $default = null)
+    private function _getStateFromPostRequest($key, $parameter, $default = null, $namespace = 'stuff')
     {
         $request = $this->getRequest()->getPost();
-        $value = $request->get($parameter, $default);
+        $value = $request->get($parameter, null);
         
         // Exchange request value with session value
-        $session = new Container('stuff');
+        $session = new Container($namespace);
         if ($value !== null) {
             $session->offsetSet($key, $value);
+        } else if ($session->offsetGet($key) === null) {
+            $session->offsetSet($key, $default);
+            $value = $default;
         } else {
             $value = $session->offsetGet($key);
         }

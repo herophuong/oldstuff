@@ -38,4 +38,8 @@ $(document).ready(function () {
         $("#filter-purpose").val(jQuery(this).data('value'));
         $("#filter-form")[0].submit();
     });
+    $("#tab-select > button").on('click', function() {
+        $("#filter-tab").val(jQuery(this).data('value'));
+        $("#filter-form")[0].submit();
+    });
 });
