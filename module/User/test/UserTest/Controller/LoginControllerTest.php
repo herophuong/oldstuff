@@ -2,6 +2,7 @@
 namespace UserTest\Controller;
 
 use UserTest\Controller\AbstractUserControllerTest;
+use Zend\View\Helper\Url as UrlHelper;
 
 class LoginControllerTest extends AbstractUserControllerTest
 {    
@@ -74,6 +75,17 @@ class LoginControllerTest extends AbstractUserControllerTest
         
         $this->dispatch('/login');
         $this->assertRedirect();
+    }
+    
+    public function testLoginRedirectionWithParameter()
+    {
+        $data['email'] = self::EMAIL;
+        $data['password'] = self::PASSWORD;
+        $this->dispatch('/login?redirect=/', 'POST', $data);
+        
+        $this->assertRedirect();
+        // TODO Test this
+//         $this->assertMatchedRouteName('home');
     }
 }
     
