@@ -29,6 +29,8 @@ abstract class AbstractStuffFilter implements InputFilterAwareInterface {
                 $this->inputFilter->add($this->getCategoryFilter());
             if ($this->getDesiredStuffFilter())
                 $this->inputFilter->add($this->getDesiredStuffFilter());
+            if ($this->getPurposeFilter())
+                $this->inputFilter->add($this->getPurposeFilter());
             if ($this->getImageFilter())
                 $this->inputFilter->add($this->getImageFilter());
         }

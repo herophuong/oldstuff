@@ -83,15 +83,15 @@ class StuffForm extends Form {
                 'class' => 'form-control',
             ),
         ));
-        /*
+        
         $this->add(array(
             'name' => 'purpose',
             'type' => 'Radio',
             'options' => array(
                 'label' => 'Purpose',
                 'value_options' => array(
-                    '0' => 'sell',
-                    '1' => 'trade',
+                    'sell' => 'Sell',
+                    'trade' => 'Trade',
                 ),
             ),
             'attributes' => array(
@@ -99,7 +99,7 @@ class StuffForm extends Form {
                 'class' => 'form-control',
             ),
         ));
-        */
+        
         $this->add(array(
             'name' => 'image',
             'type' => 'File',

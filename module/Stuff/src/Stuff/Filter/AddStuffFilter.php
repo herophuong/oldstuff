@@ -80,6 +80,13 @@ class AddStuffFilter extends AbstractStuffFilter {
         );
     }
     
+    protected function getPurposeFilter(){
+        return array(
+            'name' => 'purpose',
+            'required' => 'true',
+        );
+    }
+    
     protected function getImageFilter(){
         $fileinput = new FileInput("image");
         $fileinput->setRequired("true");
