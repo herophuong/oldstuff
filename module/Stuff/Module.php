@@ -81,6 +81,45 @@ class Module{
                     Container::setDefaultManager($sessionManager);
                     return $sessionManager;
                 },
+                'Stuff\Navigation\Head' => function($sm) {
+                    $authService = $sm->get('Zend\Authentication\AuthenticationService');
+                    $container = new \Zend\Navigation\Navigation();
+                    \Zend\Navigation\Page\Mvc::setDefaultRouter($sm->get('router'));
+                    if ($user = $authService->getIdentity()) {
+                        $container->addPages(array(
+                            array(
+                                'label' => 'My Stuff',
+                                'route' => 'stuff',
+                                'params' => array(
+                                    'user_id' => $user->user_id,
+                                ),
+                                'icon' => 'briefcase',
+                            ),
+                            array(
+                                'label' => 'Log out',
+                                'route' => 'logout',
+                                'icon' => 'share',
+                            ),
+                        ));
+                    } else {
+                        $container->addPages(array(
+                            array(
+                                'label' => 'Log in',
+                                'route' => 'login',
+                                'params' => array(
+                                    'redirect' => '/',
+                                ),
+                                'icon' => 'lock',
+                            ),
+                            array(
+                                'label' => 'Sign up',
+                                'route' => 'register',
+                                'icon' => 'user',
+                            ),
+                        ));
+                    }
+                    return $container;
+                }
             ),
         );
     }

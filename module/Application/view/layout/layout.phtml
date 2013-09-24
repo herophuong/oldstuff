@@ -44,13 +44,7 @@
                 <div class="nav-collapse">
                     <?php echo $this->navigation()->menu('navigation')->setUlClass('nav'); ?>
                     
-                    <?php 
-                    if ($user = $this->identity()) { 
-                        echo $this->navigation()->menu('signedin_user_navigation')->setUlClass('nav pull-right');
-                    } else {
-                        echo $this->navigation()->menu('anonymous_user_navigation')->setUlClass('nav pull-right');
-                    } 
-                    ?>
+                    <?php echo $this->navigation()->menu('Stuff\Navigation\Head')->setUlClass('nav pull-right'); ?>
                 </div><!--/.nav-collapse -->
                 </div>
             </div>
