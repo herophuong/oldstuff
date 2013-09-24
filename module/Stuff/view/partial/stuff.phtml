@@ -14,11 +14,16 @@
     <div class="count-gallery">
         <ul>
             <?php if ($this->object->purpose == 'sell') { ?>
-            <li><i rel="tooltip" data-title="<?php echo $this->translate('Price'); ?>" class="icon-tags"></i> <span class="price"><?php echo $this->object->price; ?></span> VND</li>
+            <li><i rel="tooltip" data-title="<?php echo $this->translate('Price'); ?>" class="icon-tags"></i> <span class="price"><h4><?php echo $this->object->price; ?></h4></span> VND</li>
             <?php } else if ($this->object->purpose == 'trade') { ?>
-            <li><i rel="tooltip" data-title="<?php echo $this->translate('Desired Stuff'); ?>" class="icon-random"></i> <?php echo $this->object->desired_stuff; ?></li>
+            <li><i rel="tooltip" data-title="<?php echo $this->translate('Desired Stuff'); ?>" class="icon-random"></i> <h4><?php echo $this->object->desired_stuff; ?></h4></li>
             <?php } ?>
-            <li><i rel="tooltip" data-title="<?php echo $this->translate('Category'); ?>" class="icon-bookmark"></i> <a href="#"><?php echo $this->object->category->cat_name; ?></a></li>
+            <li><i rel="tooltip" data-title="<?php echo $this->translate('Category'); ?>" class="icon-bookmark"></i>
+                <form method="POST" class="form-link">
+                    <button class="btn btn-link" type="submit"><?php echo $this->object->category->cat_name; ?></button>
+                    <input type="hidden" name="filter_category" value="<?php echo $this->object->category->cat_id; ?>   " />
+                </form>
+            </li>
             <li><i rel="tooltip" data-title="<?php echo $this->translate('Owner'); ?>" class="icon-user"></i>&nbsp;<a href="#"><?php echo ($this->object->user->display_name != "") ? $this->object->user->display_name : $this->object->user->email; ?></a></li>
         </ul>
     </div>

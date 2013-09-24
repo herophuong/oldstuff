@@ -242,6 +242,11 @@
     margin-right: 20px;
 }
 
+.count-gallery h4 {
+    font-weight: normal;
+    display: inline;
+}
+
 .tags-gallery{
     margin: 5px auto;
     padding-left: 20px;
@@ -1036,4 +1041,13 @@ span.login-checkbox > input[type='checkbox']:checked + label {
 
 .img-thumbnail{
     margin-right:10px;
+}
+
+/* FORM */
+.form-link {
+    margin: 0px;
+    display: inline;
+}
+.form-link .btn-link {
+    padding: 0px;
 }
