@@ -24,7 +24,7 @@
                     <input type="hidden" name="filter_category" value="<?php echo $this->object->category->cat_id; ?>   " />
                 </form>
             </li>
-            <li><i rel="tooltip" data-title="<?php echo $this->translate('Owner'); ?>" class="icon-user"></i>&nbsp;<a href="#"><?php echo ($this->object->user->display_name != "") ? $this->object->user->display_name : $this->object->user->email; ?></a></li>
+            <li><i rel="tooltip" data-title="<?php echo $this->translate('Owner'); ?>" class="icon-user"></i>&nbsp;<a href="<?php echo $this->url('stuff', array('user_id' => $this->object->user->user_id)); ?>"><?php echo ($this->object->user->display_name != "") ? $this->object->user->display_name : $this->object->user->email; ?></a></li>
         </ul>
     </div>
     <div class="tags-gallery">

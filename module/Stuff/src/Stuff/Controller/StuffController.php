@@ -57,9 +57,9 @@ class StuffController extends AbstractActionController {
         if ($tab_param)
             $container->offsetSet('tab',$tab_param);
                 
-        if (!($user = $this->identity()) || ($user->__get('user_id') != $user_id_param) || (!$user_id_param))
-            return $this->redirect()->toRoute('user',array('action' => 'login'));
-               
+//         if (!($user = $this->identity()) || ($user->__get('user_id') != $user_id_param) || (!$user_id_param))
+//             return $this->redirect()->toRoute('user',array('action' => 'login'));
+        $user = $this->getEntityManager()->getRepository('User\Entity\User')->findOneBy(array('user_id' => $user_id_param));       
         $repository = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff');
         $queryBuilder = $this->getEntityManager()->createQueryBuilder();
         
