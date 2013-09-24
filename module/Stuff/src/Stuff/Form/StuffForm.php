@@ -55,8 +55,8 @@ class StuffForm extends Form {
 		));
 		
 		$this->add(array(
-			'name' => 'catname',
-			'type' => 'Text',
+			'name' => 'category',
+			'type' => 'Select',
 			'option' => array(
 				'label' => 'Category',
 				'label_attributes' => array(
@@ -64,19 +64,62 @@ class StuffForm extends Form {
 				),
 			),
 			'attributes' => array(
-				'id' => 'inputcatname',
+				'id' => 'inputcategory',
 				'class' => 'form-control',
 			),
 		));
 		
+        $this->add(array(
+            'name' => 'desiredstuff',
+            'type' => 'Text',
+            'options' => array(
+                'label' => 'Desired Stuff',
+                'label_attributes' => array(
+                    'class' => 'control-label col-lg-4',
+                ),
+            ),
+            'attributes' => array(
+                'id' => 'inputdesiredstuff',
+                'class' => 'form-control',
+            ),
+        ));
+        
+        $this->add(array(
+            'name' => 'purpose',
+            'type' => 'Radio',
+            'options' => array(
+                'label' => 'Purpose',
+                'value_options' => array(
+                    'sell' => 'Sell',
+                    'trade' => 'Trade',
+                ),
+            ),
+            'attributes' => array(
+                'id' => 'inputpurpose',
+                'class' => 'form-control',
+            ),
+        ));
+        
+        $this->add(array(
+            'name' => 'image',
+            'type' => 'File',
+            'options' => array(
+                'label' => 'Image',
+            ),
+            'attributes' => array(
+                'id' => 'inputimage',
+                'class' => 'form-control',
+            ),
+        ));
+        
 		$this->add(array(
 			'name' => 'submit',
 			'type' => 'Submit',
 			'attributes' => array(
 				'id' => 'submit',
-				'value' => 'Add',
 				'class' => 'btn btn-primary',
 			),
 		));
+        
 	}
 }
