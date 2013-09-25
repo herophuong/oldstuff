@@ -315,9 +315,12 @@ class StuffController extends AbstractActionController {
             $and->add($queryBuilder->expr()->like('s.stuff_name', ':search'));
             $parameters->add(new Parameter('search', '%'.$filter_search.'%', 'string'));
         }
-        $parts = $and->getParts();
-        if (!empty($parts))
-            $queryBuilder->where($and)->setParameters($parameters);
+        
+        // Only show published stuffs
+        $and->add($queryBuilder->expr()->like('s.state', ':state'));
+        $parameters->add(new Parameter('state', 1, 'integer'));
+        
+        $queryBuilder->where($and)->setParameters($parameters);
         
         // Create a paginator
         $paginator = new Paginator(new PaginatorAdapter(new ORMPaginator($queryBuilder)));
