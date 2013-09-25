@@ -53,6 +53,18 @@ $this->flashMessenger()->clearCurrentMessagesFromNamespace(FlashMessenger::NAMES
             'field' => 'purpose', 
             'inputViewHelper' => 'formRadio')
     );
+    echo $this->partial('partial/field.phtml', 
+        array(
+            'form' => $form, 
+            'field' => 'price', 
+            'inputViewHelper' => 'formInput')
+    );
+    echo $this->partial('partial/field.phtml', 
+        array(
+            'form' => $form, 
+            'field' => 'desiredstuff', 
+            'inputViewHelper' => 'formInput')
+    );
     echo $this->formInput($form->get('submit')->setAttributes(array('value' => 'Add', 'class' => 'btn btn-primary pull-right')));
     echo $this->form()->closeTag(); 
 ?>
