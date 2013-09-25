@@ -102,12 +102,14 @@ class Module{
                             ),
                         ));
                     } else {
+                        $uri = $sm->get('request')->getRequestUri(); // Get current url
+                        $uri = preg_replace('/\?.*/', '', $uri); // Remove the query part
                         $container->addPages(array(
                             array(
                                 'label' => 'Log in',
                                 'route' => 'login',
-                                'params' => array(
-                                    'redirect' => '/',
+                                'query' => array(
+                                    'redirect' => $uri,
                                 ),
                                 'icon' => 'lock',
                             ),
