@@ -1,0 +1,26 @@
+<?php $this->headTitle($this->translate('Vote This User'), 'PREPEND'); ?>
+<h1><i class="iconbig-note-write"></i>&nbsp;<?php echo $this->translate('Vote This User'); ?></h1>
+
+<?php $messages = $this->flashMessenger()->getCurrentSuccessMessages();?>
+<?php if (!empty($messages)) { 
+    echo $this->alertBlock(implode('<br />', $messages), 'alert-success'); 
+} ?>
+<?php $messages = $this->flashMessenger()->getCurrentErrorMessages();?>
+<?php if (!empty($messages)) { 
+    echo $this->alertBlock(implode('<br />', $messages), 'alert-danger'); 
+} ?>
+<?php
+// Remember to clear messages after displaying them
+use Zend\Mvc\Controller\Plugin\FlashMessenger;
+$this->flashMessenger()->clearCurrentMessagesFromNamespace(FlashMessenger::NAMESPACE_ERROR);
+$this->flashMessenger()->clearCurrentMessagesFromNamespace(FlashMessenger::NAMESPACE_SUCCESS);
+?>
+<?php $messages = $form->getMessages(); // Error messages ?>
+<?php $form->setAttribute('action', ''); ?>
+<?php $form->setAttribute('class', 'form-horizontal'); ?>
+<?php $form->setAttribute('enctype', 'multipart/form-data'); ?>
+<?php echo $this->form()->openTag($form); ?>
+<?php echo $this->formInput($form->get('rate_box')->setAttributes(array('placeholder' => "Enter your vote here", 'class' => 'form-control'))); ?>
+<?php echo $this->formInput($form->get('submit')->setAttributes(array('value' => 'Vote', 'class' => 'btn btn-primary'))); ?>       
+<?php echo $this->form()->closeTag(); ?>
+  

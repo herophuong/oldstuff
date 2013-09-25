@@ -1,0 +1,100 @@
+<?php
+namespace Vote\Controller;
+
+use Zend\Mvc\Controller\AbstractActionController;
+use Zend\View\Model\ViewModel;
+
+use Doctrine\ORM\EntityManager;
+
+use Vote\Entity\Vote;
+use Vote\Form\VoteForm;
+
+
+class VoteController extends AbstractActionController
+{
+    /**
+     * @var Doctrine\ORM\EntityManager
+     */
+    protected $em;    
+    
+    public function getEntityManager(){
+        if (null === $this->em) {
+            $this->em = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
+        }
+        return $this->em;
+    }
+    
+    public function setEntityManager(EntityManager $em){
+        $this->em = $em;
+    }
+    
+    public function indexAction()
+    {
+    }
+
+    public function voteAction()
+    {
+        //Authenticate user
+		$user_id = (int) $this->params()->fromroute('user_id',0);
+        $user = $this->identity();
+		if($user->user_id != $user_id){
+			return $this->redirect()->toRoute('user',array('action' => 'login'));
+		}
+        
+        $voted_user_id = (int) $this->params()->fromroute('voted_user_id',0);
+        $vote = $this->getEntityManager()->find('Vote\Entity\Vote', $voted_user_id);
+        if ($vote == null)
+        {
+            echo "Shit happened";
+        }
+
+        $form = new VoteForm();
+
+        $request = $this->getRequest();
+        if ($request->isPost())
+        {
+            $form->setData($request->getPost());
+            if ($form->isValid())
+            {
+                $formdata = $form->getData();
+                $vote = new Vote();
+                $data = $vote->getArrayCopy();
+                $data['user_id'] = $user_id;
+                $data['voted_user_id'] = $voted_user_id;
+                $data['ratescore'] = $formdata['rate_box'];
+
+                $vote->populate($data);
+                try
+                {
+                    $this->getEntityManager()->persist($vote);
+                    $this->getEntityManager()->flush();
+                }
+                catch(DBALException $e){
+                            
+                }
+            }
+        }
+        if ($vote == null)
+        {
+            echo "Shit happened again";
+        }
+        // if ($vote->user_id == $user_id && $vote->voted_user_id == $voted_user_id)
+        // {
+        //     $data = $vote->getArrayCopy();
+        //     $data['ratescore'] = 3;
+        // }
+        // else
+        // {
+            // $vote = new Vote();
+            // $data = $vote->getArrayCopy();
+            // $data['user_id'] = $user_id;
+            // $data['voted_user_id'] = $voted_user_id;
+            // $data['ratescore'] = 4;
+        // }
+        
+
+        return array(
+            'form' => $form,
+        );
+    }
+}
