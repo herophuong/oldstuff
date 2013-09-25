@@ -138,6 +138,9 @@
     height:22px;
 }
 
+.navbar [class^="icon-"]{
+    margin-top: 2px;
+}
 /* .: SIDEBAR MENU :. */
 
 .nav-tabs.nav-stacked > li > a {

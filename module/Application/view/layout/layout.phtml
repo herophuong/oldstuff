@@ -42,9 +42,9 @@
                 </a>
                 <a class="brand" href="<?php echo $this->url('home') ?>"><img title="<?php echo $this->translate('Old Stuff Trade System') ?>" src="<?php echo $this->basePath() .'/img/os-logo.png'; ?>" alt="<?php echo $this->translate('Old Stuff Trade System') ?>" /></a>
                 <div class="nav-collapse">
-                    <?php echo $this->navigation()->menu('navigation')->setUlClass('nav'); ?>
+                    <?php echo $this->navigation()->menu()->renderPartial('navigation', 'partial/menu-left.phtml'); ?>
                     
-                    <?php echo $this->navigation()->menu('Stuff\Navigation\Head')->setUlClass('nav pull-right'); ?>
+                    <?php echo $this->navigation()->menu()->renderPartial('Stuff\Navigation\Head', 'partial/menu-right.phtml'); ?>
                 </div><!--/.nav-collapse -->
                 </div>
             </div>
