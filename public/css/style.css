@@ -863,6 +863,14 @@ span.login-checkbox > input[type='checkbox']:checked + label {
     box-sizing: border-box;
 }
 
+.content-block h1 {
+    margin-bottom: 50px;
+}
+
+.content-block .alert {
+    margin-top: 10px;
+}
+
 .btn-signin {display: inline-block; float: right; margin-top: 18px; margin-right:10px;}
 
 
