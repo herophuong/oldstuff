@@ -1,5 +1,8 @@
 <?php $this->headTitle($this->translate('Your Stuff'), 'PREPEND'); 
 use \Zend\Mvc\Controller\Plugin\FlashMessenger as PluginFlashMessenger;
+$this->flashMessenger()->setMessageOpenFormat("<div%s><button type='button' class='close' data-dismiss='alert'>&times;</button>");
+$this->flashMessenger()->setMessageSeparatorString('<br />');
+$this->flashMessenger()->setMessageCloseString('</div>');
 $authorized = ($this->identity() == $user);
 $session = new Zend\Session\Container('userstuff');
 $filter_tab = $session->offsetGet('filter.'.$user->user_id.'.tab');
