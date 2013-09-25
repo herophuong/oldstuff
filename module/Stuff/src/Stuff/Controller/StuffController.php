@@ -184,20 +184,19 @@ class StuffController extends AbstractActionController {
         $stuff = $this->getEntityManager()->find('Stuff\Entity\Stuff',$stuff_id);
                             
         $request = $this->getRequest();
-		
-		if($request->isPost()){
-            if($stuff->user->user_id != $user_id){
-                $this->flashMessenger()->addErrorMessage("Delete error.");
-               return $this->redirect()->toRoute('stuff',array('user_id' => $user_id,
-                                                              'action' => 'index',
-               ));
-            }
-            $data = $stuff->getArrayCopy();
-            $data['state'] = -1;
-            $stuff->populate($data);
-            $this->getEntityManager()->flush();
-            $this->flashMessenger()->addSuccessMessage("Delete stuff successfully.");                    
+
+        if($stuff->user->user_id != $user_id){
+            $this->flashMessenger()->addErrorMessage("Delete error.");
+            return $this->redirect()->toRoute('stuff',array('user_id' => $user_id,
+                                                            'action' => 'index',
+            ));
         }
+        $data = $stuff->getArrayCopy();
+        $data['state'] = -1;
+        $stuff->populate($data);
+        $this->getEntityManager()->flush();
+        $this->flashMessenger()->addSuccessMessage("Delete stuff successfully.");                    
+
                 
         return $this->redirect()->toRoute('stuff',array('user_id' => $user_id,
                                                       'action' => 'index',
