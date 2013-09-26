@@ -23,43 +23,43 @@ $this->flashMessenger()->clearCurrentMessagesFromNamespace(FlashMessenger::NAMES
     $form->setAttribute('enctype', 'multipart/form-data');
     
     echo $this->form()->openTag($form);
-    echo $this->partial('partial/field.phtml', 
+    echo $this->partial('partial/stuff-field.phtml', 
         array(
             'form' => $form, 
             'field' => 'stuffname', 
             'inputViewHelper' => 'formInput')
     );
-    echo $this->partial('partial/field.phtml', 
+    echo $this->partial('partial/stuff-field.phtml', 
         array(
             'form' => $form, 
             'field' => 'description', 
             'inputViewHelper' => 'formTextArea')
     );
-    echo $this->partial('partial/field.phtml', 
+    echo $this->partial('partial/stuff-field.phtml', 
         array(
             'form' => $form, 
             'field' => 'category',
             'inputViewHelper' => 'formSelect')
     );
-    echo $this->partial('partial/field.phtml', 
+    echo $this->partial('partial/stuff-field.phtml', 
         array(
             'form' => $form, 
             'field' => 'image', 
             'inputViewHelper' => 'formFile')
     );
-    echo $this->partial('partial/field.phtml', 
+    echo $this->partial('partial/stuff-field.phtml', 
         array(
             'form' => $form, 
             'field' => 'purpose', 
             'inputViewHelper' => 'formRadio')
     );
-    echo $this->partial('partial/field.phtml', 
+    echo $this->partial('partial/stuff-field.phtml', 
         array(
             'form' => $form, 
             'field' => 'price', 
             'inputViewHelper' => 'formInput')
     );
-    echo $this->partial('partial/field.phtml', 
+    echo $this->partial('partial/stuff-field.phtml', 
         array(
             'form' => $form, 
             'field' => 'desiredstuff', 
