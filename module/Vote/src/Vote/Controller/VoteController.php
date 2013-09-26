@@ -45,53 +45,105 @@ class VoteController extends AbstractActionController
         $vote = $this->getEntityManager()->find('Vote\Entity\Vote', $voted_user_id);
         if ($vote == null)
         {
-            echo "Shit happened";
-        }
+            echo "Khong co user can vote, tao moi";
+            $form = new VoteForm();
 
-        $form = new VoteForm();
-
-        $request = $this->getRequest();
-        if ($request->isPost())
-        {
-            $form->setData($request->getPost());
-            if ($form->isValid())
+            $request = $this->getRequest();
+            if ($request->isPost())
             {
-                $formdata = $form->getData();
-                $vote = new Vote();
-                $data = $vote->getArrayCopy();
-                $data['user_id'] = $user_id;
-                $data['voted_user_id'] = $voted_user_id;
-                $data['ratescore'] = $formdata['rate_box'];
-
-                $vote->populate($data);
-                try
+                $form->setData($request->getPost());
+                if ($form->isValid())
                 {
-                    $this->getEntityManager()->persist($vote);
-                    $this->getEntityManager()->flush();
-                }
-                catch(DBALException $e){
-                            
+                    $formdata = $form->getData();
+                    $vote = new Vote();
+                    $data = $vote->getArrayCopy();
+                    $data['user_id'] = $user_id;
+                    $data['voted_user_id'] = $voted_user_id;
+                    $data['ratescore'] = $formdata['rate_box'];
+
+                    $vote->populate($data);
+                    try
+                    {
+                        $this->getEntityManager()->persist($vote);
+                        $this->getEntityManager()->flush();
+                        return $this->redirect()->toRoute('home',array('user_id' => $user_id,
+                                                                  'action' => 'home',
+                        ));
+                    }
+                    catch(DBALException $e){
+                                
+                    }
                 }
             }
         }
-        if ($vote == null)
+        else
         {
-            echo "Shit happened again";
+            if ($vote->user_id == $user_id)
+            {
+                echo "Co user can vote, user vote da tung vote, chi thay doi ratescore";
+                $form = new VoteForm();
+
+                $request = $this->getRequest();
+                if ($request->isPost())
+                {
+                    $form->setData($request->getPost());
+                    if ($form->isValid())
+                    {
+                        $formdata = $form->getData();
+                        $data = $vote->getArrayCopy();
+                        $data['user_id'] = $vote->user_id;
+                        $data['voted_user_id'] = $vote->voted_user_id;
+                        $data['ratescore'] = $formdata['rate_box'];
+
+                        $vote->populate($data);
+                        try
+                        {
+                            $this->getEntityManager()->persist($vote);
+                            $this->getEntityManager()->flush();
+                            return $this->redirect()->toRoute('home',array('user_id' => $user_id,
+                                                                  'action' => 'home',
+                            ));
+                        }
+                        catch(DBALException $e){
+                                    
+                        }
+                    }
+                }
+            }
+            else 
+            {
+                echo "Co user can vote, user vote chua tung vote, tao moi";
+                $form = new VoteForm();
+
+                $request = $this->getRequest();
+                if ($request->isPost())
+                {
+                    $form->setData($request->getPost());
+                    if ($form->isValid())
+                    {
+                        $formdata = $form->getData();
+                        $vote = new Vote();
+                        $data = $vote->getArrayCopy();
+                        $data['user_id'] = $user_id;
+                        $data['voted_user_id'] = $voted_user_id;
+                        $data['ratescore'] = $formdata['rate_box'];
+
+                        $vote->populate($data);
+                        try
+                        {
+                            $this->getEntityManager()->persist($vote);
+                            $this->getEntityManager()->flush();
+                            return $this->redirect()->toRoute('home',array('user_id' => $user_id,
+                                                                  'action' => 'home',
+                            ));
+                        }
+                        catch(DBALException $e){
+                                    
+                        }
+                    }
+                }
+            }
         }
-        // if ($vote->user_id == $user_id && $vote->voted_user_id == $voted_user_id)
-        // {
-        //     $data = $vote->getArrayCopy();
-        //     $data['ratescore'] = 3;
-        // }
-        // else
-        // {
-            // $vote = new Vote();
-            // $data = $vote->getArrayCopy();
-            // $data['user_id'] = $user_id;
-            // $data['voted_user_id'] = $voted_user_id;
-            // $data['ratescore'] = 4;
-        // }
-        
 
         return array(
             'form' => $form,

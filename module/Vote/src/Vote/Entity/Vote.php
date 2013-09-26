@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="vote")
  * @property int    $user_id
  * @property int    $voted_user_id
- * @property float	$ratescore
+ * @property int	$ratescore
  */
 class Vote
 {
@@ -18,17 +18,17 @@ class Vote
      * @ORM\Id
      * @ORM\Column(type="integer");
      */
-    protected $user_id;
+    protected $voted_user_id;
     
     /**
-     * @ORM\Column(type="float")
+     * @ORM\Column(type="integer")
      */
     protected $ratescore;
      
     /**
      * @ORM\Column(type="integer")
      */
-    protected $voted_user_id;
+    protected $user_id;
     
     /**
      * Magic getter to expose protected properties.
