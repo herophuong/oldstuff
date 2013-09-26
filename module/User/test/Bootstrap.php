@@ -42,6 +42,7 @@ class Bootstrap
             'modules' => array(
                 'Application',
                 'User',
+                'Stuff',
                 'DoctrineModule',
                 'DoctrineORMModule',
             ),

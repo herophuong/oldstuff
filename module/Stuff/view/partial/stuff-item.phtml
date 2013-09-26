@@ -12,13 +12,26 @@
     <div class="span7 stuff-info">
         <h4>
             <?php echo $this->object->stuff_name; ?>
-            <?php if ($this->object->state == 1) { ?>
+            <?php if ($this->object->state == 1 && $authorized) { ?>
             <label class="label label-success"><?php echo $this->translate('published'); ?></label>
             <?php } else if ($this->object->state == 0) { ?>
             <label class="label label-inverse"><?php echo $this->translate('unpublished'); ?></label>
             <?php } ?>
         </h4>
         <hr class="alt">
+        <ul class="stuff-value">
+            <?php if ($this->object->purpose == 'sell') { ?>
+            <li><i rel="tooltip" data-title="<?php echo $this->translate('Price'); ?>" class="icon-tags"></i> <span class="price"><h4><?php echo $this->object->price; ?></h4></span> VND</li>
+            <?php } else if ($this->object->purpose == 'trade') { ?>
+            <li><i rel="tooltip" data-title="<?php echo $this->translate('Desired Stuff'); ?>" class="icon-random"></i> <h4><?php echo $this->object->desired_stuff; ?></h4></li>
+            <?php } ?>
+            <li><i rel="tooltip" data-title="<?php echo $this->translate('Category'); ?>" class="icon-bookmark"></i>
+                <form method="POST" class="form-link">
+                    <button class="btn btn-link" type="submit"><?php echo $this->object->category->cat_name; ?></button>
+                    <input type="hidden" name="filter_category" value="<?php echo $this->object->category->cat_id; ?>   " />
+                </form>
+            </li>
+        </ul>
         <div class="stuff-description"><?php echo $this->object->description ?></div>
     </div>
     <div class="span2 stuff-buttons">
@@ -35,8 +48,8 @@
             <?php echo $this->translate('Delete'); ?>
         </a>
         <?php } else { ?>
-        <a href="#" class="btn span12"><i class="icon-shopping-cart"></i>&nbsp;<?php echo $this->translate("Buy"); ?></a>
-        <a href="#" class="btn span12"><i class="icon-random"></i>&nbsp;<?php echo $this->translate("Trade"); ?></a>
+        <a href="#" class="btn span12 btn-success"><i class="icon-shopping-cart"></i>&nbsp;<?php echo $this->translate("Buy"); ?></a>
+        <a href="#" class="btn span12 btn-info"><i class="icon-random"></i>&nbsp;<?php echo $this->translate("Trade"); ?></a>
         <?php } ?>
     </div>
 </div>
