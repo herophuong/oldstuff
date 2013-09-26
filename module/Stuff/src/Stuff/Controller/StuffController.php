@@ -13,6 +13,7 @@ use Stuff\Entity\Stuff;
 // Form, filters
 use Stuff\Form\StuffForm;
 use Stuff\Filter\AddStuffFilter;
+use Stuff\Filter\EditStuffFilter;
 use Zend\Filter\File\Rename;
 
 // Doctrine
@@ -110,8 +111,7 @@ class StuffController extends AbstractActionController {
         
 		$form = new StuffForm();
 		$filter = new AddStuffFilter();
-		$form->setInputFilter($filter->getInputFilter());
-        
+		
 		$request = $this->getRequest();
 		
 		if($request->isPost()){
@@ -119,10 +119,19 @@ class StuffController extends AbstractActionController {
                 $request->getPost()->toArray(),
                 $request->getFiles()->toArray()
             );
+            $temp = $request->getPost();
+            if($temp['purpose']== 'sell'){
+                $filter->getInputFilter()->get('price')->setRequired(true)->setErrorMessage("To sell, you need to enter a price");
+            }
+            else if($temp['purpose'] == 'trade'){
+                $filter->getInputFilter()->get('desiredstuff')->setRequired(true)->setErrorMessage("To trade, you need to enter desired stuff");
+            }
+		    $form->setInputFilter($filter->getInputFilter());
+		    
 			$form->setData($post);
 			if($form->isValid()){
-				$formdata = $form->getData();
-                //Relocate and rename uploaded image
+			    $formdata = $form->getData();
+				//Relocate and rename uploaded image
                 $filefilter = new Rename(array("target" => "./public/upload/img.jpg", "randomize" => "true"));
                 $image = $filefilter->filter($formdata['image']);
                 $stuff = new Stuff();
@@ -154,6 +163,9 @@ class StuffController extends AbstractActionController {
 				}
 			}	
 		}
+        else {
+            $form->setInputFilter($filter->getInputFilter());
+        }
         //Load categories
         $categories = $this->getEntityManager()->getRepository('Category\Entity\Category')->findAll();
         foreach ($categories as $value) {
@@ -225,8 +237,7 @@ class StuffController extends AbstractActionController {
         }
         
         $form = new StuffForm();
-        $filter = new AddStuffFilter();
-        $form->setInputFilter($filter->getInputFilter());
+        $filter = new EditStuffFilter();
         $request = $this->getRequest();
         
         if($request->isPost()){
@@ -234,6 +245,14 @@ class StuffController extends AbstractActionController {
                 $request->getPost()->toArray(),
                 $request->getFiles()->toArray()
             );
+            $temp = $request->getPost();
+            if($temp['purpose']== 'sell'){
+                $filter->getInputFilter()->get('price')->setRequired(true)->setErrorMessage("To sell, you need to enter a price");
+            }
+            else if($temp['purpose'] == 'trade'){
+                $filter->getInputFilter()->get('desiredstuff')->setRequired(true)->setErrorMessage("To trade, you need to enter desired stuff");
+            }
+            $form->setInputFilter($filter->getInputFilter());
             $form->setData($post);
             if($form->isValid()){
                 $formdata = $form->getData();
@@ -266,6 +285,7 @@ class StuffController extends AbstractActionController {
         }
         else{
             //Load stuff data
+            $form->setInputFilter($filter->getInputFilter());
             $formdata['stuffname'] = $stuff->stuff_name;
             $formdata['description'] = $stuff->description;
             $formdata['price'] = $stuff->price;

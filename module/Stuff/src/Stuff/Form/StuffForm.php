@@ -79,6 +79,7 @@ class StuffForm extends Form {
                     'trade' => 'Trade',
                 ),
             ),
+            'value' => 'sell',
             'attributes' => array(
                 'id' => 'inputpurpose',
                 'class' => 'form-control',

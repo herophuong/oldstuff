@@ -46,12 +46,12 @@ class Stuff
     protected $category;
     
     /**
-     * @ORM\Column(type="float")
+     * @ORM\Column(type="float", nullable=true)
      */
     protected $price;
     
 	/**
-	 * @ORM\Column(type="text")
+	 * @ORM\Column(type="text", nullable=true)
 	 */
 	protected $description;
     
@@ -66,7 +66,7 @@ class Stuff
     protected $purpose; 
      
     /**
-     *@ORM\Column(type="string") 
+     *@ORM\Column(type="string",nullable=true) 
      */
     protected $desired_stuff;
      
