@@ -30,7 +30,8 @@
         </a>
         <a href="<?php echo $this->url('stuff', array( 'action' => 'delete', 
                                                         'user_id' => $this->object->user->user_id, 
-                                                        'stuff_id' => $this->object->stuff_id));?>">
+                                                        'stuff_id' => $this->object->stuff_id));?>"
+           class="delete-link">
             <?php echo $this->translate('Delete'); ?>
         </a>
         <?php } else { ?>

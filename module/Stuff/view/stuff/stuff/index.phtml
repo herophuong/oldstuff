@@ -4,6 +4,22 @@ $this->flashMessenger()->setMessageOpenFormat("<div%s><button type='button' clas
 $this->flashMessenger()->setMessageSeparatorString('<br />');
 $this->flashMessenger()->setMessageCloseString('</div>');
 $authorized = ($this->identity() == $user);
+if ($authorized) {
+    $this->headScript()->appendFile($this->basePath() . '/js/bootbox.min.js');
+    $script = '
+        $(document).ready(function(){
+            $("a.delete-link").on("click", function() {
+                var $link = $(this);
+                bootbox.confirm("Do you really want to delete this?", function(result) {
+                    if (result == true)
+                        window.location.href = $link.attr("href");
+                });
+                return false;
+            });
+        });
+    ';
+    $this->headScript()->appendScript($script);
+}
 $session = new Zend\Session\Container('userstuff');
 $filter_tab = $session->offsetGet('filter.'.$user->user_id.'.tab');
 ?>
@@ -48,7 +64,7 @@ $filter_tab = $session->offsetGet('filter.'.$user->user_id.'.tab');
     <div class="gallery span8 offset2 user-stuff-list">
     <?php 
         $this->partialLoop()->setObjectKey('object');
-        echo $this->partialLoop('partial/indexstuff.phtml', $paginator->getCurrentItems()); ?>
+        echo $this->partialLoop('partial/stuff-item.phtml', $paginator->getCurrentItems()); ?>
     </div>
 </div>
 <?php $this->partial()->setObjectKey('object'); echo $this->partial('partial/pagination.phtml', $paginator); ?>  
