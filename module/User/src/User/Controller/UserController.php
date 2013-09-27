@@ -189,7 +189,14 @@ class UserController extends AbstractActionController
                     
                     // Add success message
                     $this->flashMessenger()->addSuccessMessage('Your profile is updated successfully!');
-                    $this->redirect()->toRoute('user', array('action' => 'profile', 'id' => $user->user_id));
+                    // Redirect to the 'redirect' query if exists
+                    if ($redirectUrl = $request->getQuery('redirect')) {
+                        $this->redirect()->toUrl($redirectUrl);
+                    // Else redirect to profile page 
+                    } else { 
+                        $this->redirect()->toRoute('user', array('action' => 'profile', 'id' => $user->user_id));
+                    }
+                    
                 }
             }
             
@@ -218,10 +225,13 @@ class UserController extends AbstractActionController
             if ($authResult instanceof \Zend\Authentication\Result) {
                 if ($authResult->isValid()) {
                     $this->flashMessenger()->addSuccessMessage('You have successfully logged in!');
-                    if ($redirectUrl = $request->getQuery('redirect'))
+                    // Redirect to the 'redirect' query if exists
+                    if ($redirectUrl = $request->getQuery('redirect')) {
                         $this->redirect()->toUrl($redirectUrl);
-                    else
+                    // Else redirect to profile page 
+                    } else { 
                         $this->redirect()->toRoute('user', array('action' => 'profile', 'id' => $authResult->getIdentity()->user_id));
+                    }
                 } else {
                     switch($authResult->getCode()) {
                         case Result::FAILURE_IDENTITY_NOT_FOUND:
