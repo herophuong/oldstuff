@@ -1,6 +1,6 @@
 <?php $this->headTitle($this->translate('Add Stuff'), 'PREPEND'); ?>
 <div class="gallery span3 offset1 content-block">
-    <?php echo $this->partial('stuff/partial/logged-in-user-profile.phtml'); ?>
+    <?php echo $this->partial('stuff/partial/user-profile.phtml', array('user' => $this->identity())); ?>
 </div>
 <div class="gallery content-block span7">
 <h1 class="text-center"><i class="iconbig-note-write"></i>&nbsp;<?php echo $this->translate('Add New Stuff'); ?></h1>
