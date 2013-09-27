@@ -85,11 +85,13 @@ class Module{
                     $authService = $sm->get('Zend\Authentication\AuthenticationService');
                     $container = new \Zend\Navigation\Navigation();
                     \Zend\Navigation\Page\Mvc::setDefaultRouter($sm->get('router'));
+                    $routeMatch = $sm->get('Application')->getMvcEvent()->getRouteMatch();
                     if ($user = $authService->getIdentity()) {
                         $container->addPages(array(
                             array(
                                 'label' => 'My Stuff',
                                 'route' => 'stuff',
+                                'route_match' => $routeMatch,
                                 'params' => array(
                                     'user_id' => $user->user_id,
                                 ),
@@ -108,6 +110,7 @@ class Module{
                             array(
                                 'label' => 'Log in',
                                 'route' => 'login',
+                                'route_match' => $routeMatch,
                                 'query' => array(
                                     'redirect' => $uri,
                                 ),
@@ -116,6 +119,7 @@ class Module{
                             array(
                                 'label' => 'Sign up',
                                 'route' => 'register',
+                                'route_match' => $routeMatch,
                                 'icon' => 'user',
                             ),
                         ));
