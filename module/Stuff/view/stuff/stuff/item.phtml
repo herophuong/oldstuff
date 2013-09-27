@@ -1,0 +1,42 @@
+<?php $this->headTitle($this->translate('Stuff Info'), 'PREPEND'); 
+      $stuff = $this->stuff;
+?>
+<div class="gallery content-block span7">
+<h1 class="text-center"><i class="iconbig-note-write"></i>&nbsp;<?php echo $this->translate('Stuff Info'); ?></h1>
+    <div class="row-fluid stuff-item">
+        <div class="span3 stuff-image">
+            <?php if ($stuff->image !== "") { ?>
+            <a class="group" rel="group1" href="<?php echo $this->basePath() . '/' . $stuff->image[0]; ?>">
+                <img src="<?php echo $this->basePath() . '/' . $stuff->image[0]; ?>">
+            </a>
+            <?php } else { ?>
+            <img src="holder.js/225x210/gray/text:[<?php echo $this->translate("Old Stuff Trade System"); ?>]">
+            <?php } ?>
+        </div>
+        <div class="span7 stuff-info">
+            <div class="stuff-value">
+                <h4>Name: <?php echo $stuff->stuff_name; ?></h4>
+                <h4>Owner: <?php echo $stuff->user->display_name; ?></h4>
+                <h4>Description: <?php echo $stuff->description; ?></h4>
+                <h4>Purpose: <?php echo strtoupper($stuff->purpose); ?></h4>
+                <h4>Price: <?php echo $stuff->price ?> VND</h4>
+                <h4>Desired Stuff: <?php echo $stuff->desired_stuff ?></h4>
+                <h4>State:
+                    <?php if($stuff->state == 0) echo "Unpublished";
+                          else echo "Published";
+                    ?>
+                </h4>   
+            </div>
+       </div>
+    </div>
+        <?php if($stuff->user == $this->identity()){?>
+       <a href="<?php echo $this->url('stuff', array( 'action' => 'edit','id' => $stuff->stuff_id));?>" 
+          class="btn btn-primary" style="width:50px;">
+            <?php echo $this->translate('Edit'); ?>
+        </a>
+        <a href="<?php echo $this->url('stuff', array( 'action' => 'delete','id' => $stuff->stuff_id));?>" 
+          class="btn btn-primary" style="width:50px;">
+            <?php echo $this->translate('Delete'); ?>
+        </a>    
+       <?php } ?>
+</div>

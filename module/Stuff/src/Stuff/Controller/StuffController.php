@@ -263,7 +263,7 @@ class StuffController extends AbstractActionController {
         else{
             //Load stuff data
             $form->setInputFilter($filter->getInputFilter());
-            $formdata['stuffname']   = $stuff->stuff_name;
+            $formdata['stffname']   = $stuff->stuff_name;
             $formdata['description'] = $stuff->description;
             $formdata['price']       = $stuff->price;
             $formdata['category']    = $stuff->category->cat_name;
@@ -283,6 +283,16 @@ class StuffController extends AbstractActionController {
             'form' => $form,
         );
 	}
+    
+    public function itemAction(){
+        //Get stuff from db and check if it is valid
+        $stuff_id = $this->params()->fromRoute('id',0);
+        $stuff = $this->getEntityManager()->find('Stuff\Entity\Stuff',$stuff_id);
+        if(!$stuff){
+            return $this->redirect()->toRoute('home');
+        }
+        return array('stuff' => $stuff);
+    }
     
     public function homeAction()
     {
