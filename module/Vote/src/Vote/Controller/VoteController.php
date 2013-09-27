@@ -32,6 +32,11 @@ class VoteController extends AbstractActionController
     {
     }
 
+	public function calculateTotalVote()
+	{
+		
+	}
+
     public function voteAction()
     {
         //Authenticate user
