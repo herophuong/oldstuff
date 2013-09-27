@@ -50,45 +50,75 @@ class StuffController extends AbstractActionController {
 	}
 	
 	public function indexAction()
-    {                 
+    {
+        // Get user id
         $user_id = (int) $this->params()->fromroute('user_id', 0);
         if (!$user_id) {
             // Redirect on invalid request
             $this->redirect()->toRoute('home');
         }
         
-        $filter_tab = $this->_getStateFromPostRequest('filter.'.$user_id.'.tab', 'filter_tab', 'inventory', 'userstuff');
-                
+        // Init query builder
         $user = $this->getEntityManager()->getRepository('User\Entity\User')->findOneBy(array('user_id' => $user_id));       
         $repository = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff');
         $queryBuilder = $this->getEntityManager()->createQueryBuilder();
         $queryBuilder->select('s');
         $queryBuilder->from('Stuff\Entity\Stuff', 's');
         
-        switch ($filter_tab) {
-            case 'inventory':
-                $queryBuilder->where('s.user = :user_id and s.state != :state')
-                             ->orderBy('s.stuff_id', 'DESC')
-                             ->setParameters(new ArrayCollection(array(
-                                new Parameter('user_id', $user_id, 'integer'),
-                                new Parameter('state', -1),
-                             )));
-                break;
-            case 'done':
-                $queryBuilder->where('s.user = :user_id and s.state = :state')
-                             ->orderBy('s.stuff_id', 'DESC')
-                             ->setParameters(new ArrayCollection(array(
-                                new Parameter('user_id', $user_id, 'integer'),
-                                new Parameter('state', 2),
-                             )));
-                break;
-            case 'request':
-                // TODO Implement get request from this user here
-            default:
-                // Prevent error by select nothing in query builder
-                $queryBuilder->where('s.stuff_id = 0');
-                break;
+        // Get filter criteria from request or session
+        $filter_category = $this->_getStateFromPostRequest('filter.category', 'filter_category', 0, 'stuff\user\\'.$user_id);
+        $filter_purpose = $this->_getStateFromPostRequest('filter.purpose', 'filter_purpose', '', 'stuff\user\\'.$user_id);
+        $filter_search = $this->_getStateFromPostRequest('filter.search', 'filter_search', '', 'stuff\user\\'.$user_id);
+        
+        // Build the filter expression
+        $and = $queryBuilder->expr()->andX();
+        $parameters = new ArrayCollection();
+        
+        // Only show stuffs from this user
+        $and->add($queryBuilder->expr()->eq('s.user', ':user_id'));
+        $parameters->add(new Parameter('user_id', $user_id, 'integer'));
+        
+        /*--- Filter by searching ---*/
+        if ($filter_category) {
+            $and->add($queryBuilder->expr()->eq('s.category', ':cat_id'));
+            $parameters->add(new Parameter('cat_id', $filter_category, 'integer'));
         }
+        if ($filter_purpose) {
+            $and->add($queryBuilder->expr()->eq('s.purpose', ':purpose'));
+            $parameters->add(new Parameter('purpose', $filter_purpose, 'string'));
+        }
+        if ($filter_search) {
+            $or = $queryBuilder->expr()->orX();
+            $or->add($queryBuilder->expr()->like('s.stuff_name', ':search'));
+            $or->add($queryBuilder->expr()->like('s.description', ':search'));
+            $and->add($or);
+            $parameters->add(new Parameter('search', '%'.$filter_search.'%', 'string'));
+        }
+        
+        /*--- Filter by user tabs ---*/
+        if ($user == $this->identity()) {
+            $filter_tab = $this->_getStateFromPostRequest('filter.tab', 'filter_tab', 'inventory', 'stuff\user\\'.$user_id);
+            switch ($filter_tab) {
+                case 'inventory':
+                    $and->add($queryBuilder->expr()->eq('s.state', 1));
+                    break;
+                case 'done':                
+                    $and->add($queryBuilder->expr()->eq('s.state', 2));
+                    break;
+                case 'request':
+                    // TODO Implement what stuffs from this user are requested
+                default:
+                    // Prevent error by select nothing in query builder
+                    $and->add($queryBuilder->expr()->eq('s.stuff_id', 0));
+                    break;
+            }
+        } else {
+            $and->add($queryBuilder->expr()->eq('s.state', 1));
+        }
+        /*--- End filter ---*/
+        
+        $queryBuilder->where($and)->setParameters($parameters)->orderBy('s.stuff_id', 'DESC');
+        /*--- End filter ---*/
         
         $paginator = new Paginator(new PaginatorAdapter(new ORMPaginator($queryBuilder)));
         $paginator->setItemCountPerPage(10);
@@ -332,7 +362,10 @@ class StuffController extends AbstractActionController {
             $parameters->add(new Parameter('purpose', $filter_purpose, 'string'));
         }
         if ($filter_search) {
-            $and->add($queryBuilder->expr()->like('s.stuff_name', ':search'));
+            $or = $queryBuilder->expr()->orX();
+            $or->add($queryBuilder->expr()->like('s.stuff_name', ':search'));
+            $or->add($queryBuilder->expr()->like('s.description', ':search'));
+            $and->add($or);
             $parameters->add(new Parameter('search', '%'.$filter_search.'%', 'string'));
         }
         
@@ -371,8 +404,8 @@ class StuffController extends AbstractActionController {
     private function _getStateFromPostRequest($key, $parameter, $default = null, $namespace = 'stuff')
     {
         $request = $this->getRequest()->getPost();
-        $value = $request->get($parameter, null);
         
+        $value = $request->get($parameter, null);
         // Exchange request value with session value
         $session = new Container($namespace);
         if ($value !== null) {

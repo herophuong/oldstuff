@@ -5,21 +5,8 @@
 <div class="gallery content-block span7">
 <h1 class="text-center"><i class="iconbig-note-write"></i>&nbsp;<?php echo $this->translate('Edit Stuff'); ?></h1>
 
-<?php $messages = $this->flashMessenger()->getCurrentSuccessMessages();?>
-<?php if (!empty($messages)) { 
-    echo $this->alertBlock(implode('<br />', $messages), 'alert-success'); 
-} ?>
-<?php $messages = $this->flashMessenger()->getCurrentErrorMessages();?>
-<?php if (!empty($messages)) { 
-    echo $this->alertBlock(implode('<br />', $messages), 'alert-danger'); 
-} ?>
-<?php
-// Remember to clear messages after displaying them
-use Zend\Mvc\Controller\Plugin\FlashMessenger;
-$this->flashMessenger()->clearCurrentMessagesFromNamespace(FlashMessenger::NAMESPACE_ERROR);
-$this->flashMessenger()->clearCurrentMessagesFromNamespace(FlashMessenger::NAMESPACE_SUCCESS);
-?>
-<?php $messages = $form->getMessages(); // Error messages ?>
+<?php echo $this->partial('partial/current-flash-messages.phtml'); ?>
+
 <?php 
     $form->setAttribute('action', '');
     $form->setAttribute('class', 'form-horizontal');

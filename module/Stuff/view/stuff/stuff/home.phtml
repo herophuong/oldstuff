@@ -1,39 +1,4 @@
-<?php 
-    $this->headLink()->prependStylesheet($this->basePath() . '/css/bootstrap-select.css');
-    $this->headScript()->prependFile($this->basePath() . '/js/bootstrap-select.min.js')
-                       ->prependScript('jQuery(document).ready(function(){jQuery(".selectpicker").selectpicker()})');
-    $session = new Zend\Session\Container('stuff');
-    $filter_category    = $session->offsetGet('filter.category');
-    $filter_purpose     = $session->offsetGet('filter.purpose');
-    $filter_search      = $session->offsetGet('filter.search');
-?>
-<div class="row">
-    <div class="filter-bar span12">
-        <form id="filter-form" method="POST">
-            <div class="pull-left">
-            <div class="input-append">
-                <input class="span3" type="text" name="filter_search" value="<?php echo $filter_search; ?>"/>
-                <button class="btn" type="submit"><i class="icon-search"></i>&nbsp;<?php echo $this->translate('Search'); ?></button>
-            </div>
-            <select class="selectpicker" id="category-select">
-                <option value=""><?php echo $this->translate('All Category'); ?></option>
-                 <?php foreach ($categories as $category) { ?>
-                <option value="<?php echo $category->cat_id; ?>"<?php echo ($category->cat_id == $filter_category) ? ' selected="selected"' : ''; ?>><?php echo $category->cat_name; ?></option>
-                <?php } ?>
-            </select>
-            <input type="hidden" id="filter-category" name="filter_category" value="<?php echo (int) $filter_category; ?>" />
-            </div>
-            <div class="pull-right">
-            <div class="btn-group" id="purpose-select" data-toggle="buttons-radio">
-                <button type="button" class="btn<?php echo empty($filter_purpose) ? ' active' : ''; ?>" data-value=""><?php echo $this->translate('Any Purpose'); ?></button>
-                <button type="button" class="btn<?php echo ($filter_purpose == 'sell') ? ' active' : ''; ?>" data-value="sell"><i class="icon-shopping-cart"></i>&nbsp;<?php echo $this->translate('For Sale'); ?></button>
-                <button type="button" class="btn<?php echo ($filter_purpose == 'trade') ? ' active' : ''; ?>" data-value="trade"><i class="icon-random"></i>&nbsp;<?php echo $this->translate('For Trade'); ?></button>
-            </div>
-            <input type="hidden" id="filter-purpose" name="filter_purpose" value="<?php echo (string) $filter_purpose; ?>" />
-            </div>
-        </form>
-    </div>
-</div>
+<?php echo $this->partial('stuff/partial/filter-bar', array('categories' => $categories, 'namespace' => 'stuff')); ?>
 <div class="row" id="gallery-container">
     <div class="span3 item gallery">
         <div class="nav-headers">

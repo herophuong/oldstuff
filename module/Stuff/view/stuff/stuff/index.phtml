@@ -1,8 +1,5 @@
 <?php $this->headTitle($this->translate('Your Stuff'), 'PREPEND'); 
-use \Zend\Mvc\Controller\Plugin\FlashMessenger as PluginFlashMessenger;
-$this->flashMessenger()->setMessageOpenFormat("<div%s><button type='button' class='close' data-dismiss='alert'>&times;</button>");
-$this->flashMessenger()->setMessageSeparatorString('<br />');
-$this->flashMessenger()->setMessageCloseString('</div>');
+
 $authorized = ($this->identity() == $user);
 if ($authorized) {
     $this->headScript()->appendFile($this->basePath() . '/js/bootbox.min.js');
@@ -20,22 +17,23 @@ if ($authorized) {
     ';
     $this->headScript()->appendScript($script);
 }
-$session = new Zend\Session\Container('userstuff');
-$filter_tab = $session->offsetGet('filter.'.$user->user_id.'.tab');
+$session = new Zend\Session\Container('stuff\user\\'.$user->user_id);
+$filter_tab = $session->offsetGet('filter.tab');
 ?>
 
 <div class="row">
     <div class="span8 offset2 gallery content-block">
-        <?php echo $this->flashMessenger()->render(PluginFlashMessenger::NAMESPACE_SUCCESS, array('alert', 'alert-success')); ?>
+        <?php echo $this->partial('partial/flash-messages.phtml'); ?>
         <div class="row">
             <div class="span2">
                 <img class="img-polaroid" src="http://www.gravatar.com/avatar/<?php echo md5(trim($user->email)); ?>?s=200" />
             </div>
             <div class="span5">
                 <blockquote><h1><?php echo $user->display_name; ?></h1></blockquote>
-                <span class="glyphicon glyphicon-envelope"></span>&nbsp;<?php echo $user->email; ?>
+                <span class="icon-envelope"></span>&nbsp;<?php echo $user->email; ?>
                 <br /><br />
                 <?php if ($authorized) { ?>
+                <a href="<?php echo $this->url('user', array('action' => 'edit', 'id' => $user->user_id), array('query' => array('redirect' => $this->url('stuff', array('action' => 'index', 'user_id' => $user->user_id))))); ?>" class="btn"><?php echo $this->translate('Edit Profile'); ?></a>
                 <a href="<?php echo $this->url('stuff', array('action' => 'add', 'user_id' => $user->user_id));?>" class="btn btn-primary">
                 <?php echo $this->translate('Add stuff'); ?>
                 </a>
@@ -48,18 +46,22 @@ $filter_tab = $session->offsetGet('filter.'.$user->user_id.'.tab');
 
 <hr class="alt"/>
 <div class="row">
-    <div class="filter-bar span8 offset2 text-center">
-        <form id="filter-form" method="POST">
+    <?php if ($user == $this->identity()) { ?>
+    <div class="tab-bar span8 offset2">
+        <form class="filter-form" method="POST">
             <div id="tab-select" class="btn-group" data-toggle="buttons-radio">
                 <button class="btn<?php echo ($filter_tab == 'inventory') ? ' active' : ''; ?>" type="button" data-value="inventory"><?php echo $this->translate("Inventory"); ?></button>
+                <button class="btn<?php echo ($filter_tab == 'request') ? ' active' : ''; ?>" type="button" data-value="request"><?php echo $this->translate("On Request"); ?></button>
                 <button class="btn<?php echo ($filter_tab == 'done') ? ' active' : ''; ?>" type="button" data-value="done"><?php echo $this->translate("Sold/Traded"); ?></button>
-                <button class="btn<?php echo ($filter_tab == 'request') ? ' active' : ''; ?>" type="button" data-value="request"><?php echo $this->translate("Request"); ?></button>
                 <input type="hidden" id="filter-tab" name="filter_tab" value="<?php echo (string) $filter_tab; ?>" />
             </div>
         </form>
     </div>
+    <?php } ?>
+    <div class="span8 offset2">
+    <?php echo $this->partial('stuff/partial/filter-bar.phtml', array('namespace' => 'stuff\user\\'.$user->user_id)); ?>
+    </div>
 </div>
-
 <div class="row">
     <div class="gallery span8 offset2 user-stuff-list">
     <?php 

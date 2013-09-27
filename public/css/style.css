@@ -321,6 +321,42 @@
     margin-bottom: 0px;
 }
 
+.filter-bar .filter-left {
+    float: left;
+}
+
+.filter-bar .filter-right {
+    float: right;
+}
+
+@media (max-width: 979px) {
+.filter-bar .filter-left, .filter-bar .filter-right {
+    float: none;
+    text-align: center;
+}
+
+.filter-bar .filter-right {
+    margin-top: 10px;
+}
+}
+
+.tab-bar {
+    height: 0px;
+    padding: 0px;
+    position: relative;
+    border-top: 1px solid #ccc !important;
+    border-bottom: 1px solid #fff !important;
+    background-color: transparent;
+    margin-bottom: 30px;
+    margin-top: 10px;
+    min-height: 0px;
+    text-align: center;
+}
+.tab-bar .filter-form {
+    position: absolute;
+    top: -15px;
+    left: 0px; right: 0px;
+}
 /* FLAT BUTTON */
 input, .btn {
     border-radius: 0px !important;
@@ -1104,6 +1140,10 @@ ul.stuff-value li {
 
 ul.stuff-value li h4 {
     display: inline;
+}
+
+.stuff-image img {
+    max-height: 200px;
 }
 @media (max-width: 767px) {
 .stuff-item {

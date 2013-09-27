@@ -40,6 +40,7 @@ $(document).ready(function () {
     });
     $("#tab-select > button").on('click', function() {
         $("#filter-tab").val(jQuery(this).data('value'));
-        $("#filter-form")[0].submit();
+        var form = $(this).parents('form:first');
+        form.submit();
     });
 });
