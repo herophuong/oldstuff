@@ -49,16 +49,16 @@ class StuffController extends AbstractActionController {
 		$this->em = $em;
 	}
 	
-	public function indexAction()
+	public function userAction()
     {                 
-        $user_id = (int) $this->params()->fromroute('user_id', 0);
+        $user_id = (int) $this->params()->fromroute('id', 0);
         if (!$user_id) {
             // Redirect on invalid request
             $this->redirect()->toRoute('home');
         }
         
         $filter_tab = $this->_getStateFromPostRequest('filter.'.$user_id.'.tab', 'filter_tab', 'inventory', 'userstuff');
-                
+
         $user = $this->getEntityManager()->getRepository('User\Entity\User')->findOneBy(array('user_id' => $user_id));       
         $repository = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff');
         $queryBuilder = $this->getEntityManager()->createQueryBuilder();
@@ -103,7 +103,7 @@ class StuffController extends AbstractActionController {
 	
 	public function addAction(){
 	    if(!($user = $this->identity())){
-	        return $this->redirect()->toRoute('user', array('action' => 'login'));
+	        return $this->redirect()->toRoute('login');
 	    }
 		$form = new StuffForm();
 		$filter = new AddStuffFilter();
@@ -149,10 +149,7 @@ class StuffController extends AbstractActionController {
 					$this->getEntityManager()->persist($stuff);
 					$this->getEntityManager()->flush();
 					$this->flashMessenger()->addSuccessMessage("Add new stuff successfully");
-					return $this->redirect()->toRoute('user',array('user_id' => $user->user_id,
-																	'action' => 'index',
-					));
-					$form = new StuffForm();
+					return $this->redirect()->toRoute('stuff',array('action' => 'user', 'id' => $user->user_id));
 				}
 				catch(DBALException $e){
                     $this->flashMessenger()->addErrorMessage($e->getMessage());
@@ -176,29 +173,21 @@ class StuffController extends AbstractActionController {
  	}
 	
 	public function deleteAction(){
-       //Get user_id from URL and check if user is valid
-        $user_id = (int) $this->params()->fromroute('user_id',0);
-        if($this->identity()->user_id != $user_id){
-            return $this->redirect()->toRoute('home',array('action' => 'home'));
-        }
-        
+	    //Check if user is logged in
+	    if(!($user = $this->identity())){
+	        return $this->redirect()->toRoute('login');
+	    }
         //Check if stuff_id is valid and stuff belongs to right user
-        $stuff_id = (int) $this->params()->fromroute('stuff_id',0);
+        $stuff_id = (int) $this->params()->fromroute('id',0);
         if(!$stuff_id){
-            return $this->redirect()->toRoute('stuff',array('user_id' => $user_id,
-                                                          'action' => 'index',
-            ));
+            return $this->redirect()->toRoute('stuff',array('action' => 'user', 'id' => $user->user_id));
         }
         $stuff = $this->getEntityManager()->find('Stuff\Entity\Stuff',$stuff_id);
-                            
-        $request = $this->getRequest();
-
-        if($stuff->user->user_id != $user_id){
+        if($stuff->user != $user){
             $this->flashMessenger()->addErrorMessage("Delete error.");
-            return $this->redirect()->toRoute('stuff',array('user_id' => $user_id,
-                                                            'action' => 'index',
-            ));
+            return $this->redirect()->toRoute('stuff',array('action' => 'user', 'id' => $user->user_id));
         }
+        $request = $this->getRequest();        
         $data = $stuff->getArrayCopy();
         $data['state'] = -1;
         $stuff->populate($data);
@@ -206,30 +195,22 @@ class StuffController extends AbstractActionController {
         $this->flashMessenger()->addSuccessMessage("Delete stuff successfully.");                    
 
                 
-        return $this->redirect()->toRoute('stuff',array('user_id' => $user_id,
-                                                      'action' => 'index',
-        ));
+        return $this->redirect()->toRoute('stuff',array('action' => 'user', 'id' => $user->user_id));
 	}
 	
 	public function editAction(){
-	    //Get user_id from URL and check if user is valid
-	    $user_id = (int) $this->params()->fromroute('user_id',0);
-        if($this->identity()->user_id != $user_id){
-            return $this->redirect()->toRoute('home',array('action' => 'home'));
+        //Check if stuff_id is valid and stuff belongs to right users
+        $user = $this->identity();
+        if(!$user){
+            return $this->redirect()->toRoute('login');   
         }
-        
-        //Check if stuff_id is valid and stuff belongs to right user
-        $stuff_id = (int) $this->params()->fromroute('stuff_id',0);
+        $stuff_id = (int) $this->params()->fromroute('id',0);
+        $stuff = $this->getEntityManager()->find('Stuff\Entity\Stuff',$stuff_id);        
         if(!$stuff_id){
-            return $this->redirect()->toRoute('stuff',array('user_id' => $user_id,
-                                                          'action' => 'index',
-            ));
+            return $this->redirect()->toRoute('stuff',array('action' => 'user', 'id' => $user->user_id));
         }
-        $stuff = $this->getEntityManager()->find('Stuff\Entity\Stuff',$stuff_id);
-        if($stuff->user->user_id != $user_id){
-            return $this->redirect()->toRoute('stuff',array('user_id' => $user_id,
-                                                          'action' => 'index',
-            ));
+        if(!$stuff || $stuff->user != $user){
+            return $this->redirect()->toRoute('stuff',array('action' => 'user', 'id' => $user->user_id));
         }
         
         $form = new StuffForm();
@@ -270,9 +251,7 @@ class StuffController extends AbstractActionController {
                     $this->getEntityManager()->persist($stuff);
                     $this->getEntityManager()->flush();
                     $this->flashMessenger()->addSuccessMessage("Edit stuff successfully");
-                    return $this->redirect()->toRoute('stuff',array('user_id' => $user_id,
-                                                                  'action' => 'index',
-                    ));
+                    return $this->redirect()->toRoute('stuff',array('action' => 'user', 'id' => $user->user_id));
                 }
                 catch(DBALException $e){
                     $this->flashMessenger()->addErrorMessage($e->getMessage());

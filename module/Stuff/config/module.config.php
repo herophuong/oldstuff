@@ -11,7 +11,7 @@ return array(
 			'stuff' => array(
 				'type' => 'segment',
 				'options' => array(
-					'route' => '/stuff[/][:action][/:stuff_id]',
+					'route' => '/stuff[/][:action][/:id]',
 					'constraints' => array(
 						'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
 						'stuff_id' => '[0-9]+',
