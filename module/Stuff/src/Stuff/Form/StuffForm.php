@@ -98,6 +98,22 @@ class StuffForm extends Form {
             ),
         ));
         
+        $this->add(array(
+            'name' => 'state',
+            'type' => 'Select',
+            'options' => array(
+                'label' => 'State',
+                'value_options' => array(
+                    '1' => 'Publish',
+                    '0' => 'Unpublish',
+                )
+            ),
+            'attributes' => array(
+                'id' => 'inputstate',
+                'class' => 'form-control',
+            ),
+        ));
+        
 		$this->add(array(
 			'name' => 'submit',
 			'type' => 'Submit',

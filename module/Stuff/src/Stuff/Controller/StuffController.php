@@ -102,6 +102,7 @@ class StuffController extends AbstractActionController {
 	}
 	
 	public function addAction(){
+	    //Check if user is logged in
 	    if(!($user = $this->identity())){
 	        return $this->redirect()->toRoute('login');
 	    }
@@ -142,7 +143,7 @@ class StuffController extends AbstractActionController {
                 $data['category']      = $category;
                 $data['desired_stuff'] = $formdata['desiredstuff'];
                 $data['user']          = $user;
-                $data['state']         = 1;
+                $data['state']         = $formdata['state'];
                 
                 $stuff->populate($data);
 				try{
@@ -246,6 +247,7 @@ class StuffController extends AbstractActionController {
                 $category = $this->getEntityManager()->getRepository('Category\Entity\Category')->findOneBy(array('cat_name' => $formdata['category']));
                 $data['category']      = $category;
                 $data['desired_stuff'] = $formdata['desiredstuff'];
+                $data['state']         = $formdata['state'];
                 $stuff->populate($data);
                 try{
                     $this->getEntityManager()->persist($stuff);
@@ -261,12 +263,13 @@ class StuffController extends AbstractActionController {
         else{
             //Load stuff data
             $form->setInputFilter($filter->getInputFilter());
-            $formdata['stuffname'] = $stuff->stuff_name;
+            $formdata['stuffname']   = $stuff->stuff_name;
             $formdata['description'] = $stuff->description;
-            $formdata['price'] = $stuff->price;
-            $formdata['category'] = $stuff->category->cat_name;
-            $formdata['purpose'] = $stuff->purpose;
-            $formdata['desiredstuff'] = $stuff->desired_stuff;
+            $formdata['price']       = $stuff->price;
+            $formdata['category']    = $stuff->category->cat_name;
+            $formdata['purpose']     = $stuff->purpose;
+            $formdata['desiredstuff']= $stuff->desired_stuff;
+            $formdata['state']       = $stuff->state;
             $form->setData($formdata);
         }
         //Load categories to select

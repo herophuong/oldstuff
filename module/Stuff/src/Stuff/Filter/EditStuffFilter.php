@@ -95,4 +95,11 @@ class EditStuffFilter extends AbstractStuffFilter {
                                        ->attachByName("fileuploadfile");
         return $fileinput;                                     
     }
+    
+    protected function getStateFilter(){
+        return array(
+            'name' => 'state',
+            'required' => true,
+        );
+    }
 }
