@@ -32,9 +32,36 @@ class VoteController extends AbstractActionController
     {
     }
 
-	public function calculateTotalVote()
+	public function avgvoteAction()
 	{
-		
+        $avgRate = 0;
+        $numOfVote = 0;
+        //Authenticate user
+        $user_id = (int) $this->params()->fromroute('user_id',0);
+        $user = $this->identity();
+        if($user->user_id != $user_id){
+            return $this->redirect()->toRoute('user',array('action' => 'login'));
+        }
+        
+        $voted_user_id = (int) $this->params()->fromroute('voted_user_id',0);
+		$con=mysqli_connect("localhost","root","mysql","oldstuff");
+
+        // Check connection
+        if (mysqli_connect_errno($con))
+        {
+            echo "Failed to connect to MySQL: " . mysqli_connect_error();
+        }
+
+        $result = mysqli_query($con, "SELECT * FROM vote where voted_user_id=$voted_user_id");
+        while($row = mysqli_fetch_array($result))
+        {
+            $avgRate += $row['ratescore'];
+            $numOfVote++;
+        }
+        mysqli_close($con);
+        echo $avgRate;
+        echo "<br>";
+        echo $numOfVote;
 	}
 
     public function voteAction()
