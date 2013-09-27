@@ -102,13 +102,9 @@ class StuffController extends AbstractActionController {
 	}
 	
 	public function addAction(){
-	    //Authenticate user
-		$user_id = (int) $this->params()->fromroute('user_id',0);
-        $user = $this->identity();
-		if($user->user_id != $user_id){
-			return $this->redirect()->toRoute('home',array('action' => 'home'));
-		}
-        
+	    if(!($user = $this->identity())){
+	        return $this->redirect()->toRoute('user', array('action' => 'login'));
+	    }
 		$form = new StuffForm();
 		$filter = new AddStuffFilter();
 		
@@ -153,9 +149,9 @@ class StuffController extends AbstractActionController {
 					$this->getEntityManager()->persist($stuff);
 					$this->getEntityManager()->flush();
 					$this->flashMessenger()->addSuccessMessage("Add new stuff successfully");
-					//return $this->redirect()->toRoute('stuff',array('user_id' => $user_id,
-					//												'action' => 'index',
-					//));
+					return $this->redirect()->toRoute('user',array('user_id' => $user->user_id,
+																	'action' => 'index',
+					));
 					$form = new StuffForm();
 				}
 				catch(DBALException $e){
