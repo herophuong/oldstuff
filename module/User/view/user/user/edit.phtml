@@ -4,7 +4,6 @@
         <h1><i class="iconbig-pencil"></i>&nbsp;<?php echo $this->translate('Update Profile'); ?></h1>
         
         <?php $messages = $form->getMessages(); ?>
-        <?php $form->setAttribute('action', $this->url('user', array('action' => 'edit', 'id' => $user_id))); ?>
         <?php $form->setAttribute('class', 'form-horizontal'); ?>
         <?php echo $this->form()->openTag($form); ?>
         
