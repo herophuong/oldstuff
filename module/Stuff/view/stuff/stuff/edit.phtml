@@ -74,7 +74,14 @@ $this->flashMessenger()->clearCurrentMessagesFromNamespace(FlashMessenger::NAMES
             'field' => 'state',
             'inputViewHelper' => 'formSelect')
     );
-    echo $this->formInput($form->get('submit')->setAttributes(array('value' => 'Save', 'class' => 'btn btn-primary pull-right')));
-    echo $this->form()->closeTag(); 
+    echo $this->formInput($form->get('submit')->setAttributes(array('value' => 'Save', 'class' => 'btn btn-primary')));
 ?>
+    <a href="<?php echo $this->url('stuff', array( 'action' => 'user','id' => $this->identity()->user_id));?>" 
+        class="btn btn-primary pull-right" style="width:50px;">
+        <?php echo $this->translate('Cancel'); ?>
+    </a>
+<?php
+    echo $this->form()->closeTag();
+?>
+
 </div>
