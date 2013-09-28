@@ -36,6 +36,7 @@ class VoteController extends AbstractActionController
 	{
         $avgRate = 0;
         $numOfVote = 0;
+		$sumRate = 0;
         //Authenticate user
         $user_id = (int) $this->params()->fromroute('user_id',0);
         $user = $this->identity();
@@ -55,13 +56,14 @@ class VoteController extends AbstractActionController
         $result = mysqli_query($con, "SELECT * FROM vote where voted_user_id=$voted_user_id");
         while($row = mysqli_fetch_array($result))
         {
-            $avgRate += $row['ratescore'];
+            $sumRate += $row['ratescore'];
             $numOfVote++;
         }
+		$avgRate = (float) $sumRate / $numOfVote;
+
+        //mysqli_query($con, "SELECT * FROM vote where voted_user_id=$voted_user_id");
+
         mysqli_close($con);
-        echo $avgRate;
-        echo "<br>";
-        echo $numOfVote;
 	}
 
     public function voteAction()
