@@ -189,7 +189,13 @@ class UserController extends AbstractActionController
                     
                     // Add success message
                     $this->flashMessenger()->addSuccessMessage('Your profile is updated successfully!');
-                    $this->redirect()->toRoute('user', array('action' => 'profile', 'id' => $user->user_id));
+                    // Redirect to the 'redirect' query if exists
+                    if ($redirectUrl = $request->getQuery('redirect')) {
+                        $this->redirect()->toUrl($redirectUrl);
+                    // Else redirect to profile page 
+                    } else { 
+                        $this->redirect()->toRoute('user', array('action' => 'profile', 'id' => $user->user_id));
+                    }
                 }
             }
             
