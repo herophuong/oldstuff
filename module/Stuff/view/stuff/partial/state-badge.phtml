@@ -1,0 +1,15 @@
+<?php
+switch (true) {
+    case ($this->state === 1):
+?>
+<label class="label label-success"><?php echo $this->translate('published'); ?></label>
+<?php
+        break;
+    case ($this->state === 0):
+?>
+<label class="label label-inverse"><?php echo $this->translate('unpublished'); ?></label>
+<?php
+        break;
+    default:
+        break;
+}

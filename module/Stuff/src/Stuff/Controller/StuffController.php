@@ -99,7 +99,7 @@ class StuffController extends AbstractActionController {
             $filter_tab = $this->_getStateFromPostRequest('filter.tab', 'filter_tab', 'inventory', 'stuff\user\\'.$user_id);
             switch ($filter_tab) {
                 case 'inventory':
-                    $and->add($queryBuilder->expr()->eq('s.state', 1));
+                    $and->add($queryBuilder->expr()->in('s.state', array(0, 1)));
                     break;
                 case 'done':                
                     $and->add($queryBuilder->expr()->eq('s.state', 2));

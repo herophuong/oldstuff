@@ -1124,13 +1124,25 @@ span.login-checkbox > input[type='checkbox']:checked + label {
     margin-bottom: 10px;
     padding-bottom: 10px;
 }
+
 .stuff-item:last-child {
     border-bottom: none;
 }
+
+.stuff-item h4 {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 10px;
+}
+
+.stuff-item h4 a:hover {
+    text-decoration: none;
+}
+
 .stuff-buttons {
     padding: 10px 10px 0px 0px;
     text-align: center !important;
 }
+
 .stuff-buttons .btn {
     margin: 5px;
     margin-left: 0px !important;
