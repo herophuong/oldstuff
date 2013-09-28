@@ -37,15 +37,18 @@
             </div>
        </div>
     </div>
-        <?php if($stuff->user == $this->identity()){?>
-       <a href="<?php echo $this->url('stuff', array( 'action' => 'edit','id' => $stuff->stuff_id));?>" 
-          class="btn btn-primary" style="width:50px;">
-            <?php echo $this->translate('Edit'); ?>
-        </a>
-        <a href="<?php echo $this->url('stuff', array( 'action' => 'delete','id' => $stuff->stuff_id));?>" 
-          class="btn btn-link delete-link" style="width:50px;">
-            <?php echo $this->translate('Delete'); ?>
-        </a>    
-       <?php } ?>
+    <?php if($authorized){?>
+    <a href="<?php echo $this->stuffEditLink($stuff->stuff_id);?>" 
+        class="btn btn-primary">
+        <?php echo $this->translate('Edit'); ?>
+    </a>
+    <a href="<?php echo $this->stuffDeleteLink($stuff->stuff_id);?>" 
+        class="btn btn-link delete-link">
+        <?php echo $this->translate('Delete'); ?>
+    </a>    
+    <?php } else { ?>
+    <a href="#" class="btn btn-success"><i class="icon-shopping-cart"></i>&nbsp;<?php echo $this->translate("Buy"); ?></a>
+    <a href="#" class="btn btn-info"><i class="icon-random"></i>&nbsp;<?php echo $this->translate("Trade"); ?></a>
+    <?php } ?>
 </div>
 </div>

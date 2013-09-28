@@ -20,8 +20,8 @@ $filter_tab = $session->offsetGet('filter.tab');
                 <span class="icon-envelope"></span>&nbsp;<?php echo $user->email; ?>
                 <br /><br />
                 <?php if ($authorized) { ?>
-                <a href="<?php echo $this->url('user', array('action' => 'edit', 'id' => $user->user_id), array('query' => array('redirect' => $this->url('stuff', array('action' => 'user', 'id' => $user->user_id))))); ?>" class="btn"><?php echo $this->translate('Edit Profile'); ?></a>
-                <a href="<?php echo $this->url('stuff', array('action' => 'add'));?>" class="btn btn-primary">
+                <a href="<?php echo $this->url('user', array('action' => 'edit', 'id' => $user->user_id), array('query' => array('redirect' => $this->stuffUserLink($user->user_id)))); ?>" class="btn"><?php echo $this->translate('Edit Profile'); ?></a>
+                <a href="<?php echo $this->stuffAddLink();?>" class="btn btn-primary">
                 <?php echo $this->translate('Add stuff'); ?>
                 </a>
                 <?php } ?>

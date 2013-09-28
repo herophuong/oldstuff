@@ -25,10 +25,10 @@
                     <input type="hidden" name="filter_category" value="<?php echo $stuff->category->cat_id; ?>   " />
                 </form>
             </li>
-            <li><i rel="tooltip" data-title="<?php echo $this->translate('Owner'); ?>" class="icon-user"></i>&nbsp;<a href="<?php echo $this->url('stuff', array('action' => 'user', 'id' => $stuff->user->user_id)); ?>"><?php echo ($stuff->user->display_name != "") ? $stuff->user->display_name : $stuff->user->email; ?></a></li>
+            <li><i rel="tooltip" data-title="<?php echo $this->translate('Owner'); ?>" class="icon-user"></i>&nbsp;<a href="<?php echo $this->stuffUserLink($stuff->user->user_id); ?>"><?php echo ($stuff->user->display_name != "") ? $stuff->user->display_name : $stuff->user->email; ?></a></li>
         </ul>
     </div>
     <div class="tags-gallery">
-        <h4><a href="<?php echo $this->url('stuff', array('action' => 'item', 'id' => $stuff->stuff_id)); ?>"><?php echo $stuff->stuff_name; ?></a></h4>
+        <h4><a href="<?php echo $this->stuffItemLink($stuff->stuff_id); ?>"><?php echo $stuff->stuff_name; ?></a></h4>
     </div>
 </div>

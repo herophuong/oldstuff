@@ -64,7 +64,7 @@
     );
     echo $this->formInput($form->get('submit')->setAttributes(array('value' => 'Add', 'class' => 'btn btn-primary pull-right')));
 ?>
-    <a href="<?php echo $this->url('stuff', array( 'action' => 'user','id' => $this->identity()->user_id));?>" 
+    <a href="<?php echo $this->stuffUserLink($this->identity()->user_id);?>" 
         class="btn">
         <?php echo $this->translate('Cancel'); ?>
     </a>

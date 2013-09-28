@@ -5,15 +5,17 @@
     
     <?php if ($user->display_name != "") { ?>
     <h4 class="text-center">
-        <a href="<?php echo $this->url('stuff', array('action' => 'user', 'id' => $user->user_id)); ?>"
+        <a href="<?php echo $this->stuffUserLink($user->user_id); ?>"
             title="<?php echo $this->translate('Profile Page'); ?>">
             <?php echo $user->display_name; ?>
         </a>
     </h4>
     <?php } ?>
     <i class="icon-envelope"></i>&nbsp;<?php echo $user->email; ?>
+    <?php if ($user == $this->identity()) { ?>
     <br /><br />
-    <a href="<?php echo $this->url('user', array('action' => 'edit', 'id' => $user->user_id), array ('query' => array('redirect' => $this->url('stuff', array('action' => 'user', 'id' => $user->user_id)))));?>" class="btn" target="_blank">
+    <a href="<?php echo $this->url('user', array('action' => 'edit', 'id' => $user->user_id), array ('query' => array('redirect' => $this->stuffUserLink($user->user_id))));?>" class="btn" target="_blank">
     <?php echo $this->translate('Edit Profile'); ?>
+    <?php } ?>
     </a>
 </div>

@@ -33,6 +33,11 @@ return array(
         'invokables' => array(
             'alertBlock' => 'Stuff\View\Helper\AlertBlock',
             'deleteConfirmationScript' => 'Stuff\View\Helper\DeleteConfirmationScript',
+            'stuffAddLink' => 'Stuff\View\Helper\StuffAddLink',
+            'stuffEditLink' => 'Stuff\View\Helper\StuffEditLink',
+            'stuffDeleteLink' => 'Stuff\View\Helper\StuffDeleteLink',
+            'stuffUserLink' => 'Stuff\View\Helper\StuffUserLink',
+            'stuffItemLink' => 'Stuff\View\Helper\StuffItemLink',
         ),
     ),
 	'doctrine' => array(
