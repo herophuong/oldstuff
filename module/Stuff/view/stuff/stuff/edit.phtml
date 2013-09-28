@@ -1,4 +1,5 @@
 <?php $this->headTitle($this->translate('Edit Stuff'), 'PREPEND'); ?>
+<div class="row">
 <div class="gallery span3 offset1 content-block">
     <?php echo $this->partial('stuff/partial/user-profile.phtml', array('user' => $this->identity())); ?>
 </div>
@@ -71,4 +72,5 @@
     echo $this->form()->closeTag();
 ?>
 
+</div>
 </div>
