@@ -2,20 +2,7 @@
 
 $authorized = ($this->identity() == $user);
 if ($authorized) {
-    $this->headScript()->appendFile($this->basePath() . '/js/bootbox.min.js');
-    $script = '
-        $(document).ready(function(){
-            $("a.btn-link").on("click", function() {
-                var $link = $(this);
-                bootbox.confirm("<i class=\'iconbig-triangle\'></i>Do you really want to delete this?", function(result) {
-                    if (result == true)
-                        window.location.href = $link.attr("href");
-                });
-                return false;
-            });
-        });
-    ';
-    $this->headScript()->appendScript($script);
+    $this->deleteConfirmationScript(); // Init confirmation popup upon stuff deletion
 }
 $session = new Zend\Session\Container('stuff\user\\'.$user->user_id);
 $filter_tab = $session->offsetGet('filter.tab');

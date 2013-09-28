@@ -1,6 +1,14 @@
-<?php $this->headTitle($this->translate('Stuff Info'), 'PREPEND'); 
-      $stuff = $this->stuff;
+<?php $this->headTitle($stuff->stuff_name, 'PREPEND'); 
+    $stuff = $this->stuff;
+    $authorized = ($stuff->user == $this->identity());
+    if ($authorized) {
+        $this->deleteConfirmationScript();
+    }
 ?>
+<div class="row">
+<div class="gallery span3 offset1 content-block">
+    <?php echo $this->partial('stuff/partial/user-profile.phtml', array('user' => $stuff->user)); ?>
+</div>
 <div class="gallery content-block span7">
 <h1 class="text-center"><i class="iconbig-note-write"></i>&nbsp;<?php echo $this->translate('Stuff Info'); ?></h1>
     <div class="row-fluid stuff-item">
@@ -35,8 +43,9 @@
             <?php echo $this->translate('Edit'); ?>
         </a>
         <a href="<?php echo $this->url('stuff', array( 'action' => 'delete','id' => $stuff->stuff_id));?>" 
-          class="btn btn-primary" style="width:50px;">
+          class="btn btn-link delete-link" style="width:50px;">
             <?php echo $this->translate('Delete'); ?>
         </a>    
        <?php } ?>
+</div>
 </div>
