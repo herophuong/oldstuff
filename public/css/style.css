@@ -329,6 +329,13 @@
     float: right;
 }
 
+.user-filter .filter-bar input {
+    width: 150px;
+}
+.user-filter .filter-bar .bootstrap-select {
+    width: 150px;
+}
+
 @media (max-width: 979px) {
 .filter-bar .filter-left, .filter-bar .filter-right {
     float: none;
@@ -1122,10 +1129,12 @@ span.login-checkbox > input[type='checkbox']:checked + label {
 }
 .stuff-buttons {
     padding: 10px 10px 0px 0px;
+    text-align: center !important;
 }
 .stuff-buttons .btn {
     margin: 5px;
     margin-left: 0px !important;
+    max-width: 200px;
 }
 
 ul.stuff-value {

@@ -5,9 +5,9 @@ if ($authorized) {
     $this->headScript()->appendFile($this->basePath() . '/js/bootbox.min.js');
     $script = '
         $(document).ready(function(){
-            $("a.delete-link").on("click", function() {
+            $("a.btn-link").on("click", function() {
                 var $link = $(this);
-                bootbox.confirm("Do you really want to delete this?", function(result) {
+                bootbox.confirm("<i class=\'iconbig-triangle\'></i>Do you really want to delete this?", function(result) {
                     if (result == true)
                         window.location.href = $link.attr("href");
                 });
@@ -33,8 +33,8 @@ $filter_tab = $session->offsetGet('filter.tab');
                 <span class="icon-envelope"></span>&nbsp;<?php echo $user->email; ?>
                 <br /><br />
                 <?php if ($authorized) { ?>
-                <a href="<?php echo $this->url('user', array('action' => 'edit', 'id' => $user->user_id), array('query' => array('redirect' => $this->url('stuff', array('action' => 'index', 'user_id' => $user->user_id))))); ?>" class="btn"><?php echo $this->translate('Edit Profile'); ?></a>
-                <a href="<?php echo $this->url('stuff', array('action' => 'add', 'user_id' => $user->user_id));?>" class="btn btn-primary">
+                <a href="<?php echo $this->url('user', array('action' => 'edit', 'id' => $user->user_id), array('query' => array('redirect' => $this->url('stuff', array('action' => 'user', 'id' => $user->user_id))))); ?>" class="btn"><?php echo $this->translate('Edit Profile'); ?></a>
+                <a href="<?php echo $this->url('stuff', array('action' => 'add'));?>" class="btn btn-primary">
                 <?php echo $this->translate('Add stuff'); ?>
                 </a>
                 <?php } ?>
@@ -58,15 +58,22 @@ $filter_tab = $session->offsetGet('filter.tab');
         </form>
     </div>
     <?php } ?>
-    <div class="span8 offset2">
-    <?php echo $this->partial('stuff/partial/filter-bar.phtml', array('namespace' => 'stuff\user\\'.$user->user_id)); ?>
+    <div class="span8 offset2 user-filter">
+    <?php echo $this->partial('stuff/partial/filter-bar.phtml', array('namespace' => 'stuff\user\\'.$user->user_id, 'categories' => $categories)); ?>
     </div>
 </div>
 <div class="row">
     <div class="gallery span8 offset2 user-stuff-list">
-    <?php 
-        $this->partialLoop()->setObjectKey('object');
-        echo $this->partialLoop('partial/stuff-item.phtml', $paginator->getCurrentItems()); ?>
+        <?php if ($paginator->getTotalItemCount()) { ?>
+        <?php 
+            $this->partialLoop()->setObjectKey('object');
+            echo $this->partialLoop('partial/stuff-item.phtml', $paginator->getCurrentItems()); ?>
+        <?php } else { ?>
+        <div class="text-center">
+            <h2 class="muted"><?php echo $this->translate('No stuffs here'); ?></h2>
+            <h5><?php echo $this->translate('Upload new one now or change the search criteria!'); ?></h5>
+        </div>
+        <?php } ?>
     </div>
 </div>
 <?php $this->partial()->setObjectKey('object'); echo $this->partial('partial/pagination.phtml', $paginator); ?>  

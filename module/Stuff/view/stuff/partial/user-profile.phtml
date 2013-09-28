@@ -8,7 +8,7 @@
     <?php } ?>
     <i class="icon-envelope"></i>&nbsp;<?php echo $user->email; ?>
     <br /><br />
-    <a href="<?php echo $this->url('user', array('action' => 'edit', 'id' => $user->user_id), array ('query' => array('redirect' => $this->url('stuff', array('action' => 'index', 'user_id' => $user->user_id)))));?>" class="btn" target="_blank">
+    <a href="<?php echo $this->url('user', array('action' => 'edit', 'id' => $user->user_id), array ('query' => array('redirect' => $this->url('stuff', array('action' => 'user', 'id' => $user->user_id)))));?>" class="btn" target="_blank">
     <?php echo $this->translate('Edit Profile'); ?>
     </a>
 </div>

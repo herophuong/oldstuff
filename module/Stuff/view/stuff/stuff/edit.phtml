@@ -61,10 +61,10 @@
             'field' => 'state',
             'inputViewHelper' => 'formSelect')
     );
-    echo $this->formInput($form->get('submit')->setAttributes(array('value' => 'Save', 'class' => 'btn btn-primary')));
+    echo $this->formInput($form->get('submit')->setAttributes(array('value' => 'Save', 'class' => 'btn btn-primary pull-right')));
 ?>
     <a href="<?php echo $this->url('stuff', array( 'action' => 'user','id' => $this->identity()->user_id));?>" 
-        class="btn btn-primary pull-right" style="width:50px;">
+        class="btn">
         <?php echo $this->translate('Cancel'); ?>
     </a>
 <?php

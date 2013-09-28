@@ -93,9 +93,19 @@ class Module{
                                 'route' => 'stuff',
                                 'route_match' => $routeMatch,
                                 'params' => array(
-                                    'user_id' => $user->user_id,
+                                    'id' => $user->user_id,
+                                    'action' => 'user',
                                 ),
                                 'icon' => 'briefcase',
+                            ),
+                            array(
+                                'label' => 'Add Stuff',
+                                'route' => 'stuff',
+                                'route_match' => $routeMatch,
+                                'params' => array(
+                                    'action' => 'add',
+                                ),
+                                'icon' => 'plus-sign',
                             ),
                             array(
                                 'label' => 'Log out',

@@ -37,14 +37,13 @@
     <div class="span2 stuff-buttons">
         <?php if ($authorized) { ?>
         <a href="<?php echo $this->url('stuff', array( 'action' => 'edit', 
-                                                        'user_id' => $this->object->user->user_id, 
-                                                        'stuff_id' => $this->object->stuff_id));?>" class="btn btn-primary" style="width:50px;">
+                                                        'id' => $this->object->stuff_id));?>" 
+            class="btn btn-primary span12">
             <?php echo $this->translate('Edit'); ?>
         </a>
         <a href="<?php echo $this->url('stuff', array( 'action' => 'delete', 
-                                                        'user_id' => $this->object->user->user_id, 
-                                                        'stuff_id' => $this->object->stuff_id));?>"
-           class="delete-link">
+                                                        'id' => $this->object->stuff_id));?>"
+            class="btn btn-link span12">
             <?php echo $this->translate('Delete'); ?>
         </a>
         <?php } else { ?>
