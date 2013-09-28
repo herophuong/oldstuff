@@ -1,0 +1,71 @@
+<?php $this->headTitle($this->translate('Buy Request'), 'PREPEND');
+    $user = $this->identity();
+    $stuff = $this->stuff; 
+?>
+<div class="row">
+<div class="gallery content-block span7">
+<h1 class="text-center"><i class="iconbig-note-write"></i>&nbsp;<?php echo $this->translate('Buy Request'); ?></h1>
+    <div class="row-fluid stuff-item">
+        <?php echo $this->partial('partial/current-flash-messages.phtml'); ?>
+        
+        <?php 
+            $form->setAttribute('action', '');
+            $form->setAttribute('class', 'form-horizontal');
+            $form->setAttribute('enctype', 'multipart/form-data');
+            
+            echo $this->form()->openTag($form);
+        ?>  
+        <div class="span3 stuff-image">
+            <?php if ($stuff->image !== "") { ?>
+            <a class="group" rel="group1" href="<?php echo $this->basePath() . '/' . $stuff->image[0]; ?>">
+                <img src="<?php echo $this->basePath() . '/' . $stuff->image[0]; ?>">
+            </a>
+            <?php } else { ?>
+            <img src="holder.js/225x210/gray/text:[<?php echo $this->translate("Old Stuff Trade System"); ?>]">
+            <?php } ?>
+        </div>
+        <div class="span7 stuff-info">
+            <div class="stuff-value">
+               <label>Stuff Name: <?php echo $stuff->stuff_name;?></label>
+               <label>Price:      <?php echo $stuff->price;?></label>        
+               <label>Seller:     <?php echo $stuff->user->display_name;?></label>
+               <label>Customer:   <?php echo $user->display_name;?></label>                
+                <?php
+                    echo $this->partial('partial/stuff-field.phtml', 
+                        array(
+                            'form' => $form, 
+                            'field' => 'address', 
+                            'inputViewHelper' => 'formInput')
+                    );
+                    echo $this->partial('partial/stuff-field.phtml', 
+                        array(
+                            'form' => $form, 
+                            'field' => 'phone', 
+                            'inputViewHelper' => 'formInput')
+                    );
+                    echo $this->partial('partial/stuff-field.phtml', 
+                        array(
+                            'form' => $form, 
+                            'field' => 'description', 
+                            'inputViewHelper' => 'formTextArea')
+                    );
+                    echo $this->partial('partial/stuff-field.phtml', 
+                        array(
+                            'form' => $form, 
+                            'field' => 'paymentmethod',
+                            'inputViewHelper' => 'formSelect')
+                    );
+                    echo $this->formInput($form->get('submit')->setAttributes(array('value' => 'Send Request', 'class' => 'btn btn-primary pull-right')));
+                ?>
+                    <a href="<?php echo $this->stuffUserLink($this->identity()->user_id);?>" 
+                        class="btn">
+                        <?php echo $this->translate('Cancel'); ?>
+                    </a>
+                <?php
+                    echo $this->form()->closeTag();
+                ?>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
