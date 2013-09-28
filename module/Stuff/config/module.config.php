@@ -11,15 +11,14 @@ return array(
 			'stuff' => array(
 				'type' => 'segment',
 				'options' => array(
-					'route' => '/stuff[/][:user_id][/:action][/:stuff_id]',
+					'route' => '/stuff[/][:action][/:id]',
 					'constraints' => array(
 						'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
-						'user_id' => '[0-9]+',
 						'stuff_id' => '[0-9]+',
 					),
 					'defaults' => array(
 						'controller' => 'Stuff\Controller\Stuff',
-						'action' => 'index',
+						'action' => 'home',
 					),
 				),
 			),

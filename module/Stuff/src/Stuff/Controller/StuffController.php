@@ -49,10 +49,9 @@ class StuffController extends AbstractActionController {
 		$this->em = $em;
 	}
 	
-	public function indexAction()
-    {
-        // Get user id
-        $user_id = (int) $this->params()->fromroute('user_id', 0);
+	public function userAction()
+    {                 
+        $user_id = (int) $this->params()->fromroute('id', 0);
         if (!$user_id) {
             // Redirect on invalid request
             $this->redirect()->toRoute('home');
@@ -125,20 +124,19 @@ class StuffController extends AbstractActionController {
         $page = (int) $this->params()->fromQuery('page');
         if ($page) 
             $paginator->setCurrentPageNumber($page);
+        $categories = $this->getEntityManager()->getRepository('Category\Entity\Category')->findBy(array(), array('cat_name' => 'ASC'));
         return array(
             'user' => $user,       
             'paginator' => $paginator,
+            'categories' => $categories,
         );
 	}
 	
 	public function addAction(){
-	    //Authenticate user
-		$user_id = (int) $this->params()->fromroute('user_id',0);
-        $user = $this->identity();
-		if($user->user_id != $user_id){
-			return $this->redirect()->toRoute('home',array('action' => 'home'));
-		}
-        
+	    //Check if user is logged in
+	    if(!($user = $this->identity())){
+	        return $this->redirect()->toRoute('login');
+	    }
 		$form = new StuffForm();
 		$filter = new AddStuffFilter();
 		
@@ -176,17 +174,14 @@ class StuffController extends AbstractActionController {
                 $data['category']      = $category;
                 $data['desired_stuff'] = $formdata['desiredstuff'];
                 $data['user']          = $user;
-                $data['state']         = 1;
+                $data['state']         = $formdata['state'];
                 
                 $stuff->populate($data);
 				try{
 					$this->getEntityManager()->persist($stuff);
 					$this->getEntityManager()->flush();
 					$this->flashMessenger()->addSuccessMessage("Add new stuff successfully");
-					//return $this->redirect()->toRoute('stuff',array('user_id' => $user_id,
-					//												'action' => 'index',
-					//));
-					$form = new StuffForm();
+					return $this->redirect()->toRoute('stuff',array('action' => 'user', 'id' => $user->user_id));
 				}
 				catch(DBALException $e){
                     $this->flashMessenger()->addErrorMessage($e->getMessage());
@@ -210,29 +205,21 @@ class StuffController extends AbstractActionController {
  	}
 	
 	public function deleteAction(){
-       //Get user_id from URL and check if user is valid
-        $user_id = (int) $this->params()->fromroute('user_id',0);
-        if($this->identity()->user_id != $user_id){
-            return $this->redirect()->toRoute('home',array('action' => 'home'));
-        }
-        
+	    //Check if user is logged in
+	    if(!($user = $this->identity())){
+	        return $this->redirect()->toRoute('login');
+	    }
         //Check if stuff_id is valid and stuff belongs to right user
-        $stuff_id = (int) $this->params()->fromroute('stuff_id',0);
+        $stuff_id = (int) $this->params()->fromroute('id',0);
         if(!$stuff_id){
-            return $this->redirect()->toRoute('stuff',array('user_id' => $user_id,
-                                                          'action' => 'index',
-            ));
+            return $this->redirect()->toRoute('stuff',array('action' => 'user', 'id' => $user->user_id));
         }
         $stuff = $this->getEntityManager()->find('Stuff\Entity\Stuff',$stuff_id);
-                            
-        $request = $this->getRequest();
-
-        if($stuff->user->user_id != $user_id){
+        if($stuff->user != $user){
             $this->flashMessenger()->addErrorMessage("Delete error.");
-            return $this->redirect()->toRoute('stuff',array('user_id' => $user_id,
-                                                            'action' => 'index',
-            ));
+            return $this->redirect()->toRoute('stuff',array('action' => 'user', 'id' => $user->user_id));
         }
+        $request = $this->getRequest();        
         $data = $stuff->getArrayCopy();
         $data['state'] = -1;
         $stuff->populate($data);
@@ -240,30 +227,22 @@ class StuffController extends AbstractActionController {
         $this->flashMessenger()->addSuccessMessage("Delete stuff successfully.");                    
 
                 
-        return $this->redirect()->toRoute('stuff',array('user_id' => $user_id,
-                                                      'action' => 'index',
-        ));
+        return $this->redirect()->toRoute('stuff',array('action' => 'user', 'id' => $user->user_id));
 	}
 	
 	public function editAction(){
-	    //Get user_id from URL and check if user is valid
-	    $user_id = (int) $this->params()->fromroute('user_id',0);
-        if($this->identity()->user_id != $user_id){
-            return $this->redirect()->toRoute('home',array('action' => 'home'));
+        //Check if stuff_id is valid and stuff belongs to right users
+        $user = $this->identity();
+        if(!$user){
+            return $this->redirect()->toRoute('login');   
         }
-        
-        //Check if stuff_id is valid and stuff belongs to right user
-        $stuff_id = (int) $this->params()->fromroute('stuff_id',0);
+        $stuff_id = (int) $this->params()->fromroute('id',0);
+        $stuff = $this->getEntityManager()->find('Stuff\Entity\Stuff',$stuff_id);        
         if(!$stuff_id){
-            return $this->redirect()->toRoute('stuff',array('user_id' => $user_id,
-                                                          'action' => 'index',
-            ));
+            return $this->redirect()->toRoute('stuff',array('action' => 'user', 'id' => $user->user_id));
         }
-        $stuff = $this->getEntityManager()->find('Stuff\Entity\Stuff',$stuff_id);
-        if($stuff->user->user_id != $user_id){
-            return $this->redirect()->toRoute('stuff',array('user_id' => $user_id,
-                                                          'action' => 'index',
-            ));
+        if(!$stuff || $stuff->user != $user){
+            return $this->redirect()->toRoute('stuff',array('action' => 'user', 'id' => $user->user_id));
         }
         
         $form = new StuffForm();
@@ -299,14 +278,13 @@ class StuffController extends AbstractActionController {
                 $category = $this->getEntityManager()->getRepository('Category\Entity\Category')->findOneBy(array('cat_name' => $formdata['category']));
                 $data['category']      = $category;
                 $data['desired_stuff'] = $formdata['desiredstuff'];
+                $data['state']         = $formdata['state'];
                 $stuff->populate($data);
                 try{
                     $this->getEntityManager()->persist($stuff);
                     $this->getEntityManager()->flush();
                     $this->flashMessenger()->addSuccessMessage("Edit stuff successfully");
-                    return $this->redirect()->toRoute('stuff',array('user_id' => $user_id,
-                                                                  'action' => 'index',
-                    ));
+                    return $this->redirect()->toRoute('stuff',array('action' => 'user', 'id' => $user->user_id));
                 }
                 catch(DBALException $e){
                     $this->flashMessenger()->addErrorMessage($e->getMessage());
@@ -316,12 +294,13 @@ class StuffController extends AbstractActionController {
         else{
             //Load stuff data
             $form->setInputFilter($filter->getInputFilter());
-            $formdata['stuffname'] = $stuff->stuff_name;
+            $formdata['stuffname']   = $stuff->stuff_name;
             $formdata['description'] = $stuff->description;
-            $formdata['price'] = $stuff->price;
-            $formdata['category'] = $stuff->category->cat_name;
-            $formdata['purpose'] = $stuff->purpose;
-            $formdata['desiredstuff'] = $stuff->desired_stuff;
+            $formdata['price']       = $stuff->price;
+            $formdata['category']    = $stuff->category->cat_name;
+            $formdata['purpose']     = $stuff->purpose;
+            $formdata['desiredstuff']= $stuff->desired_stuff;
+            $formdata['state']       = $stuff->state;
             $form->setData($formdata);
         }
         //Load categories to select
@@ -335,6 +314,16 @@ class StuffController extends AbstractActionController {
             'form' => $form,
         );
 	}
+    
+    public function itemAction(){
+        //Get stuff from db and check if it is valid
+        $stuff_id = $this->params()->fromRoute('id',0);
+        $stuff = $this->getEntityManager()->find('Stuff\Entity\Stuff',$stuff_id);
+        if(!$stuff){
+            return $this->redirect()->toRoute('home');
+        }
+        return array('stuff' => $stuff);
+    }
     
     public function homeAction()
     {

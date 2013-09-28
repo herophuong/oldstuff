@@ -33,6 +33,8 @@ abstract class AbstractStuffFilter implements InputFilterAwareInterface {
                 $this->inputFilter->add($this->getPurposeFilter());
             if ($this->getImageFilter())
                 $this->inputFilter->add($this->getImageFilter());
+            if ($this->getStateFilter())
+                $this->inputFilter->add($this->getStateFilter());
         }
         return $this->inputFilter;
     }
@@ -48,4 +50,5 @@ abstract class AbstractStuffFilter implements InputFilterAwareInterface {
     abstract protected function getCategoryFilter();
     abstract protected function getDesiredStuffFilter();
     abstract protected function getImageFilter();
+    abstract protected function getStateFilter();
 }
