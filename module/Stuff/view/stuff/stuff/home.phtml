@@ -9,7 +9,7 @@
     <?php if ($paginator->getTotalItemCount()) { ?>
     <?php 
         $this->partialLoop()->setObjectKey('object');
-        echo $this->partialLoop('partial/stuff.phtml', $paginator->getCurrentItems()); ?>
+        echo $this->partialLoop('partial/stuff-catalog-item.phtml', $paginator->getCurrentItems()); ?>
     <?php } else { ?>
     <div class="span9 item gallery text-center">
         <h2 class="muted"><?php echo $this->translate('No stuffs here'); ?></h2>
@@ -17,4 +17,4 @@
     </div>
     <?php } ?>
 </div>
-<?php $this->partial()->setObjectKey('object'); echo $this->partial('partial/pagination.phtml', $paginator); ?>
+<?php echo $this->partial('partial/pagination.phtml', array('paginator' => $paginator)); ?>

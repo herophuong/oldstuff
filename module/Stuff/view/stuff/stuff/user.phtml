@@ -63,4 +63,4 @@ $filter_tab = $session->offsetGet('filter.tab');
         <?php } ?>
     </div>
 </div>
-<?php $this->partial()->setObjectKey('object'); echo $this->partial('partial/pagination.phtml', $paginator); ?>  
+<?php echo $this->partial('partial/pagination.phtml', array('paginator' => $paginator)); ?>  

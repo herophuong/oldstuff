@@ -257,11 +257,12 @@
 
 .tags-gallery a{
     text-decoration:none;
+    color: #333;
 }
 
 .tags-gallery a:hover{
     color: #555;
-    text-decoration:underline;
+    text-decoration:none;
 }
 
 .pagination {
@@ -1134,7 +1135,7 @@ span.login-checkbox > input[type='checkbox']:checked + label {
     padding-bottom: 10px;
 }
 
-.stuff-item h4 a:hover {
+h4 a:hover {
     text-decoration: none;
 }
 
