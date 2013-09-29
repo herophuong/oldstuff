@@ -9,16 +9,25 @@ class VoteForm extends Form
 	{
 		parent::__construct($name);
 
+		// $this->setAttribute('method', 'post');
+
 		$this->add(array(
-			'name' => 'rate_box',
-			'type' => 'Text',
-			'options' => array(
-				'label' => 'Enter your rate here',
-				'label_attributes' => array(
-					'class' => 'control-label col-lg-4',
-				),
-			),
-		));
+            'type' => 'Zend\Form\Element\Radio',
+            'name' => 'rate_box',
+            'options' => array(
+                'label' => 'Please choose your rate',
+                'value_options' => array(
+                    '1' => ' Very Bad',
+                    '2' => ' Bad',
+                    '3' => ' Fine',
+                    '4' => ' Good',
+                    '5' => ' Very Good',
+                ),
+            ),
+            'attributes' => array(
+                'value' => '1' //set checked to '1'
+            )
+        ));
 
 		$this->add(array(
 			'name' => 'submit',

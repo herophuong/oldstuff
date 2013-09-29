@@ -32,6 +32,15 @@ class VoteController extends AbstractActionController
     {
     }
 
+    // public function showvoteAction() {
+    //     $con = mysqli_connect("localhost", "root", "mysql", "oldstuff");
+    //     if (mysqli_connect_errno($con))
+    //     {
+    //         echo "Failed to connect to MySQL: " . mysqli_connect_error();
+    //     }
+    //     $result = mysqli_query($con, "SELECT avgrate FROM userrate WHERE ");
+    // }
+
 	public function avgvoteAction()
 	{
         $avgRate = 0;
@@ -53,16 +62,35 @@ class VoteController extends AbstractActionController
             echo "Failed to connect to MySQL: " . mysqli_connect_error();
         }
 
-        $result = mysqli_query($con, "SELECT * FROM vote where voted_user_id=$voted_user_id");
+        $result = mysqli_query($con, "SELECT * FROM vote WHERE voted_user_id=$voted_user_id");
         while($row = mysqli_fetch_array($result))
         {
             $sumRate += $row['ratescore'];
-            $numOfVote++;
+            ++$numOfVote;
         }
-		$avgRate = (float) $sumRate / $numOfVote;
+        if ($numOfVote != 0) 
+        {
+		    $avgRate = (float) $sumRate / $numOfVote;
+        }
+        else
+        {
+            $avgRate = 0;
+        }
 
-        //mysqli_query($con, "SELECT * FROM vote where voted_user_id=$voted_user_id");
-
+        $temp_query = mysqli_query($con, "SELECT * FROM userrate where user_id=$voted_user_id");
+        $row1 = mysqli_fetch_array($temp_query);
+        if ($row1 == 0) 
+        {
+            //echo "Khong co thang nao";
+            //echo $voted_user_id;
+            mysqli_query($con, "INSERT INTO userrate (user_id, avgrate) VALUES ($voted_user_id, $avgRate)");
+        }
+        else 
+        {
+            //echo "Co 1 thang";
+            //echo $voted_user_id;
+            mysqli_query($con, "UPDATE userrate SET avgrate=$avgRate WHERE user_id=$voted_user_id");
+        }
         mysqli_close($con);
 	}
 
@@ -144,7 +172,7 @@ class VoteController extends AbstractActionController
                     }
                 }
             }
-            else 
+            elseif ($vote->user_id != $user_id)
             {
                 echo "Co user can vote, user vote chua tung vote, tao moi";
                 $form = new VoteForm();
@@ -179,6 +207,8 @@ class VoteController extends AbstractActionController
             }
         }
 
+        $this->avgvoteAction();
+        $this->avgvoteAction();
         return array(
             'form' => $form,
         );

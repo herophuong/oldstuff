@@ -30,19 +30,9 @@ $this->flashMessenger()->clearCurrentMessagesFromNamespace(FlashMessenger::NAMES
 <?php $form->setAttribute('action', ''); ?>
 <?php $form->setAttribute('class', 'form-horizontal'); ?>
 <?php $form->setAttribute('enctype', 'multipart/form-data'); ?>
-<div id="star"></div>
 <?php echo $this->form()->openTag($form); ?>
-<?php echo $this->formInput($form->get('rate_box')->setAttributes(array('placeholder' => "Enter your vote here", 'class' => 'form-control'))); ?>
+<?php echo $this->formRow($form->get('rate_box')); ?>
 <?php echo $this->formInput($form->get('submit')->setAttributes(array('value' => 'Vote', 'class' => 'btn btn-primary'))); ?>       
 <?php echo $this->form()->closeTag(); ?>
-
-<script type="text/javascript">
-	$(function() {
-      $.fn.raty.defaults.path = 'lib/img';
-
-      $('#star').raty();
-  	});
-</script>
-
 </body>
 </html>
