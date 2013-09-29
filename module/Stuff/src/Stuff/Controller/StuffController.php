@@ -9,11 +9,14 @@ use Zend\View\Model\ViewModel;
 // Entities
 use Category\Entity\Category;
 use Stuff\Entity\Stuff;
+use Stuff\Entity\Request;
 
 // Form, filters
 use Stuff\Form\StuffForm;
+use Stuff\Form\RequestForm;
 use Stuff\Filter\AddStuffFilter;
 use Stuff\Filter\EditStuffFilter;
+use Stuff\Filter\BuyFilter;
 use Zend\Filter\File\Rename;
 
 // Doctrine
@@ -323,6 +326,51 @@ class StuffController extends AbstractActionController {
             return $this->redirect()->toRoute('home');
         }
         return array('stuff' => $stuff);
+    }
+    
+    public function buyAction(){
+        //Check if user is logged in
+        if(!($user = $this->identity())){
+            return $this->redirect()->toRoute('login');
+        }
+        //Check if stuff belongs to current user
+        $stuff_id = $this->params()->fromRoute('id',0);
+        $stuff = $this->getEntityManager()->find('Stuff\Entity\Stuff',$stuff_id);
+        if($stuff->user == $user){
+            return $this->redirect()->toRoute('stuff', array('action' => 'user', 'id' => $user->user_id));
+        }
+        $filter = new BuyFilter();
+        $form = new RequestForm();
+        $form->setInputFilter($filter->getInputFilter());
+        $request = $this->getRequest();
+        if($request->isPost()){
+            $form->setData($request->getPost());
+            if($form->isValid()){
+                $formdata = $form->getData();
+                $buyrequest = new Request();
+                $data = $buyrequest->getArrayCopy();
+                $data['address']       = $formdata['address'];
+                $data['phone']         = $formdata['phone'];
+                $data['description']   = $formdata['description'];
+                $data['payment_method']= $formdata['paymentmethod'];
+                $data['requesting']    = $user;
+                $data['stuff']         = $stuff;
+                $data['state']         = 0;
+                $stuff->state = 2;
+                $buyrequest->populate($data);
+                try{
+                    $this->getEntityManager()->persist($buyrequest);
+                    $this->getEntityManager()->persist($stuff);
+                    $this->getEntityManager()->flush();
+                    $this->flashMessenger()->addSuccessMessage("Request has been sent");
+                    return $this->redirect()->toRoute('stuff',array('action' => 'user', 'id' => $user->user_id));
+                }
+                catch(DBALException $e){
+                    $this->flashMessenger()->addErrorMessage($e->getMessage());
+                }
+            }
+        }
+        return array('form' => $form, 'stuff' => $stuff);        
     }
     
     public function homeAction()
