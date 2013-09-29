@@ -94,6 +94,19 @@ class Contact
      */
     public function populate($data = array()) 
     {
-        
+        if (isset($data['contact_id']))
+            $this->contact_id = $data['contact_id'];
+        if (isset($data['address']))
+            $this->address = $data['address'];
+        if (isset($data['city']))
+            $this->city = $data['city'];
+        if (isset($data['state']))
+            $this->state = $data['state'];
+        if (isset($data['zipcode']))
+            $this->zipcode = $data['zipcode'];
+        if (isset($data['country']))
+            $this->country = $data['country'];
+        if (isset($data['phone']))
+            $this->phone = $data['phone'];
     }
 }
