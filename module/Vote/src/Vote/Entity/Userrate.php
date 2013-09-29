@@ -4,33 +4,32 @@ namespace Vote\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Vote
+ * Userrate
  *
  * @ORM\Entity
- * @ORM\Table(name="vote")
+ * @ORM\Table(name="userrate")
  * @property int    $user_id
- * @property int    $voted_user_id
- * @property int	$ratescore
+ * @property float	$avgrate
+ * @property int    $numofvote
  */
-class Vote
+class Userrate
 {
     /**
      * @ORM\Id
      * @ORM\Column(type="integer");
      */
-    protected $voted_user_id;
-    
-    /**
-     * @ORM\Column(type="integer")
-     */
-    protected $ratescore;
-     
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     */
     protected $user_id;
     
+    /**
+     * @ORM\Column(type="float")
+     */
+    protected $avgrate;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    protected $numofvote;
+
     /**
      * Magic getter to expose protected properties.
      *
@@ -71,7 +70,7 @@ class Vote
     public function populate($data = array()) 
     {
     	$this->user_id = $data['user_id'];
-        $this->voted_user_id = $data['voted_user_id'];
-        $this->ratescore = $data['ratescore'];
+        $this->avgrate = $data['avgrate'];
+        $this->numofvote = $data['numofvote'];
     }
 }

@@ -3,10 +3,12 @@ namespace Vote\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
+use Zend\Mvc\Controller\Plugin\FlashMessenger;
 
 use Doctrine\ORM\EntityManager;
 
 use Vote\Entity\Vote;
+use Vote\Entity\Userrate;
 use Vote\Form\VoteForm;
 
 
@@ -49,12 +51,14 @@ class VoteController extends AbstractActionController
         //Authenticate user
         $user_id = (int) $this->params()->fromroute('user_id',0);
         $user = $this->identity();
-        if($user->user_id != $user_id){
+        if($user->user_id != $user_id)
+        {
             return $this->redirect()->toRoute('user',array('action' => 'login'));
         }
         
         $voted_user_id = (int) $this->params()->fromroute('voted_user_id',0);
-		$con=mysqli_connect("localhost","root","mysql","oldstuff");
+        
+        $con=mysqli_connect("localhost","root","mysql","oldstuff");
 
         // Check connection
         if (mysqli_connect_errno($con))
@@ -66,32 +70,48 @@ class VoteController extends AbstractActionController
         while($row = mysqli_fetch_array($result))
         {
             $sumRate += $row['ratescore'];
-            ++$numOfVote;
+            $numOfVote++;
         }
         if ($numOfVote != 0) 
         {
-		    $avgRate = (float) $sumRate / $numOfVote;
+            $avgRate = (float) $sumRate / $numOfVote;
         }
         else
         {
             $avgRate = 0;
         }
+        echo "avgRate = " . $avgRate;
+        $userrate = $this->getEntityManager()->find('Vote\Entity\Userrate', $voted_user_id);
+        if (!$userrate)
+        {
+            $userrate = new Userrate();
+            $data = $userrate->getArrayCopy();
+            $data['user_id'] = $voted_user_id;
+            $data['avgrate'] = $avgRate;
+            $data['numofvote'] = $numOfVote;
+        }
+        else
+        {
+            $data = $userrate->getArrayCopy();
+            $data['user_id'] = $voted_user_id;
+            $data['avgrate'] = $avgRate;
+            $data['numofvote'] = $numOfVote;
+        }
+        
 
-        $temp_query = mysqli_query($con, "SELECT * FROM userrate where user_id=$voted_user_id");
-        $row1 = mysqli_fetch_array($temp_query);
-        if ($row1 == 0) 
+        $userrate->populate($data);
+        try
         {
-            //echo "Khong co thang nao";
-            //echo $voted_user_id;
-            mysqli_query($con, "INSERT INTO userrate (user_id, avgrate) VALUES ($voted_user_id, $avgRate)");
+            $this->getEntityManager()->persist($userrate);
+            $this->getEntityManager()->flush();
+            return $this->redirect()->toRoute('home',array('user_id' => $user_id,
+                                                            'action' => 'home',
+            ));
         }
-        else 
+        catch (DBALException $e)
         {
-            //echo "Co 1 thang";
-            //echo $voted_user_id;
-            mysqli_query($con, "UPDATE userrate SET avgrate=$avgRate WHERE user_id=$voted_user_id");
+            $this->flashMessenger()->addErrorMessage($e->getMessage());
         }
-        mysqli_close($con);
 	}
 
     public function voteAction()
@@ -104,7 +124,7 @@ class VoteController extends AbstractActionController
 		}
         
         $voted_user_id = (int) $this->params()->fromroute('voted_user_id',0);
-        $vote = $this->getEntityManager()->find('Vote\Entity\Vote', $voted_user_id);
+        $vote = $this->getEntityManager()->getRepository('Vote\Entity\Vote')->findOneBy(array('voted_user_id' => $voted_user_id, 'user_id' => $user_id));
         if ($vote == null)
         {
             echo "Khong co user can vote, tao moi";
@@ -128,12 +148,14 @@ class VoteController extends AbstractActionController
                     {
                         $this->getEntityManager()->persist($vote);
                         $this->getEntityManager()->flush();
-                        return $this->redirect()->toRoute('home',array('user_id' => $user_id,
-                                                                  'action' => 'home',
+                        $this->flashMessenger()->addSuccessMessage("Thank you for your vote");
+                        return $this->redirect()->toRoute('vote',array('user_id' => $user_id,
+                                                                    'voted_user_id' => $voted_user_id,
+                                                                  'action' => 'avgvote',
                         ));
                     }
                     catch(DBALException $e){
-                                
+                        $this->flashMessenger()->addErrorMessage($e->getMessage());          
                     }
                 }
             }
@@ -162,12 +184,14 @@ class VoteController extends AbstractActionController
                         {
                             $this->getEntityManager()->persist($vote);
                             $this->getEntityManager()->flush();
-                            return $this->redirect()->toRoute('home',array('user_id' => $user_id,
-                                                                  'action' => 'home',
-                            ));
+                            $this->flashMessenger()->addSuccessMessage("Thank you for your vote");
+                            return $this->redirect()->toRoute('vote',array('user_id' => $user_id,
+                                                                    'voted_user_id' => $voted_user_id,
+                                                                  'action' => 'avgvote',
+                        ));
                         }
                         catch(DBALException $e){
-                                    
+                            $this->flashMessenger()->addErrorMessage($e->getMessage());        
                         }
                     }
                 }
@@ -195,20 +219,19 @@ class VoteController extends AbstractActionController
                         {
                             $this->getEntityManager()->persist($vote);
                             $this->getEntityManager()->flush();
-                            return $this->redirect()->toRoute('home',array('user_id' => $user_id,
-                                                                  'action' => 'home',
-                            ));
+                            $this->flashMessenger()->addSuccessMessage("Thank you for your vote");
+                            return $this->redirect()->toRoute('vote',array('user_id' => $user_id,
+                                                                    'voted_user_id' => $voted_user_id,
+                                                                  'action' => 'avgvote',
+                        ));
                         }
                         catch(DBALException $e){
-                                    
+                            $this->flashMessenger()->addErrorMessage($e->getMessage());        
                         }
                     }
                 }
             }
         }
-
-        $this->avgvoteAction();
-        $this->avgvoteAction();
         return array(
             'form' => $form,
         );
