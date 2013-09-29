@@ -2,51 +2,58 @@
 namespace User\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+
 /**
- * A user
+ * A contact
  *
  * @ORM\Entity
- * @ORM\Table(name="user")
- * @property int    $user_id
- * @property string $email
- * @property string $display_name
- * @property string $password
- * @property int    $state
+ * @ORM\Table(name="contact")
+ * @property int    $contact_id
+ * @property string $address
+ * @property string $city
+ * @property string $state
+ * @property string $zipcode
+ * @property string $country
+ * @property string $phone
  */
-class User
+class Contact
 {
     /**
      * @ORM\Id
      * @ORM\Column(type="integer");
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected $user_id;
-    
-    /**
-     * @ORM\Column(type="string",unique=true)
-     */
-    protected $email;
-    
-    /**
-     * @ORM\Column(type="string",nullable=true)
-     */
-    protected $display_name;
+    protected $contact_id;
     
     /**
      * @ORM\Column(type="string")
      */
-    protected $password;
+    protected $address;
     
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string")
+     */
+    protected $city;
+    
+    /**
+     * @ORM\Column(type="string")
      */
     protected $state;
     
     /**
-     * @ORM\OneToOne(targetEntity="User\Entity\Contact")
-     * @ORM\JoinColumn(name="contact_id",referencedColumnName="contact_id")
+     * @ORM\Column(type="string")
      */
-    protected $contact;
+    protected $zipcode;
+    
+    /**
+     * @ORM\Column(type="string")
+     */
+    protected $country;
+    
+    /**
+     * @ORM\Column(type="string")
+     */
+    protected $phone;
     
     /**
      * Magic getter to expose protected properties.
@@ -87,10 +94,6 @@ class User
      */
     public function populate($data = array()) 
     {
-        $this->user_id = $data['user_id'];
-        $this->email = $data['email'];
-        $this->display_name = $data['display_name'];
-        $this->password = $data['password'];
-        $this->state = $data['state'];
+        
     }
 }
