@@ -14,9 +14,11 @@ use Stuff\Entity\Request;
 // Form, filters
 use Stuff\Form\StuffForm;
 use Stuff\Form\BuyForm;
+use Stuff\Form\TradeForm;
 use Stuff\Filter\AddStuffFilter;
 use Stuff\Filter\EditStuffFilter;
 use Stuff\Filter\BuyFilter;
+use Stuff\Filter\TradeFilter;
 use Zend\Filter\File\Rename;
 
 // Doctrine
@@ -377,6 +379,65 @@ class StuffController extends AbstractActionController {
             }
         }
         return array('form' => $form, 'stuff' => $stuff);        
+    }
+    
+    public function tradeAction(){
+       //Check if user is logged in
+        if(!($user = $this->identity())){
+            return $this->redirect()->toRoute('login');
+        }
+        //Check that stuff doesn't belong to current user
+        $stuff_id = $this->params()->fromRoute('id',0);
+        $stuff = $this->getEntityManager()->find('Stuff\Entity\Stuff',$stuff_id);
+        if($stuff->user == $user){
+            return $this->redirect()->toRoute('stuff', array('action' => 'user', 'id' => $user->user_id));
+        }
+        //Check that stuff is available to trade
+        if($stuff->purpose != 'trade' || $stuff->state != 1){
+            $this->flashMessenger()->addErrorMessage("Stuff is not available to trade");
+            return $this->redirect()->toRoute('stuff', array('action' => 'user', 'id' => $user->user_id));
+        }
+        
+        $filter = new TradeFilter();
+        $form = new TradeForm();
+        $form->setInputFilter($filter->getInputFilter());
+        
+        $Ddlstuffs = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff')->findBy(array('user' => $this->identity(), 'state' => 1));
+       
+        $Ddlstuff_list = array();
+        foreach ($Ddlstuffs as $Ddlstuff)
+        {            
+            $Ddlstuff_list[$Ddlstuff->stuff_id] = $Ddlstuff->stuff_name;            
+        }
+        $option = $form->get('exchangeStuff')->setValueOptions($Ddlstuff_list);             
+        $request = $this->getRequest();
+        if($request->isPost()){
+            $form->setData($request->getPost());
+            if($form->isValid()){
+                $formdata = $form->getData();
+                //Copy form to entity
+                $traderequest = new Request();
+                $data = $traderequest->getArrayCopy();
+                $data['payment_method']= 'exchange';
+                $data['requesting']    = $user;
+                $data['exchange_id']   = $formdata['exchangeStuff'];
+                $data['type']          = $stuff->purpose;
+                $data['stuff']         = $stuff;
+                $data['state']         = 1;               
+                $traderequest->populate($data);
+                try{
+                    $this->getEntityManager()->persist($traderequest);
+                    $this->getEntityManager()->persist($stuff);
+                    $this->getEntityManager()->flush();
+                    $this->flashMessenger()->addSuccessMessage("Request for trade sent.");
+                    return $this->redirect()->toRoute('stuff',array('action' => 'user', 'id' => $user->user_id));
+                }
+                catch(DBALException $e){
+                    $this->flashMessenger()->addErrorMessage($e->getMessage());
+                }
+            }
+        }
+        return array('form' => $form, 'stuff' => $stuff);     
     }
     
     public function homeAction()
