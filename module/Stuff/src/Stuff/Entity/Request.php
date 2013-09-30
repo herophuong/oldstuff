@@ -10,10 +10,9 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="request")
  * @property User    $requesting
  * @property Stuff   $stuff
- * @property string $address
- * @property string $phone
+ * @property string $type
  * @property string $payment_method
- * @property string $description
+ * @property int $exchange_id
  * @property int    $state
  */
 class Request
@@ -33,19 +32,14 @@ class Request
     protected $stuff;
     
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="integer", nullable=true)
      */
-    protected $address;
+    protected $exchange_id;
     
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="string")
      */
-    protected $phone;
-    
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
-    protected $description;
+    protected $type;
     
     /**
      * @ORM\Column(type="string")
@@ -98,9 +92,8 @@ class Request
     {
         $this->requesting = $data['requesting'];
         $this->stuff = $data['stuff'];
-        $this->address = $data['address'];
-        $this->phone = $data['phone'];
-        $this->description = $data['description'];
+        $this->type = $data['type'];
+        $this->exchange_id = $data['exchange_id'];
         $this->payment_method = $data['payment_method'];
         $this->state = $data['state'];
     }

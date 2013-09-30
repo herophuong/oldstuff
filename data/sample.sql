@@ -28,11 +28,10 @@ DROP TABLE IF EXISTS `request`;
 CREATE TABLE IF NOT EXISTS `request` (
   `stuff_id` int(11) NOT NULL,
   `requesting_id` int(11) NOT NULL,
-  `address` text NOT NULL,
-  `description` text COLLATE utf8_unicode_ci,
-  `state` smallint(6) NOT NULL,
-  `phone` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `exchange_id` int(11),
+  `type` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `payment_method` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `state` smallint(6) NOT NULL,
   PRIMARY KEY (`stuff_id`,`requesting_id`)
   ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci; 
 

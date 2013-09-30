@@ -13,7 +13,7 @@ use Stuff\Entity\Request;
 
 // Form, filters
 use Stuff\Form\StuffForm;
-use Stuff\Form\RequestForm;
+use Stuff\Form\BuyForm;
 use Stuff\Filter\AddStuffFilter;
 use Stuff\Filter\EditStuffFilter;
 use Stuff\Filter\BuyFilter;
@@ -333,36 +333,42 @@ class StuffController extends AbstractActionController {
         if(!($user = $this->identity())){
             return $this->redirect()->toRoute('login');
         }
-        //Check if stuff belongs to current user
+        //Check that stuff doesn't belong to current user
         $stuff_id = $this->params()->fromRoute('id',0);
         $stuff = $this->getEntityManager()->find('Stuff\Entity\Stuff',$stuff_id);
         if($stuff->user == $user){
             return $this->redirect()->toRoute('stuff', array('action' => 'user', 'id' => $user->user_id));
         }
+        //Check that stuff is available to buy
+        if($stuff->purpose != 'sell' || $stuff->state != 1){
+            $this->flashMessenger()->addErrorMessage("Stuff is not available to buy");
+            return $this->redirect()->toRoute('stuff', array('action' => 'user', 'id' => $user->user_id));
+        }
+        
         $filter = new BuyFilter();
-        $form = new RequestForm();
+        $form = new BuyForm();
         $form->setInputFilter($filter->getInputFilter());
         $request = $this->getRequest();
         if($request->isPost()){
             $form->setData($request->getPost());
             if($form->isValid()){
                 $formdata = $form->getData();
+                //Copy form to entity
                 $buyrequest = new Request();
                 $data = $buyrequest->getArrayCopy();
-                $data['address']       = $formdata['address'];
-                $data['phone']         = $formdata['phone'];
-                $data['description']   = $formdata['description'];
                 $data['payment_method']= $formdata['paymentmethod'];
                 $data['requesting']    = $user;
+                $data['exchange_id']   = 0;
+                $data['type']          = $stuff->purpose;
                 $data['stuff']         = $stuff;
-                $data['state']         = 0;
+                $data['state']         = 1;
                 $stuff->state = 2;
                 $buyrequest->populate($data);
                 try{
                     $this->getEntityManager()->persist($buyrequest);
                     $this->getEntityManager()->persist($stuff);
                     $this->getEntityManager()->flush();
-                    $this->flashMessenger()->addSuccessMessage("Request has been sent");
+                    $this->flashMessenger()->addSuccessMessage("Buy completed");
                     return $this->redirect()->toRoute('stuff',array('action' => 'user', 'id' => $user->user_id));
                 }
                 catch(DBALException $e){
