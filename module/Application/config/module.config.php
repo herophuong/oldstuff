@@ -79,6 +79,7 @@ return array(
             array(
                 'label' => 'Home',
                 'route' => 'home',
+                'icon'  => 'home',
             ),
         ),
     ),

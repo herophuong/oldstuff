@@ -1,0 +1,66 @@
+<?php $this->headTitle($this->translate('Your Stuff'), 'PREPEND'); 
+
+$authorized = ($this->identity() == $user);
+if ($authorized) {
+    $this->deleteConfirmationScript(); // Init confirmation popup upon stuff deletion
+}
+$session = new Zend\Session\Container('stuff\user\\'.$user->user_id);
+$filter_tab = $session->offsetGet('filter.tab');
+?>
+
+<div class="row">
+    <div class="span8 offset2 gallery content-block">
+        <?php echo $this->partial('partial/flash-messages.phtml'); ?>
+        <div class="row">
+            <div class="span2">
+                <img class="img-polaroid" src="http://www.gravatar.com/avatar/<?php echo md5(trim($user->email)); ?>?s=200" />
+            </div>
+            <div class="span5">
+                <blockquote><h1><?php echo $user->display_name; ?></h1></blockquote>
+                <span class="icon-envelope"></span>&nbsp;<?php echo $user->email; ?>
+                <br /><br />
+                <?php if ($authorized) { ?>
+                <a href="<?php echo $this->url('user', array('action' => 'edit', 'id' => $user->user_id), array('query' => array('redirect' => $this->stuffUserLink($user->user_id)))); ?>" class="btn"><?php echo $this->translate('Edit Profile'); ?></a>
+                <a href="<?php echo $this->stuffAddLink();?>" class="btn btn-primary">
+                <?php echo $this->translate('Add stuff'); ?>
+                </a>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<hr class="alt"/>
+<div class="row">
+    <?php if ($user == $this->identity()) { ?>
+    <div class="tab-bar span8 offset2">
+        <form class="filter-form" method="POST">
+            <div id="tab-select" class="btn-group" data-toggle="buttons-radio">
+                <button class="btn<?php echo ($filter_tab == 'inventory') ? ' active' : ''; ?>" type="button" data-value="inventory"><?php echo $this->translate("Inventory"); ?></button>
+                <button class="btn<?php echo ($filter_tab == 'request') ? ' active' : ''; ?>" type="button" data-value="request"><?php echo $this->translate("On Request"); ?></button>
+                <button class="btn<?php echo ($filter_tab == 'done') ? ' active' : ''; ?>" type="button" data-value="done"><?php echo $this->translate("Sold/Traded"); ?></button>
+                <input type="hidden" id="filter-tab" name="filter_tab" value="<?php echo (string) $filter_tab; ?>" />
+            </div>
+        </form>
+    </div>
+    <?php } ?>
+    <div class="span8 offset2 user-filter">
+    <?php echo $this->partial('stuff/partial/filter-bar.phtml', array('namespace' => 'stuff\user\\'.$user->user_id, 'categories' => $categories)); ?>
+    </div>
+</div>
+<div class="row">
+    <div class="gallery span8 offset2 user-stuff-list">
+        <?php if ($paginator->getTotalItemCount()) { ?>
+        <?php 
+            $this->partialLoop()->setObjectKey('object');
+            echo $this->partialLoop('partial/stuff-item.phtml', $paginator->getCurrentItems()); ?>
+        <?php } else { ?>
+        <div class="text-center">
+            <h2 class="muted"><?php echo $this->translate('No stuffs here'); ?></h2>
+            <h5><?php echo $this->translate('Upload new one now or change the search criteria!'); ?></h5>
+        </div>
+        <?php } ?>
+    </div>
+</div>
+<?php echo $this->partial('partial/pagination.phtml', array('paginator' => $paginator)); ?>  

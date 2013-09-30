@@ -1,9 +1,11 @@
+<?php $paginator = $this->paginator; ?>
+<?php if ($paginator->count() > 1) : ?>
 <div class="container">
     <div class="pagination">
         <ul>
             <li><a href="?page=1">&laquo;</a></li>
-            <?php for ($i = 1; $i <= $this->object->count(); $i++) { ?>
-                <?php if ($i == $this->object->getCurrentPageNumber()) { ?>
+            <?php for ($i = 1; $i <= $paginator->count(); $i++) { ?>
+                <?php if ($i == $paginator->getCurrentPageNumber()) { ?>
             <li class="active">
                 <span><?php echo $i; ?></span>
             </li>
@@ -13,7 +15,8 @@
             </li>
                 <?php } ?>
             <?php } ?>
-            <li><a href="?page=<?php echo $this->object->count(); ?>">&raquo;</a></li>
+            <li><a href="?page=<?php echo $paginator->count(); ?>">&raquo;</a></li>
         </ul>
     </div>
 </div>
+<?php endif; ?>

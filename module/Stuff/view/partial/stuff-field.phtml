@@ -1,0 +1,15 @@
+<div class="control-group">
+    <?php $element = $this->form->get($this->field); ?>
+    <?php $element->setOptions(array('label_attributes' => array('class' => 'control-label'))); ?>
+    <?php echo $this->formLabel($element); ?>
+    <div class="controls">
+        <?php $inputViewHelper = (string) $this->inputViewHelper;?>
+        <?php echo call_user_func(array($this, $inputViewHelper), $element); ?>
+    <?php
+    $messages = $this->form->getMessages();
+    if (isset($messages[$this->field])) {
+        echo '<br />'.$this->alertBlock(implode('<br />', $messages[$this->field]), 'alert-danger');
+    } 
+    ?>
+    </div>
+</div>

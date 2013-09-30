@@ -1,18 +1,20 @@
+<?php echo $this->partial('stuff/partial/filter-bar', array('categories' => $categories, 'namespace' => 'stuff')); ?>
 <div class="row" id="gallery-container">
-    <div class="span3 item">
+    <div class="span3 item gallery">
         <div class="nav-headers">
-            <h4>Find some interesting stuffs or submit your own things. You will never know what you can find here!</h4>
+            <blockquote><h4><?php echo $this->translate('Find some interesting stuffs with amazing prices or submit your own things. You will never know what you can find here!'); ?></h4></blockquote>
+            <div class="clearfix"></div>
         </div>
-        <ul class="nav nav-tabs nav-stacked">
-            <li class="active"><a href="#">All</a></li>
-            <?php foreach ($categories as $category) { ?>
-            <li><a href="#"><?php echo $category->cat_name; ?></a></li>
-            <?php } ?>
-        </ul>
     </div>
-    
+    <?php if ($paginator->getTotalItemCount()) { ?>
     <?php 
         $this->partialLoop()->setObjectKey('object');
-        echo $this->partialLoop('partial/stuff.phtml', $paginator->getCurrentItems()); ?>
+        echo $this->partialLoop('partial/stuff-catalog-item.phtml', $paginator->getCurrentItems()); ?>
+    <?php } else { ?>
+    <div class="span9 item gallery text-center">
+        <h2 class="muted"><?php echo $this->translate('No stuffs here'); ?></h2>
+        <h5><?php echo $this->translate('You can change your search criteria to get more stuffs!'); ?></h5>
+    </div>
+    <?php } ?>
 </div>
-<?php $this->partial()->setObjectKey('object'); echo $this->partial('partial/pagination.phtml', $paginator); ?>
+<?php echo $this->partial('partial/pagination.phtml', array('paginator' => $paginator)); ?>

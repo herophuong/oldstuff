@@ -1,19 +1,36 @@
 <?php
 namespace Stuff\Controller;
-use Category\Entity\Category;
+
+// MVC
 use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
-use Doctrine\ORM\EntityManager;
-use Stuff\Form\StuffForm;
-use Stuff\Entity\Stuff;
 use Zend\Mvc\Controller\Plugin\FlashMessenger;
+use Zend\View\Model\ViewModel;
+
+// Entities
+use Category\Entity\Category;
+use Stuff\Entity\Stuff;
+use Stuff\Entity\Request;
+
+// Form, filters
+use Stuff\Form\StuffForm;
+use Stuff\Form\RequestForm;
 use Stuff\Filter\AddStuffFilter;
-use Zend\Session\Container;
+use Stuff\Filter\EditStuffFilter;
+use Stuff\Filter\BuyFilter;
 use Zend\Filter\File\Rename;
+
+// Doctrine
+use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Query\Parameter;
+
 // Paginator
 use DoctrineORMModule\Paginator\Adapter\DoctrinePaginator as PaginatorAdapter;
 use Doctrine\ORM\Tools\Pagination\Paginator as ORMPaginator;
 use Zend\Paginator\Paginator;
+
+// Container
+use Zend\Session\Container;
 
 /**
  * 
@@ -35,65 +52,97 @@ class StuffController extends AbstractActionController {
 		$this->em = $em;
 	}
 	
-	public function indexAction(){
+	public function userAction()
+    {                 
+        $user_id = (int) $this->params()->fromroute('id', 0);
+        if (!$user_id) {
+            // Redirect on invalid request
+            $this->redirect()->toRoute('home');
+        }
         
-        $container = new Container('user');      
-              
-        $user_id_param = (int) $this->params()->fromroute('user_id',0);        
-		$tab_param = $this->getRequest()->getQuery()->tab;        
-        if ($tab_param)
-            $container->offsetSet('tab',$tab_param);
-                
-        if (!($user = $this->identity()) || ($user->__get('user_id') != $user_id_param) || (!$user_id_param))
-            return $this->redirect()->toRoute('user',array('action' => 'login'));
-               
+        // Init query builder
+        $user = $this->getEntityManager()->getRepository('User\Entity\User')->findOneBy(array('user_id' => $user_id));       
         $repository = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff');
         $queryBuilder = $this->getEntityManager()->createQueryBuilder();
+        $queryBuilder->select('s');
+        $queryBuilder->from('Stuff\Entity\Stuff', 's');
         
-        if ($container->tab == "inventory" || $container->tab == "")
-        {
-            $queryBuilder->select('s')
-                         ->from('Stuff\Entity\Stuff', 's')
-                         ->where('s.user = '.$user_id_param.' and s.state != -1')
-                         ->orderBy('s.stuff_id', 'DESC');
-           
+        // Get filter criteria from request or session
+        $filter_category = $this->_getStateFromPostRequest('filter.category', 'filter_category', 0, 'stuff\user\\'.$user_id);
+        $filter_purpose = $this->_getStateFromPostRequest('filter.purpose', 'filter_purpose', '', 'stuff\user\\'.$user_id);
+        $filter_search = $this->_getStateFromPostRequest('filter.search', 'filter_search', '', 'stuff\user\\'.$user_id);
+        
+        // Build the filter expression
+        $and = $queryBuilder->expr()->andX();
+        $parameters = new ArrayCollection();
+        
+        // Only show stuffs from this user
+        $and->add($queryBuilder->expr()->eq('s.user', ':user_id'));
+        $parameters->add(new Parameter('user_id', $user_id, 'integer'));
+        
+        /*--- Filter by searching ---*/
+        if ($filter_category) {
+            $and->add($queryBuilder->expr()->eq('s.category', ':cat_id'));
+            $parameters->add(new Parameter('cat_id', $filter_category, 'integer'));
         }
-        else if ($container->tab == "done")
-        {
-            $queryBuilder->select('s')
-                         ->from('Stuff\Entity\Stuff', 's')
-                         ->where('s.user = '.$user_id_param.' and s.state = 2')
-                         ->orderBy('s.stuff_id', 'DESC'); 
-        }      
-        else if ($container->tab == "request")
-        {            
-            
+        if ($filter_purpose) {
+            $and->add($queryBuilder->expr()->eq('s.purpose', ':purpose'));
+            $parameters->add(new Parameter('purpose', $filter_purpose, 'string'));
+        }
+        if ($filter_search) {
+            $or = $queryBuilder->expr()->orX();
+            $or->add($queryBuilder->expr()->like('s.stuff_name', ':search'));
+            $or->add($queryBuilder->expr()->like('s.description', ':search'));
+            $and->add($or);
+            $parameters->add(new Parameter('search', '%'.$filter_search.'%', 'string'));
         }
         
-            $paginator = new Paginator(new PaginatorAdapter(new ORMPaginator($queryBuilder)));
-            $paginator->setItemCountPerPage(10);
-            $page = (int) $this->params()->fromQuery('page');
-            if ($page) 
-                $paginator->setCurrentPageNumber($page);
-            return array(
-                'user' => $user,       
-                'paginator' => $paginator,
-                'tab'=> '&'.$container->tab,
-            );
+        /*--- Filter by user tabs ---*/
+        if ($user == $this->identity()) {
+            $filter_tab = $this->_getStateFromPostRequest('filter.tab', 'filter_tab', 'inventory', 'stuff\user\\'.$user_id);
+            switch ($filter_tab) {
+                case 'inventory':
+                    $and->add($queryBuilder->expr()->in('s.state', array(0, 1)));
+                    break;
+                case 'done':                
+                    $and->add($queryBuilder->expr()->eq('s.state', 2));
+                    break;
+                case 'request':
+                    // TODO Implement what stuffs from this user are requested
+                default:
+                    // Prevent error by select nothing in query builder
+                    $and->add($queryBuilder->expr()->eq('s.stuff_id', 0));
+                    break;
+            }
+        } else {
+            $and->add($queryBuilder->expr()->eq('s.state', 1));
+        }
+        /*--- End filter ---*/
+        
+        $queryBuilder->where($and)->setParameters($parameters)->orderBy('s.stuff_id', 'DESC');
+        /*--- End filter ---*/
+        
+        $paginator = new Paginator(new PaginatorAdapter(new ORMPaginator($queryBuilder)));
+        $paginator->setItemCountPerPage(10);
+        $page = (int) $this->params()->fromQuery('page');
+        if ($page) 
+            $paginator->setCurrentPageNumber($page);
+        $categories = $this->getEntityManager()->getRepository('Category\Entity\Category')->findBy(array(), array('cat_name' => 'ASC'));
+        return array(
+            'user' => $user,       
+            'paginator' => $paginator,
+            'categories' => $categories,
+        );
 	}
 	
 	public function addAction(){
-	    //Authenticate user
-		$user_id = (int) $this->params()->fromroute('user_id',0);
-        $user = $this->identity();
-		if($user->user_id != $user_id){
-			return $this->redirect()->toRoute('home',array('action' => 'home'));
-		}
-        
+	    //Check if user is logged in
+	    if(!($user = $this->identity())){
+	        return $this->redirect()->toRoute('login');
+	    }
 		$form = new StuffForm();
 		$filter = new AddStuffFilter();
-		$form->setInputFilter($filter->getInputFilter());
-        
+		
 		$request = $this->getRequest();
 		
 		if($request->isPost()){
@@ -101,10 +150,19 @@ class StuffController extends AbstractActionController {
                 $request->getPost()->toArray(),
                 $request->getFiles()->toArray()
             );
+            $temp = $request->getPost();
+            if($temp['purpose']== 'sell'){
+                $filter->getInputFilter()->get('price')->setRequired(true)->setErrorMessage("To sell, you need to enter a price");
+            }
+            else if($temp['purpose'] == 'trade'){
+                $filter->getInputFilter()->get('desiredstuff')->setRequired(true)->setErrorMessage("To trade, you need to enter desired stuff");
+            }
+		    $form->setInputFilter($filter->getInputFilter());
+		    
 			$form->setData($post);
 			if($form->isValid()){
-				$formdata = $form->getData();
-                //Relocate and rename uploaded image
+			    $formdata = $form->getData();
+				//Relocate and rename uploaded image
                 $filefilter = new Rename(array("target" => "./public/upload/img.jpg", "randomize" => "true"));
                 $image = $filefilter->filter($formdata['image']);
                 $stuff = new Stuff();
@@ -119,23 +177,23 @@ class StuffController extends AbstractActionController {
                 $data['category']      = $category;
                 $data['desired_stuff'] = $formdata['desiredstuff'];
                 $data['user']          = $user;
-                $data['state']         = 1;
+                $data['state']         = $formdata['state'];
                 
                 $stuff->populate($data);
 				try{
 					$this->getEntityManager()->persist($stuff);
 					$this->getEntityManager()->flush();
 					$this->flashMessenger()->addSuccessMessage("Add new stuff successfully");
-					//return $this->redirect()->toRoute('stuff',array('user_id' => $user_id,
-					//												'action' => 'index',
-					//));
-					$form = new StuffForm();
+					return $this->redirect()->toRoute('stuff',array('action' => 'user', 'id' => $user->user_id));
 				}
 				catch(DBALException $e){
                     $this->flashMessenger()->addErrorMessage($e->getMessage());
 				}
 			}	
 		}
+        else {
+            $form->setInputFilter($filter->getInputFilter());
+        }
         //Load categories
         $categories = $this->getEntityManager()->getRepository('Category\Entity\Category')->findAll();
         foreach ($categories as $value) {
@@ -150,66 +208,48 @@ class StuffController extends AbstractActionController {
  	}
 	
 	public function deleteAction(){
-       //Get user_id from URL and check if user is valid
-        $user_id = (int) $this->params()->fromroute('user_id',0);
-        if($this->identity()->user_id != $user_id){
-            return $this->redirect()->toRoute('home',array('action' => 'home'));
-        }
-        
+	    //Check if user is logged in
+	    if(!($user = $this->identity())){
+	        return $this->redirect()->toRoute('login');
+	    }
         //Check if stuff_id is valid and stuff belongs to right user
-        $stuff_id = (int) $this->params()->fromroute('stuff_id',0);
+        $stuff_id = (int) $this->params()->fromroute('id',0);
         if(!$stuff_id){
-            return $this->redirect()->toRoute('stuff',array('user_id' => $user_id,
-                                                          'action' => 'index',
-            ));
+            return $this->redirect()->toRoute('stuff',array('action' => 'user', 'id' => $user->user_id));
         }
         $stuff = $this->getEntityManager()->find('Stuff\Entity\Stuff',$stuff_id);
-                            
-        $request = $this->getRequest();
-		
-		if($request->isPost()){
-            if($stuff->user->user_id != $user_id){
-                $this->flashMessenger()->addErrorMessage("Delete error.");
-               return $this->redirect()->toRoute('stuff',array('user_id' => $user_id,
-                                                              'action' => 'index',
-               ));
-            }
-            $data = $stuff->getArrayCopy();
-            $data['state'] = -1;
-            $stuff->populate($data);
-            $this->getEntityManager()->flush();
-            $this->flashMessenger()->addSuccessMessage("Delete stuff successfully.");                    
+        if($stuff->user != $user){
+            $this->flashMessenger()->addErrorMessage("Delete error.");
+            return $this->redirect()->toRoute('stuff',array('action' => 'user', 'id' => $user->user_id));
         }
+        $request = $this->getRequest();        
+        $data = $stuff->getArrayCopy();
+        $data['state'] = -1;
+        $stuff->populate($data);
+        $this->getEntityManager()->flush();
+        $this->flashMessenger()->addSuccessMessage("Delete stuff successfully.");                    
+
                 
-        return $this->redirect()->toRoute('stuff',array('user_id' => $user_id,
-                                                      'action' => 'index',
-        ));
+        return $this->redirect()->toRoute('stuff',array('action' => 'user', 'id' => $user->user_id));
 	}
 	
 	public function editAction(){
-	    //Get user_id from URL and check if user is valid
-	    $user_id = (int) $this->params()->fromroute('user_id',0);
-        if($this->identity()->user_id != $user_id){
-            return $this->redirect()->toRoute('home',array('action' => 'home'));
+        //Check if stuff_id is valid and stuff belongs to right users
+        $user = $this->identity();
+        if(!$user){
+            return $this->redirect()->toRoute('login');   
         }
-        
-        //Check if stuff_id is valid and stuff belongs to right user
-        $stuff_id = (int) $this->params()->fromroute('stuff_id',0);
+        $stuff_id = (int) $this->params()->fromroute('id',0);
+        $stuff = $this->getEntityManager()->find('Stuff\Entity\Stuff',$stuff_id);        
         if(!$stuff_id){
-            return $this->redirect()->toRoute('stuff',array('user_id' => $user_id,
-                                                          'action' => 'index',
-            ));
+            return $this->redirect()->toRoute('stuff',array('action' => 'user', 'id' => $user->user_id));
         }
-        $stuff = $this->getEntityManager()->find('Stuff\Entity\Stuff',$stuff_id);
-        if($stuff->user->user_id != $user_id){
-            return $this->redirect()->toRoute('stuff',array('user_id' => $user_id,
-                                                          'action' => 'index',
-            ));
+        if(!$stuff || $stuff->user != $user){
+            return $this->redirect()->toRoute('stuff',array('action' => 'user', 'id' => $user->user_id));
         }
         
         $form = new StuffForm();
-        $filter = new AddStuffFilter();
-        $form->setInputFilter($filter->getInputFilter());
+        $filter = new EditStuffFilter();
         $request = $this->getRequest();
         
         if($request->isPost()){
@@ -217,6 +257,14 @@ class StuffController extends AbstractActionController {
                 $request->getPost()->toArray(),
                 $request->getFiles()->toArray()
             );
+            $temp = $request->getPost();
+            if($temp['purpose']== 'sell'){
+                $filter->getInputFilter()->get('price')->setRequired(true)->setErrorMessage("To sell, you need to enter a price");
+            }
+            else if($temp['purpose'] == 'trade'){
+                $filter->getInputFilter()->get('desiredstuff')->setRequired(true)->setErrorMessage("To trade, you need to enter desired stuff");
+            }
+            $form->setInputFilter($filter->getInputFilter());
             $form->setData($post);
             if($form->isValid()){
                 $formdata = $form->getData();
@@ -233,14 +281,13 @@ class StuffController extends AbstractActionController {
                 $category = $this->getEntityManager()->getRepository('Category\Entity\Category')->findOneBy(array('cat_name' => $formdata['category']));
                 $data['category']      = $category;
                 $data['desired_stuff'] = $formdata['desiredstuff'];
+                $data['state']         = $formdata['state'];
                 $stuff->populate($data);
                 try{
                     $this->getEntityManager()->persist($stuff);
                     $this->getEntityManager()->flush();
                     $this->flashMessenger()->addSuccessMessage("Edit stuff successfully");
-                    return $this->redirect()->toRoute('stuff',array('user_id' => $user_id,
-                                                                  'action' => 'index',
-                    ));
+                    return $this->redirect()->toRoute('stuff',array('action' => 'user', 'id' => $user->user_id));
                 }
                 catch(DBALException $e){
                     $this->flashMessenger()->addErrorMessage($e->getMessage());
@@ -249,12 +296,14 @@ class StuffController extends AbstractActionController {
         }
         else{
             //Load stuff data
-            $formdata['stuffname'] = $stuff->stuff_name;
+            $form->setInputFilter($filter->getInputFilter());
+            $formdata['stuffname']   = $stuff->stuff_name;
             $formdata['description'] = $stuff->description;
-            $formdata['price'] = $stuff->price;
-            $formdata['category'] = $stuff->category->cat_name;
-            $formdata['purpose'] = $stuff->purpose;
-            $formdata['desiredstuff'] = $stuff->desired_stuff;
+            $formdata['price']       = $stuff->price;
+            $formdata['category']    = $stuff->category->cat_name;
+            $formdata['purpose']     = $stuff->purpose;
+            $formdata['desiredstuff']= $stuff->desired_stuff;
+            $formdata['state']       = $stuff->state;
             $form->setData($formdata);
         }
         //Load categories to select
@@ -269,14 +318,101 @@ class StuffController extends AbstractActionController {
         );
 	}
     
+    public function itemAction(){
+        //Get stuff from db and check if it is valid
+        $stuff_id = $this->params()->fromRoute('id',0);
+        $stuff = $this->getEntityManager()->find('Stuff\Entity\Stuff',$stuff_id);
+        if(!$stuff){
+            return $this->redirect()->toRoute('home');
+        }
+        return array('stuff' => $stuff);
+    }
+    
+    public function buyAction(){
+        //Check if user is logged in
+        if(!($user = $this->identity())){
+            return $this->redirect()->toRoute('login');
+        }
+        //Check if stuff belongs to current user
+        $stuff_id = $this->params()->fromRoute('id',0);
+        $stuff = $this->getEntityManager()->find('Stuff\Entity\Stuff',$stuff_id);
+        if($stuff->user == $user){
+            return $this->redirect()->toRoute('stuff', array('action' => 'user', 'id' => $user->user_id));
+        }
+        $filter = new BuyFilter();
+        $form = new RequestForm();
+        $form->setInputFilter($filter->getInputFilter());
+        $request = $this->getRequest();
+        if($request->isPost()){
+            $form->setData($request->getPost());
+            if($form->isValid()){
+                $formdata = $form->getData();
+                $buyrequest = new Request();
+                $data = $buyrequest->getArrayCopy();
+                $data['address']       = $formdata['address'];
+                $data['phone']         = $formdata['phone'];
+                $data['description']   = $formdata['description'];
+                $data['payment_method']= $formdata['paymentmethod'];
+                $data['requesting']    = $user;
+                $data['stuff']         = $stuff;
+                $data['state']         = 0;
+                $stuff->state = 2;
+                $buyrequest->populate($data);
+                try{
+                    $this->getEntityManager()->persist($buyrequest);
+                    $this->getEntityManager()->persist($stuff);
+                    $this->getEntityManager()->flush();
+                    $this->flashMessenger()->addSuccessMessage("Request has been sent");
+                    return $this->redirect()->toRoute('stuff',array('action' => 'user', 'id' => $user->user_id));
+                }
+                catch(DBALException $e){
+                    $this->flashMessenger()->addErrorMessage($e->getMessage());
+                }
+            }
+        }
+        return array('form' => $form, 'stuff' => $stuff);        
+    }
+    
     public function homeAction()
     {
+        // Get filter request
+        $filter_category    = $this->_getStateFromPostRequest('filter.category', 'filter_category');
+        $filter_purpose     = $this->_getStateFromPostRequest('filter.purpose', 'filter_purpose');
+        $filter_search      = $this->_getStateFromPostRequest('filter.search', 'filter_search');
+
         // Get stuffs
         $repository = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff');
         $queryBuilder = $this->getEntityManager()->createQueryBuilder();
         $queryBuilder->select('s')
                      ->from('Stuff\Entity\Stuff', 's')
                      ->orderBy('s.stuff_id', 'DESC');
+        
+        // Build the filter expression
+        $and = $queryBuilder->expr()->andX();
+        $parameters = new ArrayCollection();
+        if ($filter_category) {
+            $and->add($queryBuilder->expr()->eq('s.category', ':cat_id'));
+            $parameters->add(new Parameter('cat_id', $filter_category, 'integer'));
+        }
+        if ($filter_purpose) {
+            $and->add($queryBuilder->expr()->eq('s.purpose', ':purpose'));
+            $parameters->add(new Parameter('purpose', $filter_purpose, 'string'));
+        }
+        if ($filter_search) {
+            $or = $queryBuilder->expr()->orX();
+            $or->add($queryBuilder->expr()->like('s.stuff_name', ':search'));
+            $or->add($queryBuilder->expr()->like('s.description', ':search'));
+            $and->add($or);
+            $parameters->add(new Parameter('search', '%'.$filter_search.'%', 'string'));
+        }
+        
+        // Only show published stuffs
+        $and->add($queryBuilder->expr()->like('s.state', ':state'));
+        $parameters->add(new Parameter('state', 1, 'integer'));
+        
+        $queryBuilder->where($and)->setParameters($parameters);
+        
+        // Create a paginator
         $paginator = new Paginator(new PaginatorAdapter(new ORMPaginator($queryBuilder)));
         $paginator->setItemCountPerPage(11);
         $page = (int) $this->params()->fromQuery('page');
@@ -289,5 +425,35 @@ class StuffController extends AbstractActionController {
             'categories' => $categories,
             'paginator' => $paginator,
         );
+    }
+    
+    /**
+     * Get a value from post request or session if request not available
+     * Auto save value into session when the value has been changed
+     *
+     * @param string $key       Key to get the value from session
+     * @param string $parameter The parameter name of the value to get from POST request
+     * @param mixed  $default   Default value if value is not available
+     * @param string $namespace The namespace to initialize the session container
+     *
+     * @return mixed|null
+     */
+    private function _getStateFromPostRequest($key, $parameter, $default = null, $namespace = 'stuff')
+    {
+        $request = $this->getRequest()->getPost();
+        
+        $value = $request->get($parameter, null);
+        // Exchange request value with session value
+        $session = new Container($namespace);
+        if ($value !== null) {
+            $session->offsetSet($key, $value);
+        } else if ($session->offsetGet($key) === null) {
+            $session->offsetSet($key, $default);
+            $value = $default;
+        } else {
+            $value = $session->offsetGet($key);
+        }
+        
+        return $value;
     }
 }

@@ -4,7 +4,7 @@
  * Afriq Yasin Ramadhan
  */
  
- @font-face {
+/* @font-face {
 			font-family: segoeuil;
 			src: url('../fonts/segoeuil.ttf');
 		}
@@ -15,13 +15,13 @@
  @font-face {
 			font-family: segoeuib;
 			src: url('../fonts/segoeuib.ttf');
-		}
+		}*/
  
  body {
     padding-top: 70px;
 	background:#fafafa;
     background: url(../img/body-bg.png) repeat;
-    font-family:segoeui;
+    font-family:'Open Sans';
 	}    
 
 	
@@ -49,9 +49,9 @@
 }
 
 .navbar .divider-vertical {
-  width: 1px;
+/*   width: 1px; */
   height: 40px;
-  margin: 0 9px;
+  margin: 0px;
   overflow: hidden;
   background-color: #fafafa !important;
   border-right: 1px solid #ccc !important;
@@ -138,6 +138,9 @@
     height:22px;
 }
 
+.navbar [class^="icon-"]{
+    margin-top: 2px;
+}
 /* .: SIDEBAR MENU :. */
 
 .nav-tabs.nav-stacked > li > a {
@@ -163,7 +166,6 @@
     background:#fff;
     border:1px solid #ccc;
     border-bottom: none;
-    height:105px;
     padding:15px;
 }
 
@@ -243,6 +245,11 @@
     margin-right: 20px;
 }
 
+.count-gallery h4 {
+    font-weight: normal;
+    display: inline;
+}
+
 .tags-gallery{
     margin: 5px auto;
     padding-left: 20px;
@@ -250,11 +257,12 @@
 
 .tags-gallery a{
     text-decoration:none;
+    color: #333;
 }
 
 .tags-gallery a:hover{
     color: #555;
-    text-decoration:underline;
+    text-decoration:none;
 }
 
 .pagination {
@@ -294,7 +302,91 @@
     text-decoration:none;
 }
 
+/* FILTER BAR */
+.filter-bar {
+    box-shadow:0 0 1px 1px #ccc;
+    -moz-box-shadow:0 0 1px 1px #ccc;
+    -o-box-shadow:0 0 1px 1px #ccc;
+    -webkit-box-shadow:0 0 1px 1px #ccc;
+    margin-bottom:30px;
+    background:#fff;
+    padding: 15px;
+    box-sizing: border-box;
+}
 
+.filter-bar form {
+    margin: 0px;
+}
+
+.filter-bar .input-append {
+    margin-bottom: 0px;
+}
+
+.filter-bar .filter-left {
+    float: left;
+}
+
+.filter-bar .filter-right {
+    float: right;
+}
+
+.user-filter .filter-bar input {
+    width: 150px;
+}
+.user-filter .filter-bar .bootstrap-select {
+    width: 150px;
+}
+
+@media (max-width: 979px) {
+.filter-bar .filter-left, .filter-bar .filter-right {
+    float: none;
+    text-align: center;
+}
+
+.filter-bar .filter-right {
+    margin-top: 10px;
+}
+}
+
+.tab-bar {
+    height: 0px;
+    padding: 0px;
+    position: relative;
+    border-top: 1px solid #ccc !important;
+    border-bottom: 1px solid #fff !important;
+    background-color: transparent;
+    margin-bottom: 30px;
+    margin-top: 10px;
+    min-height: 0px;
+    text-align: center;
+}
+.tab-bar .filter-form {
+    position: absolute;
+    top: -15px;
+    left: 0px; right: 0px;
+}
+/* FLAT BUTTON */
+input, .btn {
+    border-radius: 0px !important;
+}
+
+.btn {
+    background-color: #ffffff;
+    background-image: none;
+}
+.btn.active {
+    color: #333333;
+    background-color: #eeeeef;
+}
+.btn-primary {
+    background-color: #006dcc;
+}
+.btn-info {
+    background-color: #49afcd;
+}
+.btn-success {
+    background-color: #5bb75b;
+}
 /* .: TYPHOGRAPHY :. */
 
 hr.alt{
@@ -818,6 +910,15 @@ span.login-checkbox > input[type='checkbox']:checked + label {
 
 .content-block {
     padding: 20px;
+    box-sizing: border-box;
+}
+
+.content-block h1 {
+    margin-bottom: 50px;
+}
+
+.content-block .alert {
+    margin-top: 10px;
 }
 
 .btn-signin {display: inline-block; float: right; margin-top: 18px; margin-right:10px;}
@@ -1006,4 +1107,69 @@ span.login-checkbox > input[type='checkbox']:checked + label {
 
 .img-thumbnail{
     margin-right:10px;
+}
+
+/* FORM */
+.form-link {
+    margin: 0px;
+    display: inline;
+}
+.form-link .btn-link {
+    padding: 0px;
+}
+
+/* USER STUFF LIST */
+
+.stuff-item {
+    border-bottom: 1px dashed #ccc;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+}
+
+.stuff-item:last-child {
+    border-bottom: none;
+}
+
+.stuff-item h4 {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 10px;
+}
+
+h4 a:hover {
+    text-decoration: none;
+}
+
+.stuff-buttons {
+    padding: 10px 10px 0px 0px;
+    text-align: center !important;
+}
+
+.stuff-buttons .btn {
+    margin: 5px;
+    margin-left: 0px !important;
+    max-width: 200px;
+}
+
+ul.stuff-value {
+    margin-bottom:5px;
+    list-style-type:none;
+}
+
+ul.stuff-value li {
+    margin-left: -5px;
+    margin-right: 20px;
+}
+
+ul.stuff-value li h4 {
+    display: inline;
+}
+
+.stuff-image img {
+    max-height: 200px;
+}
+@media (max-width: 767px) {
+.stuff-item {
+    padding: 20px;
+    box-sizing: border-box;
+}
 }

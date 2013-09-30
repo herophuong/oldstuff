@@ -1,0 +1,11 @@
+<?php
+use \Zend\Mvc\Controller\Plugin\FlashMessenger as PluginFlashMessenger;
+// Config flash messenger
+$this->flashMessenger()->setMessageOpenFormat("<div%s><button type='button' class='close' data-dismiss='alert'>&times;</button>");
+$this->flashMessenger()->setMessageSeparatorString('<br />');
+$this->flashMessenger()->setMessageCloseString('</div>');
+
+// Render flash messenger
+echo $this->flashMessenger()->render(PluginFlashMessenger::NAMESPACE_SUCCESS, array('alert', 'alert-success'));
+echo $this->flashMessenger()->render(PluginFlashMessenger::NAMESPACE_ERROR, array('alert', 'alert-danger'));
+?>

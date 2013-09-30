@@ -8,7 +8,7 @@ class AddStuffFilter extends AbstractStuffFilter {
 	protected function getStuffNameFilter(){
 		return array(
 				'name' => 'stuffname',
-				'required' => 'true',
+				'required' => true,
 				'validators' => array(
 					array(
 	                    'name' => 'NotEmpty',
@@ -31,7 +31,7 @@ class AddStuffFilter extends AbstractStuffFilter {
 	protected function getDescriptionFilter(){
 		return array(
 				'name' => 'description',
-				'required' => 'false',
+				'required' => false,
 				'validators' => array(
 					array(
 	                    'name' => 'NotEmpty',
@@ -47,7 +47,7 @@ class AddStuffFilter extends AbstractStuffFilter {
 	protected function getPriceFilter(){
 		return array(
 				'name' => 'price',
-				'required' => 'true',
+				'required' => false,
 				'validators' => array(
 					array(
 	                    'name' => 'NotEmpty',
@@ -69,30 +69,37 @@ class AddStuffFilter extends AbstractStuffFilter {
     protected function getCategoryFilter(){
         return array(
             'name' => 'category',
-            'required' => 'true',
+            'required' => true,
         );
     }
 
     protected function getDesiredStuffFilter(){
         return array(
             'name' => 'desiredstuff',
-            'required' => 'true',
+            'required' => false,
         );
     }
     
     protected function getPurposeFilter(){
         return array(
             'name' => 'purpose',
-            'required' => 'true',
+            'required' => true,
         );
     }
     
     protected function getImageFilter(){
         $fileinput = new FileInput("image");
-        $fileinput->setRequired("true");
+        $fileinput->setRequired(true);
         $fileinput->getValidatorChain()->attachByName("filesize", array("max" => "2MB"))
                                        ->attachByName("fileisimage")
                                        ->attachByName("fileuploadfile");
         return $fileinput;                                     
+    }
+    
+    protected function getStateFilter(){
+        return array(
+            'name' => 'state',
+            'required' => true,
+        );
     }
 }

@@ -1,0 +1,14 @@
+<ul class="nav pull-right">
+<li class="divider-vertical"></li>
+<?php foreach ($this->container as $page) : ?>
+<li<?php echo ($page->isActive()) ? ' class="active"' : ''; ?>>
+    <a href="<?php echo $page->getHref(); ?>">
+        <?php if (isset($page->icon)) : ?>
+        <i class="icon-<?php echo $page->icon; ?>"></i>&nbsp;
+        <?php endif; ?>
+        <?php echo $page->label; ?>
+    </a>
+</li>
+<li class="divider-vertical"></li>
+<?php endforeach; ?>
+</ul>

@@ -10,11 +10,11 @@ $this->flashMessenger()->setMessageCloseString('</div>');
 <div class="row">
     <div class="span8 offset2 gallery content-block">
         <?php echo $this->flashMessenger()->render(PluginFlashMessenger::NAMESPACE_SUCCESS, array('alert', 'alert-success')); ?>
-        <div class="row">
-            <div class="span2">
+        <div class="row-fluid">
+            <div class="span3">
                 <img class="img-polaroid" src="http://www.gravatar.com/avatar/<?php echo md5(trim($user->email)); ?>?s=200" />
             </div>
-            <div class="span6">
+            <div class="span9">
                 <blockquote><h1><?php echo $user->display_name; ?></h1></blockquote>
                 <span class="glyphicon glyphicon-envelope"></span>&nbsp;<?php echo $user->email; ?>
                 <br /><br />

@@ -17,7 +17,8 @@
                         ->prependStylesheet($this->basePath() . '/css/bootstrap-responsive.css')
                         ->prependStylesheet($this->basePath() . '/css/icon-style.css')
                         ->prependStylesheet($this->basePath() . '/css/style.css')
-                        ->prependStylesheet($this->basePath() . '/css/bootstrap.css'); ?>
+                        ->prependStylesheet($this->basePath() . '/css/bootstrap.css')
+                        ->prependStylesheet($this->basePath() . '/css/open-sans.css'); ?>
 
         <!-- Scripts -->
         <?php echo $this->headScript()
@@ -42,15 +43,9 @@
                 </a>
                 <a class="brand" href="<?php echo $this->url('home') ?>"><img title="<?php echo $this->translate('Old Stuff Trade System') ?>" src="<?php echo $this->basePath() .'/img/os-logo.png'; ?>" alt="<?php echo $this->translate('Old Stuff Trade System') ?>" /></a>
                 <div class="nav-collapse">
-                    <?php echo $this->navigation()->menu('navigation')->setUlClass('nav'); ?>
+                    <?php echo $this->navigation()->menu()->renderPartial('navigation', 'partial/menu-left.phtml'); ?>
                     
-                    <?php 
-                    if ($user = $this->identity()) { 
-                        echo $this->navigation()->menu('signedin_user_navigation')->setUlClass('nav pull-right');
-                    } else {
-                        echo $this->navigation()->menu('anonymous_user_navigation')->setUlClass('nav pull-right');
-                    } 
-                    ?>
+                    <?php echo $this->navigation()->menu()->renderPartial('Stuff\Navigation\Head', 'partial/menu-right.phtml'); ?>
                 </div><!--/.nav-collapse -->
                 </div>
             </div>

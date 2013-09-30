@@ -14,9 +14,6 @@ class StuffForm extends Form {
 			'type' => 'Text',
 			'options' => array(
 				'label' => 'Name',
-				'label_attributes' => array(
-					'class' => 'control-label col-lg-4',
-				),
 			),
 			'attributes' => array(
 				'id' => 'inputstuffname',
@@ -29,9 +26,6 @@ class StuffForm extends Form {
 			'type' => 'TextArea',
 			'options' => array(
 				'label' => 'Description',
-				'label_attributes' => array(
-					'class' => 'control-label col-lg-4',
-				),
 			),
 			'attributes' => array(
 				'id' => 'inputdescription',
@@ -44,9 +38,6 @@ class StuffForm extends Form {
 			'type' => 'Text',
 			'options' => array(
 				'label' => 'Price',
-				'label_attributes' => array(
-					'class' => 'control-label col-lg-4',
-				),
 			),
 			'attributes' => array(
 				'id' => 'inputprice',
@@ -57,11 +48,8 @@ class StuffForm extends Form {
 		$this->add(array(
 			'name' => 'category',
 			'type' => 'Select',
-			'option' => array(
+			'options' => array(
 				'label' => 'Category',
-				'label_attributes' => array(
-					'class' => 'control-label col-lg-4',
-				),
 			),
 			'attributes' => array(
 				'id' => 'inputcategory',
@@ -74,9 +62,6 @@ class StuffForm extends Form {
             'type' => 'Text',
             'options' => array(
                 'label' => 'Desired Stuff',
-                'label_attributes' => array(
-                    'class' => 'control-label col-lg-4',
-                ),
             ),
             'attributes' => array(
                 'id' => 'inputdesiredstuff',
@@ -94,6 +79,7 @@ class StuffForm extends Form {
                     'trade' => 'Trade',
                 ),
             ),
+            'value' => 'sell',
             'attributes' => array(
                 'id' => 'inputpurpose',
                 'class' => 'form-control',
@@ -108,6 +94,22 @@ class StuffForm extends Form {
             ),
             'attributes' => array(
                 'id' => 'inputimage',
+                'class' => 'form-control',
+            ),
+        ));
+        
+        $this->add(array(
+            'name' => 'state',
+            'type' => 'Select',
+            'options' => array(
+                'label' => 'State',
+                'value_options' => array(
+                    '1' => 'Publish',
+                    '0' => 'Unpublish',
+                )
+            ),
+            'attributes' => array(
+                'id' => 'inputstate',
                 'class' => 'form-control',
             ),
         ));
