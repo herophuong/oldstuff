@@ -17,6 +17,10 @@ $authorized = ($this->identity() == $user);
 if ($authorized) {
     $this->deleteConfirmationScript(); // Init confirmation popup upon stuff deletion
 }
+else
+{
+    $logged_user = $this->identity();
+}
 $session = new Zend\Session\Container('stuff\user\\'.$user->user_id);
 $filter_tab = $session->offsetGet('filter.tab');
 ?>
@@ -31,6 +35,8 @@ $filter_tab = $session->offsetGet('filter.tab');
             <div class="span5">
                 <blockquote><h1><?php echo $user->display_name; ?></h1></blockquote>
                 <span class="icon-envelope"></span>&nbsp;<?php echo $user->email; ?>
+                <br>
+                <a href="<?php echo $this->url('vote', array('action' => 'vote', 'user_id' => $logged_user->user_id, 'voted_user_id' => $user->user_id)); ?>" >Rate this user</a>
                 <br>
                 <?php $con = mysqli_connect("localhost", "root", "mysql", "oldstuff");
                     if (mysqli_connect_errno($con))
