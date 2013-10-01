@@ -6,9 +6,11 @@ use Zend\View\Model\ViewModel;
 
 // Form and filters
 use User\Form\UserForm;
+use User\Form\ContactForm;
 use User\Filter\RegisterFilter;
 use User\Filter\ProfileFilter;
 use User\Filter\LoginFilter;
+use User\Filter\ContactFilter;
 
 // Doctrine and entity
 use Doctrine\ORM\EntityManager;
@@ -142,10 +144,14 @@ class UserController extends AbstractActionController
             }
             
             // Create a new user form
-            $form = new UserForm();
+            $userForm = new UserForm();
+            $contactForm = new ContactForm('contact');
+            $contactForm->setWrapElements(true);
+            $contactForm->prepare();
             
             // Put some data into our current form
-            $form->setData(array('display_name' => $user->display_name));
+            $userForm->setData(array('display_name' => $user->display_name));
+            $contactForm->setData($user->contact->getArrayCopy());
             
             // Get the request
             $request = $this->getRequest();
@@ -156,31 +162,37 @@ class UserController extends AbstractActionController
                 $data = $request->getPost();
                 
                 // Get input filter 
-                $filter = new ProfileFilter();
+                $userFilter = new ProfileFilter();
+                $contactFilter = new ContactFilter();
                 
                 // Password confirmation filter should be required when password exists
                 if (isset($data['password']) && !empty($data['password'])) {
-                    $filter->getInputFilter()->get('passwordconfirmation')->setRequired(true)->setErrorMessage('Your password fields is not matched!');
+                    $userFilter->getInputFilter()->get('passwordconfirmation')->setRequired(true)->setErrorMessage('Your password fields is not matched!');
                 }
                 
                 // Set the filter into form
-                $form->setInputFilter($filter->getInputFilter());
+                $userForm->setInputFilter($userFilter->getInputFilter());
+                $contactForm->setInputFilter($contactFilter->getInputFilter());
                 
                 // Populate data into the form 
-                $form->setData($data);
+                $userForm->setData($data);
+                if (isset($data['contact']))
+                    $contactForm->setData($data['contact']);
                 
                 // Validate data
-                if ($form->isValid()) {
+                if ($userForm->isValid() && $contactForm->isValid()) {
                     // Get filtered and validated data
-                    $validData = $form->getData();
+                    $validUserData = $userForm->getData();
+                    $validContactData = $contactForm->getData();
                     
                     // Change user display name
-                    $user->display_name = $validData['display_name'];
+                    $user->display_name = $validUserData['display_name'];
+                    $user->contact->populate($validContactData);
                     
                     // Change user password
-                    if (isset($validData['password']) && !empty($validData['password'])) {
+                    if (isset($validUserData['password']) && !empty($validUserData['password'])) {
                         $bcrypt = new BCrypt();
-                        $user->password = $bcrypt->create($validData['password']);
+                        $user->password = $bcrypt->create($validUserData['password']);
                     }
                     
                     // Now store user data
@@ -200,8 +212,9 @@ class UserController extends AbstractActionController
             }
             
             return array(
-                'form' => $form,
-                'user_id' => $id,
+                'userForm' => $userForm,
+                'contactForm' => $contactForm,
+                'redirectUrl' => $request->getQuery('redirect'),
             );
         }
     }

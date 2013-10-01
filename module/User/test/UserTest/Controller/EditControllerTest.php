@@ -119,6 +119,47 @@ class EditControllerTest extends AbstractUserControllerTest
         $this->assertEquals($oldpassword, $user->password);
     }
     
+    public function testChangeContact()
+    {
+        $contact['address'] = '20 Ton That Tung';
+        $contact['city'] = 'Dong Dat';
+        $contact['state'] = 'Ha Noi';
+        $contact['country'] = 'Vietnam';
+        $contact['zipcode'] = '21000';
+        $contact['phone'] = '0988373748';
+        $this->dispatch('/user/edit/'.$this->getUser()->user_id, 'POST', array('contact' => $contact));
+        
+        // Clear identity map
+        $this->getEntityManager()->clear();
+        
+        // Get the user from the database
+        $currentContact = $this->getEntityManager()->find('User\Entity\User', $this->getUser()->user_id)->contact;
+        
+        // Make sure the contact is changed
+        $currentContact = $currentContact->getArrayCopy();
+        $this->assertEquals($contact['address'], $currentContact['address']);
+        $this->assertEquals($contact['city'], $currentContact['city']);
+        $this->assertEquals($contact['state'], $currentContact['state']);
+        $this->assertEquals($contact['zipcode'], $currentContact['zipcode']);
+        $this->assertEquals($contact['country'], $currentContact['country']);
+        $this->assertEquals($contact['phone'], $currentContact['phone']);
+    }
+    
+    public function testChangeInvalidPhone()
+    {
+        $contact['phone'] = 'abcxyz';
+        $this->dispatch('/user/edit/'.$this->getUser()->user_id, 'POST', array('contact' => $contact));
+        
+        // Clear identity map
+        $this->getEntityManager()->clear();
+        
+        // Get the user from the database
+        $currentContact = $this->getEntityManager()->find('User\Entity\User', $this->getUser()->user_id)->contact->getArrayCopy();
+        
+        // Make sure the contact is unchanged
+        $this->assertNotEquals($contact['phone'], $currentContact['phone']);
+    }
+    
     public function testUnspecifiedIdPage()
     {
         $this->dispatch('/user/edit');

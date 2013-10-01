@@ -43,7 +43,7 @@ class User
     protected $state;
     
     /**
-     * @ORM\OneToOne(targetEntity="User\Entity\Contact")
+     * @ORM\OneToOne(targetEntity="User\Entity\Contact",cascade="persist")
      * @ORM\JoinColumn(name="contact_id",referencedColumnName="contact_id")
      */
     protected $contact;
@@ -87,10 +87,17 @@ class User
      */
     public function populate($data = array()) 
     {
-        $this->user_id = $data['user_id'];
-        $this->email = $data['email'];
-        $this->display_name = $data['display_name'];
-        $this->password = $data['password'];
-        $this->state = $data['state'];
+        if (isset($data['user_id']))
+            $this->user_id = $data['user_id'];
+        if (isset($data['email']))
+            $this->email = $data['email'];
+        if (isset($data['display_name']))
+            $this->display_name = $data['display_name'];
+        if (isset($data['password']))
+            $this->password = $data['password'];
+        if (isset($data['state']))
+            $this->state = $data['state'];
+        if (isset($data['contact']))
+            $this->contact = $data['contact'];
     }
 }

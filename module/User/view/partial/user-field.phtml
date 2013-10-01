@@ -1,8 +1,8 @@
 <div class="control-group">
     <?php $element = $this->form->get($this->field); ?>
-    <?php $element->setOptions(array('label_attributes' => array('class' => 'control-label'))); ?>
+    <?php //$element->setOptions(array('label_attributes' => array('class' => 'control-label'))); ?>
     <?php echo $this->formLabel($element); ?>
-    <div class="controls">
+    
         <?php $inputViewHelper = isset($this->inputViewHelper) ? $this->inputViewHelper : 'formInput';?>
         <?php echo call_user_func(array($this, $inputViewHelper), $element); ?>
     <?php
@@ -11,5 +11,5 @@
         echo '<br />'.$this->alertBlock(implode('<br />', $messages[$this->field]), 'alert-danger');
     } 
     ?>
-    </div>
+    
 </div>

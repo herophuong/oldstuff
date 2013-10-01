@@ -125,6 +125,18 @@ class User implements ServiceManagerAwareInterface
             $userData['password']   = $bcrypt->create($formData['password']);
             $userData['state']      = 1;
             
+            // Set up empty contact for this new user
+            $contact = new \User\Entity\Contact();
+            $contact->populate(array(
+                'address' => '',
+                'city' => '',
+                'state' => '',
+                'zipcode' => '',
+                'country' => '',
+                'phone' => '',
+            ));
+            $userData['contact'] = $contact;
+            
             $user->populate($userData);
             
             try {
