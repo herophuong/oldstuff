@@ -327,7 +327,18 @@ class StuffController extends AbstractActionController {
         if(!$stuff){
             return $this->redirect()->toRoute('home');
         }
-        return array('stuff' => $stuff);
+        $request = $this->getEntityManager()->getRepository('Stuff\Entity\Request');
+        
+        $queryBuilder = $this->getEntityManager()->createQueryBuilder()
+                ->select('r')
+                ->from('Stuff\Entity\Request', 'r')
+                ->where('r.stuff = '.$stuff_id);
+        $results = $queryBuilder->getQuery()->execute();        
+        
+        return array(
+            'stuff' => $stuff,       
+            'results' => $results,               
+        );           
     }
     
     public function buyAction(){
@@ -440,7 +451,7 @@ class StuffController extends AbstractActionController {
         return array('form' => $form, 'stuff' => $stuff);     
     }
     
-    public function viewRequestAction(){       
+    public function viewrequestAction(){       
         if(!($user = $this->identity())){
             return $this->redirect()->toRoute('login');
         }    

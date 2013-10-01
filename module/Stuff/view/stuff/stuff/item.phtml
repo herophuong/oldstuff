@@ -52,3 +52,17 @@
     <?php } ?>
 </div>
 </div>
+<hr class="alt"/>
+<div class="row">
+    <div class="gallery span8 offset2 user-stuff-list">
+        <?php if (count($this->results) > 0) { ?>
+        <?php 
+            $this->partialLoop()->setObjectKey('object');
+            echo $this->partialLoop('partial/request.phtml', $this->results); ?>
+        <?php } else { ?>
+        <div class="text-center">
+            <h2 class="muted"><?php echo $this->translate('No request for this item'); ?></h2>            
+        </div>
+        <?php } ?>
+    </div>
+</div>

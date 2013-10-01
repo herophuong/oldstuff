@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @property Stuff   $stuff
  * @property string $type
  * @property string $payment_method
- * @property int $exchange_id
+ * @property Stuff  $exchange_id
  * @property int    $state
  */
 class Request
@@ -32,7 +32,8 @@ class Request
     protected $stuff;
     
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\ManyToOne(targetEntity="Stuff\Entity\Stuff")
+     * @ORM\JoinColumn(name="exchange_id", referencedColumnName="stuff_id")
      */
     protected $exchange_id;
     
