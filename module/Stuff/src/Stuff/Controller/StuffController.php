@@ -440,6 +440,62 @@ class StuffController extends AbstractActionController {
         return array('form' => $form, 'stuff' => $stuff);     
     }
     
+    public function viewRequestAction(){       
+        if(!($user = $this->identity())){
+            return $this->redirect()->toRoute('login');
+        }    
+        $stuff_id = $_GET['stuff'];  $exchange_id = $_GET['exchange'];
+        
+        if (($stuff_id == "")||($exchange_id == "")) {
+            return $this->redirect()->toRoute('stuff', array('action' => 'user', 'id' => $user->user_id));
+        } 
+        $stuff = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff')->findOneBy(array('stuff_id' => $stuff_id));       
+        $exchange = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff')->findOneBy(array('stuff_id' => $exchange_id));       
+        return array('stuff' => $stuff, 'exchange' => $exchange);     
+    }
+    
+    public function rejectAction()
+    {
+        $stuff_id = $_GET['stuff'];  $requesting_id = $_GET['requester'];
+        $request = $this->getEntityManager()->getRepository('Stuff\Entity\Request')->findOneBy(array('stuff' => $stuff_id, 'requesting' => $requesting_id));
+        $data = $request->getArrayCopy();
+        $data['state'] = 2;
+        $request->populate($data);
+        $this->getEntityManager()->flush();
+        $stuff = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff')->findOneBy(array('stuff_id' => $stuff_id));  
+        $user = $this->getEntityManager()->getRepository('User\Entity\User')->findOneBy(array('user_id' => $requesting_id));  
+        $this->flashMessenger()->addSuccessMessage("You've rejected an offer on item '". $stuff->stuff_name. "' from '" . $user->email. "'.");
+        return $this->redirect()->toRoute('stuff', array('action' => 'user', 'id' => $this->identity()->user_id));
+    }
+    
+     public function acceptAction()
+    {
+         // TODO : receiving contact from requestor
+        $stuff_id = $_GET['stuff'];  $requesting_id = $_GET['requester'];
+        $request = $this->getEntityManager()->getRepository('Stuff\Entity\Request')->findOneBy(array('stuff' => $stuff_id, 'requesting' => $requesting_id));
+        $exchange_id = $request->exchange_id;
+        $data = $request->getArrayCopy();
+        $data['state'] = 3;
+        $request->populate($data);
+        $this->getEntityManager()->flush();
+        
+        $stuff = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff')->findOneBy(array('stuff_id' => $stuff_id));      
+        $data = $stuff->getArrayCopy();
+        $data['state'] = 2;
+        $stuff->populate($data);
+        $this->getEntityManager()->flush();
+        
+        $stuff = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff')->findOneBy(array('stuff_id' => $exchange_id));      
+        $data = $stuff->getArrayCopy();
+        $data['state'] = 2;
+        $stuff->populate($data);
+        $this->getEntityManager()->flush();
+        
+        $user = $this->getEntityManager()->getRepository('User\Entity\User')->findOneBy(array('user_id' => $requesting_id));  
+        $this->flashMessenger()->addSuccessMessage("You've accepted an offer on item '". $stuff->stuff_name. "' from '" . $user->email. "'.");
+        return $this->redirect()->toRoute('stuff', array('action' => 'user', 'id' => $this->identity()->user_id));        
+    }
+    
     public function homeAction()
     {
         // Get filter request

@@ -1,0 +1,67 @@
+<?php $this->headTitle($this->translate('Trade Request'), 'PREPEND');
+    $user = $this->identity();
+    $stuff = $this->stuff; 
+    $exchange = $this->exchange;
+?>
+<div class="row">
+<div class="gallery content-block span7">
+<h1 class="text-center"><i class="iconbig-note-write"></i>&nbsp;<?php echo $this->translate('Trade Request'); ?></h1>
+    <div class="row-fluid stuff-item">
+        <?php echo $this->partial('partial/current-flash-messages.phtml'); ?>
+                
+        <div class="span3 stuff-image">
+            <?php if ($stuff->image !== "") { ?>
+            <a class="group" rel="group1" href="<?php echo $this->basePath() . '/' . $stuff->image[0]; ?>">
+                <img src="<?php echo $this->basePath() . '/' . $stuff->image[0]; ?>">
+            </a>
+            <?php } else { ?>
+            <img src="holder.js/225x210/gray/text:[<?php echo $this->translate("Old Stuff Trade System"); ?>]">
+            <?php } ?>
+        </div>
+        <div class="span7 stuff-info">
+            <div class="stuff-value">
+               <label>Stuff Name: &nbsp; <?php echo $stuff->stuff_name;?></label>
+               <label>Price:      &nbsp; <?php echo $stuff->price;?></label>        
+               <label>Seller:     &nbsp; <?php echo $stuff->user->display_name;?></label>
+               <label>Description:&nbsp; <?php echo $stuff->description;?></label> 
+            </div>
+        </div>
+    </div>
+    
+    <h2 class="text-center"><?php echo $this->translate('Trade with'); ?></h2>
+    <hr class="alt"/>
+    <div class="row-fluid stuff-item">      
+        <div class="span3 stuff-image">
+            <?php if ($exchange->image !== "") { ?>
+            <a class="group" rel="group1" href="<?php echo $this->basePath() . '/' . $exchange->image[0]; ?>">
+                <img src="<?php echo $this->basePath() . '/' . $exchange->image[0]; ?>">
+            </a>
+            <?php } else { ?>
+            <img src="holder.js/225x210/gray/text:[<?php echo $this->translate("Old Stuff Trade System"); ?>]">
+            <?php } ?>
+        </div>
+        <div class="span7 stuff-info">
+            <div class="stuff-value">
+               <label>Stuff Name: &nbsp; <?php echo $exchange->stuff_name;?></label>
+               <label>Price:      &nbsp; <?php echo $exchange->price;?></label>        
+               <label>Seller:     &nbsp; <?php echo $exchange->user->display_name;?></label>               
+               <label>Description:&nbsp; <?php echo $exchange->description;?></label>               
+            </div>
+        </div>
+    </div>
+     
+ <a href="<?php echo $this->stuffUserLink($this->identity()->user_id);?>" 
+                        class="btn">
+                        <?php echo $this->translate('Cancel'); ?> </a>  
+    
+  <a href="<?php echo $this->url('stuff', array('action' => 'reject')) 
+                        .'?stuff='.$stuff->stuff_id .'&requester='.$exchange->user->user_id ?>"
+                        class="btn btn-primary" style="margin:0 25% 0 25%"> 
+                        <?php echo $this->translate('Reject'); ?>  </a>
+    
+  <a href="<?php echo $this->url('stuff', array('action' => 'accept')) 
+                        .'?stuff='.$stuff->stuff_id .'&requester='.$exchange->user->user_id ?>" 
+                        class="btn btn-primary"> 
+                        <?php echo $this->translate('Accept'); ?> </a>
+</div>
+</div>
