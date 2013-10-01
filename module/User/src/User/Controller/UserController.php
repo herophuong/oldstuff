@@ -214,6 +214,7 @@ class UserController extends AbstractActionController
             return array(
                 'userForm' => $userForm,
                 'contactForm' => $contactForm,
+                'redirectUrl' => $request->getQuery('redirect'),
             );
         }
     }

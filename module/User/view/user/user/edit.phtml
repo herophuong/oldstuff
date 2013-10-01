@@ -47,6 +47,11 @@
             </div>
         </div>
         <?php echo $this->formInput($userForm->get('submit')->setAttributes(array('value' => 'Save', 'class' => 'btn btn-primary pull-right'))); ?>
+        <?php if (!empty($redirectUrl)) { ?>
+        <a href="<?php echo $redirectUrl; ?>" class="btn btn-default"><?php echo $this->translate('Cancel'); ?></a>
+        <?php } else { ?>
+        <a href="<?php echo $this->url('user', array('action' => 'profile', 'id' => $this->identity()->user_id)); ?>" class="btn btn-default"><?php echo $this->translate('Cancel'); ?></a>
+        <?php } ?>
         <?php echo $this->form()->closeTag(); ?>
     </div>
 </div>
