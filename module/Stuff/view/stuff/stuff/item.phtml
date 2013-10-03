@@ -66,3 +66,18 @@
         <?php } ?>
     </div>
 </div>
+<?php if ($stuff->state == 2 && !is_null($contact)) { ?> 
+<div class="row">
+    <div class="gallery span6 offset3 user-stuff-list"> 
+        <h2 class="text-center"><i class="iconbig-note-write"></i>&nbsp;<?php echo $this->translate('Contact Info'); ?></h1>
+        <ul>
+               <li> <b> Address: </b>    <?php echo $contact->contact->address;?></li>
+               <li> <b> City: </b>     <?php echo $contact->contact->city;?></li>       
+               <li> <b> State: </b>    <?php echo $contact->contact->state;?></li>
+               <li> <b> Zip code:</b>   <?php echo $contact->contact->zipcode;?></li>  
+               <li> <b> Country:</b>   <?php echo $contact->contact->country;?></li>
+               <li> <b> Phone:</b>   <?php echo $contact->contact->phone;?></li>     
+        </ul>
+    </div>
+</div>
+ <?php } ?> 

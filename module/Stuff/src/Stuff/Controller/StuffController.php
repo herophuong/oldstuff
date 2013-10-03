@@ -111,6 +111,9 @@ class StuffController extends AbstractActionController {
                     break;
                 case 'request':
                     // TODO Implement what stuffs from this user are requested
+                    $queryBuilder->innerJoin('s.requests', 'r', 'WITH', 'r.state = 1');
+//                    $and->add($queryBuilder->expr()->eq('r.state', 1));
+                    break;
                 default:
                     // Prevent error by select nothing in query builder
                     $and->add($queryBuilder->expr()->eq('s.stuff_id', 0));
@@ -123,7 +126,7 @@ class StuffController extends AbstractActionController {
         
         $queryBuilder->where($and)->setParameters($parameters)->orderBy('s.stuff_id', 'DESC');
         /*--- End filter ---*/
-        
+//        echo $queryBuilder; die;
         $paginator = new Paginator(new PaginatorAdapter(new ORMPaginator($queryBuilder)));
         $paginator->setItemCountPerPage(10);
         $page = (int) $this->params()->fromQuery('page');
@@ -335,9 +338,14 @@ class StuffController extends AbstractActionController {
                 ->where('r.stuff = '.$stuff_id);
         $results = $queryBuilder->getQuery()->execute();        
         
+        $accepted = 0;
+        foreach ($results as $result) $accepted = $result->requesting;       
+       
+        $usercontact = $this->getEntityManager()->getRepository('User\Entity\User')->find($accepted); 
         return array(
             'stuff' => $stuff,       
-            'results' => $results,               
+            'results' => $results,
+            'contact' => $usercontact,
         );           
     }
     
@@ -401,6 +409,7 @@ class StuffController extends AbstractActionController {
         $stuff_id = $this->params()->fromRoute('id',0);
         $stuff = $this->getEntityManager()->find('Stuff\Entity\Stuff',$stuff_id);
         if($stuff->user == $user){
+            $this->flashMessenger()->addErrorMessage("This is your own item.");
             return $this->redirect()->toRoute('stuff', array('action' => 'user', 'id' => $user->user_id));
         }
         //Check that stuff is available to trade
@@ -431,21 +440,25 @@ class StuffController extends AbstractActionController {
                 $data = $traderequest->getArrayCopy();
                 $data['payment_method']= 'exchange';
                 $data['requesting']    = $user;
-                $data['exchange_id']   = $formdata['exchangeStuff'];
+                $data['exchange_id']   = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff')->findOneBy(array('stuff_id' => $formdata['exchangeStuff']));
                 $data['type']          = $stuff->purpose;
                 $data['stuff']         = $stuff;
                 $data['state']         = 1;               
                 $traderequest->populate($data);
+                $duplicateTest = $this->getEntityManager()->getRepository('Stuff\Entity\Request')->findOneBy(array('stuff' => $stuff,'requesting'=>$user));   
+                if (is_null($duplicateTest))                
                 try{
                     $this->getEntityManager()->persist($traderequest);
                     $this->getEntityManager()->persist($stuff);
                     $this->getEntityManager()->flush();
                     $this->flashMessenger()->addSuccessMessage("Request for trade sent.");
                     return $this->redirect()->toRoute('stuff',array('action' => 'user', 'id' => $user->user_id));
-                }
+                }                            
                 catch(DBALException $e){
                     $this->flashMessenger()->addErrorMessage($e->getMessage());
                 }
+                else $this->flashMessenger()->addErrorMessage("You've already sent request for this item.");
+                
             }
         }
         return array('form' => $form, 'stuff' => $stuff);     
@@ -476,7 +489,7 @@ class StuffController extends AbstractActionController {
         $stuff = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff')->findOneBy(array('stuff_id' => $stuff_id));  
         $user = $this->getEntityManager()->getRepository('User\Entity\User')->findOneBy(array('user_id' => $requesting_id));  
         $this->flashMessenger()->addSuccessMessage("You've rejected an offer on item '". $stuff->stuff_name. "' from '" . $user->email. "'.");
-        return $this->redirect()->toRoute('stuff', array('action' => 'user', 'id' => $this->identity()->user_id));
+        return $this->redirect()->toRoute('stuff', array('action' => 'item', 'id' => $stuff_id));
     }
     
      public function acceptAction()
@@ -504,7 +517,7 @@ class StuffController extends AbstractActionController {
         
         $user = $this->getEntityManager()->getRepository('User\Entity\User')->findOneBy(array('user_id' => $requesting_id));  
         $this->flashMessenger()->addSuccessMessage("You've accepted an offer on item '". $stuff->stuff_name. "' from '" . $user->email. "'.");
-        return $this->redirect()->toRoute('stuff', array('action' => 'user', 'id' => $this->identity()->user_id));        
+        return $this->redirect()->toRoute('stuff', array('action' => 'item', 'id' => $stuff_id));
     }
     
     public function homeAction()
