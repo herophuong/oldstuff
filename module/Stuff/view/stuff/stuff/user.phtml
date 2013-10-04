@@ -36,8 +36,14 @@ $filter_tab = $session->offsetGet('filter.tab');
                 <blockquote><h1><?php echo $user->display_name; ?></h1></blockquote>
                 <span class="icon-envelope"></span>&nbsp;<?php echo $user->email; ?>
                 <br>
+                <?php if ($this->identity())
+                      { ?>
+
                 <a href="<?php echo $this->url('vote', array('action' => 'vote', 'user_id' => $logged_user->user_id, 'voted_user_id' => $user->user_id)); ?>" >Rate this user</a>
                 <br>
+                <?php } else { ?>
+                    <p style="color:red; font-size:20px">You must log in to rate</p>
+                <?php } ?>
                 <?php $con = mysqli_connect("localhost", "root", "mysql", "oldstuff");
                     if (mysqli_connect_errno($con))
                     {

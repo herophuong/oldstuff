@@ -127,7 +127,6 @@ class VoteController extends AbstractActionController
         $vote = $this->getEntityManager()->getRepository('Vote\Entity\Vote')->findOneBy(array('voted_user_id' => $voted_user_id, 'user_id' => $user_id));
         if ($vote == null)
         {
-            echo "Khong co user can vote, tao moi";
             $form = new VoteForm();
 
             $request = $this->getRequest();
@@ -164,7 +163,7 @@ class VoteController extends AbstractActionController
         {
             if ($vote->user_id == $user_id)
             {
-                echo "Co user can vote, user vote da tung vote, chi thay doi ratescore";
+                echo "You rated this user before";
                 $form = new VoteForm();
 
                 $request = $this->getRequest();
@@ -198,7 +197,6 @@ class VoteController extends AbstractActionController
             }
             elseif ($vote->user_id != $user_id)
             {
-                echo "Co user can vote, user vote chua tung vote, tao moi";
                 $form = new VoteForm();
 
                 $request = $this->getRequest();
