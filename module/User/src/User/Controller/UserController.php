@@ -141,6 +141,7 @@ class UserController extends AbstractActionController
             // Preven anonymous or other users from accessing this page
             if ($this->identity() != $user) {
                 $this->redirect()->toRoute('home');
+                return false; // Prevent view rendering
             }
             
             // Create a new user form

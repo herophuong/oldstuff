@@ -352,6 +352,7 @@ class StuffController extends AbstractActionController {
     public function buyAction(){
         //Check if user is logged in
         if(!($user = $this->identity())){
+            $this->flashMessenger()->addInfoMessage('You need to login first to buy this stuff!');
             return $this->redirect()->toRoute('login');
         }
         //Check that stuff doesn't belong to current user

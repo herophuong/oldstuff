@@ -62,7 +62,6 @@ return array(
     'view_helpers' => array(
         'invokables' => array(
             'formField' => 'User\View\Helper\FormField',
-            'alertBlock' => 'User\View\Helper\AlertBlock',
         ),
     ),
     'doctrine' => array(
