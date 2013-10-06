@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 29, 2013 at 10:01 AM
+-- Generation Time: Oct 06, 2013 at 05:10 PM
 -- Server version: 5.5.32-0ubuntu0.13.04.1
 -- PHP Version: 5.4.16
 
@@ -21,19 +21,6 @@ SET time_zone = "+00:00";
 --
 
 -- --------------------------------------------------------
---
--- Table structure for table `request`
---
-DROP TABLE IF EXISTS `request`;
-CREATE TABLE IF NOT EXISTS `request` (
-  `stuff_id` int(11) NOT NULL,
-  `requesting_id` int(11) NOT NULL,
-  `exchange_id` int(11),
-  `type` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `payment_method` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `state` smallint(6) NOT NULL,
-  PRIMARY KEY (`stuff_id`,`requesting_id`)
-  ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci; 
 
 --
 -- Table structure for table `category`
@@ -46,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `category` (
   `description` longtext COLLATE utf8_unicode_ci NOT NULL,
   `state` smallint(6) NOT NULL,
   PRIMARY KEY (`cat_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=6 ;
 
 --
 -- Dumping data for table `category`
@@ -74,17 +61,39 @@ CREATE TABLE IF NOT EXISTS `contact` (
   `country` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `phone` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`contact_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=5 ;
 
 --
 -- Dumping data for table `contact`
 --
 
 INSERT INTO `contact` (`contact_id`, `address`, `city`, `state`, `zipcode`, `country`, `phone`) VALUES
-(1, '20 Tong Duy Tan', 'Hoan Kiem', 'Hanoi', '21000', 'Vietnam', '0983777475'),
+(1, '20 Tong Duy Tan', 'Hoan Kiem', 'Hanoi', '21000', 'Viet', '0983777474'),
 (2, '57C/879, La Thanh', 'Ba Dinh', 'Hanoi', '21000', 'Vietnam', '0983772817'),
 (3, '18/26, Thai Thinh 2', 'Dong Da', 'Hanoi', '21000', 'Vietnam', '0984777382'),
 (4, '123 Phu Doan', 'Hoan Kiem', 'Hanoi', '21000', 'Vietnam', '0987336473');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `request`
+--
+
+DROP TABLE IF EXISTS `request`;
+CREATE TABLE IF NOT EXISTS `request` (
+  `request_id` int(11) NOT NULL AUTO_INCREMENT,
+  `requestor_id` int(11) DEFAULT NULL,
+  `requested_id` int(11) DEFAULT NULL,
+  `proposed_id` int(11) DEFAULT NULL,
+  `created_time` datetime NOT NULL,
+  `type` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `payment_method` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `state` smallint(6) NOT NULL,
+  PRIMARY KEY (`request_id`),
+  KEY `IDX_3B978F9FA7F43455` (`requestor_id`),
+  KEY `IDX_3B978F9F983624B7` (`requested_id`),
+  KEY `IDX_3B978F9FC44DAE77` (`proposed_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=4 ;
 
 -- --------------------------------------------------------
 
@@ -107,7 +116,7 @@ CREATE TABLE IF NOT EXISTS `stuff` (
   PRIMARY KEY (`stuff_id`),
   KEY `IDX_5941F83EA76ED395` (`user_id`),
   KEY `IDX_5941F83EE6ADA943` (`cat_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=26 ;
 
 --
 -- Dumping data for table `stuff`
@@ -132,7 +141,7 @@ INSERT INTO `stuff` (`stuff_id`, `user_id`, `price`, `description`, `state`, `st
 (17, 2, 10000000, 'Nascetur. Sed cum ac magnis! Nascetur ac, montes, ac augue cum, amet, ac rhoncus purus, in nisi aliquet, est', 1, 'Acer Laptop', 'upload/04.jpg', 'sell', '', 3),
 (18, 4, 4000000, 'Nascetur. Sed cum ac magnis! Nascetur ac, montes, ac augue cum, amet, ac rhoncus purus, in nisi aliquet, est', 1, 'Old Samsung Laptop', 'upload/05.jpg', 'sell', '', 5),
 (19, 2, 75000, 'Nascetur. Sed cum ac magnis! Nascetur ac, montes, ac augue cum, amet, ac rhoncus purus, in nisi aliquet, est', 1, 'Old Computer Fan', 'upload/06.jpg', 'sell', '', 3),
-(20, 1, 500000, 'Enim ultricies pellentesque placerat sit pid diam magnis tempor porta! Ut augue, dictumst?', 1, 'Jeans Jacket', 'upload/01.jpg', 'sell', '', 2),
+(20, 1, 500000, 'Enim ultricies pellentesque placerat sit pid diam magnis tempor porta! Ut augue, dictumst?', 1, 'Jeans Jacket', 'upload/01.jpg', 'sell,trade', 'Leather Jacket', 2),
 (21, 2, 200000, 'Nascetur. Sed cum ac magnis! Nascetur ac, montes, ac augue cum, amet, ac rhoncus purus, in nisi aliquet, est', 1, 'Old Clock', 'upload/02.jpg', 'sell', '', 5),
 (22, 3, 300000, 'Nascetur. Sed cum ac magnis! Nascetur ac, montes, ac augue cum, amet, ac rhoncus purus, in nisi aliquet, est', 1, 'Harry Potter Series', 'upload/03.jpg', 'trade', 'Jeans', 1),
 (23, 4, 10000000, 'Nascetur. Sed cum ac magnis! Nascetur ac, montes, ac augue cum, amet, ac rhoncus purus, in nisi aliquet, est', 1, 'Acer Laptop', 'upload/04.jpg', 'sell', '', 3),
@@ -156,7 +165,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `UNIQ_8D93D649E7927C74` (`email`),
   UNIQUE KEY `UNIQ_8D93D649E7A1254A` (`contact_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
 
 --
 -- Dumping data for table `user`
@@ -171,6 +180,14 @@ INSERT INTO `user` (`user_id`, `email`, `display_name`, `password`, `state`, `co
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `request`
+--
+ALTER TABLE `request`
+  ADD CONSTRAINT `FK_3B978F9FC44DAE77` FOREIGN KEY (`proposed_id`) REFERENCES `stuff` (`stuff_id`),
+  ADD CONSTRAINT `FK_3B978F9F983624B7` FOREIGN KEY (`requested_id`) REFERENCES `stuff` (`stuff_id`),
+  ADD CONSTRAINT `FK_3B978F9FA7F43455` FOREIGN KEY (`requestor_id`) REFERENCES `user` (`user_id`);
 
 --
 -- Constraints for table `stuff`
