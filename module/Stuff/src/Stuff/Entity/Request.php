@@ -33,7 +33,7 @@ class Request
     
     /**
      * @ORM\ManyToOne(targetEntity="Stuff\Entity\Stuff")
-     * @ORM\JoinColumn(name="exchange_id", referencedColumnName="stuff_id")
+     * @ORM\JoinColumn(name="exchange_id", referencedColumnName="stuff_id", nullable = true)
      */
     protected $exchange_id;
     
