@@ -80,7 +80,7 @@ class StuffController extends AbstractActionController {
                     break;
                 case 'request':
                     // Get stuffs having pending requests
-                    $filter_requests = 0;
+                    $filter_requests = array(0);
                     $filter_states = 1;
                     break;
                 default:
@@ -90,7 +90,6 @@ class StuffController extends AbstractActionController {
             $filter_states = 1;
         }
         /*--- End filter ---*/
-        
         // Get the query
         $queryBuilder = $this->_buildQuery(array(
             'category' => $filter_category,
@@ -100,7 +99,7 @@ class StuffController extends AbstractActionController {
             'requests' => isset($filter_requests) ? $filter_requests : null,
             'user' => $user_id,
         ));
-
+        
         // Get the paginator
         $paginator = $this->_buildPaginator($queryBuilder);
         
@@ -391,6 +390,14 @@ class StuffController extends AbstractActionController {
             return $this->redirect()->toRoute('stuff', array('action' => 'user', 'id' => $user->user_id));
         }
         
+        //Check that user has all contact information filled
+        if (($this->identity()->contact->address == "") || ($this->identity()->contact->city == "")
+             || ($this->identity()->contact->state == "") || ($this->identity()->contact->zipcode == "")
+             || ($this->identity()->contact->country == "") || ($this->identity()->contact->phone == "")) {
+            $this->flashMessenger()->addErrorMessage("You need more contact information to request trading.");
+            return $this->redirect()->toRoute('user', array('action' => 'edit', 'id' => $user->user_id));
+        }            
+        
         $filter = new TradeFilter();
         $form = new TradeForm();
         $form->setInputFilter($filter->getInputFilter());
@@ -452,7 +459,7 @@ class StuffController extends AbstractActionController {
         $stuff_id = $_GET['stuff'];  $requesting_id = $_GET['requester'];
         $request = $this->getEntityManager()->getRepository('Stuff\Entity\Request')->findOneBy(array('stuff' => $stuff_id, 'requesting' => $requesting_id));
         $data = $request->getArrayCopy();
-        $data['state'] = 2;
+        $data['state'] = -1;
         $request->populate($data);
         $this->getEntityManager()->flush();
         $stuff = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff')->findOneBy(array('stuff_id' => $stuff_id));  
@@ -612,7 +619,7 @@ class StuffController extends AbstractActionController {
     
     private function _filterStuffRequests(&$queryBuilder, $value)
     {
-        $queryBuilder->innerJoin('s.requests', 'r', 'WITH', 'r.state IN :req_state');
+        $queryBuilder->innerJoin('s.requests', 'r', 'WITH', 'r.state IN (:req_state)');
         $queryBuilder->setParameter('req_state', $value);
     }
     

@@ -69,8 +69,12 @@
         <?php echo $this->translate('Delete'); ?>
     </a>    
     <?php } else if (!$authorized && $stuff->state == 1) { ?>
-    <a href="#" class="btn btn-success"><i class="icon-shopping-cart"></i>&nbsp;<?php echo $this->translate("Buy"); ?></a>
-    <a href="#" class="btn btn-info"><i class="icon-random"></i>&nbsp;<?php echo $this->translate("Trade"); ?></a>
+    <?php if (strpos($stuff->purpose, 'sell') !== false) { ?>
+    <a href="<?php echo $this->stuffBuyLink($stuff->stuff_id); ?>" class="btn btn-success"><i class="icon-shopping-cart"></i>&nbsp;<?php echo $this->translate("Buy"); ?></a>
+    <?php } ?>
+    <?php if (strpos($stuff->purpose, 'trade') !== false) { ?>
+    <a href="<?php echo $this->stuffTradeLink($stuff->stuff_id); ?>" class="btn btn-info"><i class="icon-random"></i>&nbsp;<?php echo $this->translate("Trade"); ?></a>
+    <?php } ?>
     <?php } ?>
 </div>
 </div>
@@ -132,3 +136,4 @@
 </div>
 <?php } ?> 
 <?php } ?>
+
