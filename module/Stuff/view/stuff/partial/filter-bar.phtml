@@ -15,7 +15,7 @@ $filter_search      = $session->offsetGet('filter.search');
             <div class="filter-left">
             <div class="input-append">
                 <input type="text" name="filter_search" value="<?php echo $filter_search; ?>"/>
-                <button class="btn" type="submit"><i class="icon-search"></i>&nbsp;<?php echo $this->translate('Search'); ?></button>
+                <button class="btn" type="submit"><i class="icon-search"></i></button>
             </div>
             <?php if (isset($this->categories)) : ?>
             <select class="selectpicker" id="category-select">

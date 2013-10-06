@@ -71,12 +71,13 @@ class StuffForm extends Form {
         
         $this->add(array(
             'name' => 'purpose',
-            'type' => 'Radio',
+            'type' => 'Select',
             'options' => array(
                 'label' => 'Purpose',
                 'value_options' => array(
                     'sell' => 'Sell',
                     'trade' => 'Trade',
+                    'sell,trade' => 'Sell/Trade',
                 ),
             ),
             'value' => 'sell',

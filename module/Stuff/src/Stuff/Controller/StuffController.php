@@ -88,8 +88,8 @@ class StuffController extends AbstractActionController {
             $parameters->add(new Parameter('cat_id', $filter_category, 'integer'));
         }
         if ($filter_purpose) {
-            $and->add($queryBuilder->expr()->eq('s.purpose', ':purpose'));
-            $parameters->add(new Parameter('purpose', $filter_purpose, 'string'));
+            $and->add($queryBuilder->expr()->like('s.purpose', ':purpose'));
+            $parameters->add(new Parameter('purpose', '%'.$filter_purpose.'%', 'string'));
         }
         if ($filter_search) {
             $or = $queryBuilder->expr()->orX();
@@ -156,10 +156,10 @@ class StuffController extends AbstractActionController {
                 $request->getFiles()->toArray()
             );
             $temp = $request->getPost();
-            if($temp['purpose']== 'sell'){
+            if(strpos($temp['purpose'], 'sell') !== false) {
                 $filter->getInputFilter()->get('price')->setRequired(true)->setErrorMessage("To sell, you need to enter a price");
             }
-            else if($temp['purpose'] == 'trade'){
+            if(strpos($temp['purpose'], 'trade') !== false) {
                 $filter->getInputFilter()->get('desiredstuff')->setRequired(true)->setErrorMessage("To trade, you need to enter desired stuff");
             }
 		    $form->setInputFilter($filter->getInputFilter());
@@ -359,10 +359,11 @@ class StuffController extends AbstractActionController {
         $stuff_id = $this->params()->fromRoute('id',0);
         $stuff = $this->getEntityManager()->find('Stuff\Entity\Stuff',$stuff_id);
         if($stuff->user == $user){
+            $this->flashMessenger()->addInfoMessage('You can not buy your own item!');
             return $this->redirect()->toRoute('stuff', array('action' => 'user', 'id' => $user->user_id));
         }
         //Check that stuff is available to buy
-        if($stuff->purpose != 'sell' || $stuff->state != 1){
+        if(strpos($stuff->purpose, 'sell') === false || $stuff->state != 1){
             $this->flashMessenger()->addErrorMessage("Stuff is not available to buy");
             return $this->redirect()->toRoute('stuff', array('action' => 'user', 'id' => $user->user_id));
         }
@@ -410,12 +411,12 @@ class StuffController extends AbstractActionController {
         $stuff_id = $this->params()->fromRoute('id',0);
         $stuff = $this->getEntityManager()->find('Stuff\Entity\Stuff',$stuff_id);
         if($stuff->user == $user){
-            $this->flashMessenger()->addErrorMessage("This is your own item.");
+            $this->flashMessenger()->addInfoMessage("You can not trade with your own item!");
             return $this->redirect()->toRoute('stuff', array('action' => 'user', 'id' => $user->user_id));
         }
         //Check that stuff is available to trade
-        if($stuff->purpose != 'trade' || $stuff->state != 1){
-            $this->flashMessenger()->addErrorMessage("Stuff is not available to trade");
+        if(strpos($stuff->purpose, 'trade') === false || $stuff->state != 1){
+            $this->flashMessenger()->addInfoMessage("Stuff is not available to trade!");
             return $this->redirect()->toRoute('stuff', array('action' => 'user', 'id' => $user->user_id));
         }
         
@@ -543,8 +544,8 @@ class StuffController extends AbstractActionController {
             $parameters->add(new Parameter('cat_id', $filter_category, 'integer'));
         }
         if ($filter_purpose) {
-            $and->add($queryBuilder->expr()->eq('s.purpose', ':purpose'));
-            $parameters->add(new Parameter('purpose', $filter_purpose, 'string'));
+            $and->add($queryBuilder->expr()->like('s.purpose', ':purpose'));
+            $parameters->add(new Parameter('purpose', '%'.$filter_purpose.'%', 'string'));
         }
         if ($filter_search) {
             $or = $queryBuilder->expr()->orX();

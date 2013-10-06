@@ -18,10 +18,11 @@
             } ?>
         </h4>
         <ul class="stuff-value">
-            <?php if ($stuff->purpose == 'sell') { ?>
-            <li><i rel="tooltip" data-title="<?php echo $this->translate('Price'); ?>" class="icon-tags"></i> <span class="price"><h4><?php echo $stuff->price; ?></h4></span> VND</li>
-            <?php } else if ($stuff->purpose == 'trade') { ?>
-            <li><i rel="tooltip" data-title="<?php echo $this->translate('Desired Stuff'); ?>" class="icon-random"></i> <h4><?php echo $stuff->desired_stuff; ?></h4></li>
+            <?php if (strpos($stuff->purpose, 'sell') !== false) { ?>
+            <li><i rel="tooltip" data-title="<?php echo $this->translate('Price'); ?>" class="icon-tags"></i> <span class="price"><strong><?php echo $stuff->price; ?></strong></span> VND</li>
+            <?php } ?>
+            <?php if (strpos($stuff->purpose, 'trade') !== false) { ?>
+            <li><i rel="tooltip" data-title="<?php echo $this->translate('Desired Stuff'); ?>" class="icon-random"></i> <strong><?php echo $stuff->desired_stuff; ?></strong></li>
             <?php } ?>
             <li><i rel="tooltip" data-title="<?php echo $this->translate('Category'); ?>" class="icon-bookmark"></i>
                 <form method="POST" class="form-link">
