@@ -353,7 +353,7 @@ class StuffController extends AbstractActionController {
         //Check if user is logged in
         if(!($user = $this->identity())){
             $this->flashMessenger()->addInfoMessage('You need to login first to buy this stuff!');
-            return $this->redirect()->toRoute('login');
+            return $this->redirect()->toRoute('login', array(), array('query' => array('redirect' => $this->getRequest()->getUriString())));
         }
         //Check that stuff doesn't belong to current user
         $stuff_id = $this->params()->fromRoute('id',0);
@@ -405,7 +405,8 @@ class StuffController extends AbstractActionController {
     public function tradeAction(){
        //Check if user is logged in
         if(!($user = $this->identity())){
-            return $this->redirect()->toRoute('login');
+            $this->flashMessenger()->addInfoMessage("You need to log in first to trade with this item!");
+            return $this->redirect()->toRoute('login', array(), array('query' => array('redirect' => $this->getRequest()->getUriString())));
         }
         //Check that stuff doesn't belong to current user
         $stuff_id = $this->params()->fromRoute('id',0);
