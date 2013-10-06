@@ -38,6 +38,8 @@ return array(
             'stuffDeleteLink' => 'Stuff\View\Helper\StuffDeleteLink',
             'stuffUserLink' => 'Stuff\View\Helper\StuffUserLink',
             'stuffItemLink' => 'Stuff\View\Helper\StuffItemLink',
+            'stuffBuyLink' => 'Stuff\View\Helper\StuffBuyLink',
+            'stuffTradeLink' => 'Stuff\View\Helper\StuffTradeLink',
         ),
     ),
 	'doctrine' => array(
