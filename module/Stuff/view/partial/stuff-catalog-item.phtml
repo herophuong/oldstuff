@@ -4,10 +4,14 @@
         <ul>
             <li><a href="<?php echo $this->stuffItemLink($stuff->stuff_id); ?>" 
                    rel="tooltip" data-original-title="<?php echo $this->translate('Detail'); ?>"><i class="iconbig-search"></i></a></li>
+            <?php if (strpos($stuff->purpose, 'sell') !== false) { ?>
             <li><a href="<?php echo $this->stuffBuyLink($stuff->stuff_id); ?>" 
                    rel="tooltip" data-original-title="<?php echo $this->translate('Buy it'); ?>"><i class="iconbig-cart"></i></a></li>
+            <?php } ?>
+            <?php if (strpos($stuff->purpose, 'trade') !== false) { ?>
             <li><a href="<?php echo $this->stuffTradeLink($stuff->stuff_id); ?>"
                    rel="tooltip" data-original-title="<?php echo $this->translate('Request for a trade'); ?>"><i class="iconbig-2way"></i></a></li>
+            <?php } ?>
         </ul>
     </div>
     <?php if ($stuff->image !== "") { ?>
