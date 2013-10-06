@@ -26,7 +26,7 @@
     </div>
     <div class="span2 stuff-buttons">
         <?php if ($authorized) { ?>
-         <?php if ($request->stuff->state == 1) { ?>
+         <?php if ($request->state == 0) { ?>
         <a href="<?php echo $this->url('stuff', array('action' => 'viewrequest')) 
                         .'?stuff='.$request->stuff->stuff_id .'&exchange='.$request->exchange_id->stuff_id ?>"
                         class="btn btn-primary"> 
@@ -41,9 +41,12 @@
                         .'?stuff='.$request->stuff->stuff_id .'&requester='.$request->requesting->user_id ?>" 
                         class="btn"> 
                         <?php echo $this->translate('Reject'); ?>  </a>
-        <?php } else {?>       
+        <?php } else if ($request->state == 1) {?>       
             <a href="javascript:void()" class="btn btn-success"> 
                         <?php echo $this->translate('Accepted'); ?> </a>
+        <?php } else if ($request->state == -1) {?>       
+            <a href="javascript:void()" class="btn btn-danger"> 
+                        <?php echo $this->translate('Rejected'); ?> </a>
             <?php } ?>       
         <?php } ?>       
     </div>

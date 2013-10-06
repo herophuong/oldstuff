@@ -68,12 +68,12 @@
         <?php echo $this->translate('Delete'); ?>
     </a>    
     <?php } else if (!$authorized) { ?>
-    <a href="#" class="btn btn-success"><i class="icon-shopping-cart"></i>&nbsp;<?php echo $this->translate("Buy"); ?></a>
-    <a href="#" class="btn btn-info"><i class="icon-random"></i>&nbsp;<?php echo $this->translate("Trade"); ?></a>
+    <a href="<?php echo $this->stuffBuyLink($stuff->stuff_id); ?>" class="btn btn-success"><i class="icon-shopping-cart"></i>&nbsp;<?php echo $this->translate("Buy"); ?></a>
+    <a href="<?php echo $this->stuffTradeLink($stuff->stuff_id); ?>" class="btn btn-info"><i class="icon-random"></i>&nbsp;<?php echo $this->translate("Trade"); ?></a>
     <?php } ?>
 </div>
 </div>
-<?php if ($authorized) { ?>
+
 <hr class="alt"/>
 <div class="row">
     <div class="gallery span8 offset2 user-stuff-list">
@@ -88,7 +88,7 @@
         <?php } ?>
     </div>
 </div>
-<?php if ($stuff->state == 2 && !is_null($contact)) { ?> 
+<?php if ($authorized && $stuff->state == 3 && !is_null($contact)) { ?> 
 <div class="row">
     <div class="gallery span6 offset3 user-stuff-list"> 
         <h2 class="text-center"><i class="iconbig-note-write"></i>&nbsp;<?php echo $this->translate('Contact Info'); ?></h1>
@@ -103,4 +103,3 @@
     </div>
 </div>
 <?php } ?> 
-<?php } ?>

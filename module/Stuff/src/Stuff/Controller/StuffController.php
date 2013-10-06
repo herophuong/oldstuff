@@ -329,24 +329,32 @@ class StuffController extends AbstractActionController {
         $stuff = $this->getEntityManager()->find('Stuff\Entity\Stuff',$stuff_id);
         if(!$stuff){
             return $this->redirect()->toRoute('home');
-        }
-        $request = $this->getEntityManager()->getRepository('Stuff\Entity\Request');
+        }        
         
         $queryBuilder = $this->getEntityManager()->createQueryBuilder()
                 ->select('r')
                 ->from('Stuff\Entity\Request', 'r')
-                ->where('r.stuff = '.$stuff_id);
+                ->where('r.stuff = '.$stuff_id.' and r.state = 1');
         $results = $queryBuilder->getQuery()->execute();        
         
         $accepted = 0;
         foreach ($results as $result) $accepted = $result->requesting;       
        
         $usercontact = $this->getEntityManager()->getRepository('User\Entity\User')->find($accepted); 
-        return array(
-            'stuff' => $stuff,       
-            'results' => $results,
-            'contact' => $usercontact,
-        );           
+        
+        if ($stuff->state == 1) {
+            $request = $this->getEntityManager()->getRepository('Stuff\Entity\Request')->findBy(array('stuff'=>$stuff_id));
+            return array(
+                'stuff' => $stuff,       
+                'results' => $request,
+                'contact' => $usercontact,
+            );   
+        } else 
+            return array(
+                'stuff' => $stuff,       
+                'results' => $results,
+                'contact' => $usercontact,
+            );   
     }
     
     public function buyAction(){
@@ -421,6 +429,14 @@ class StuffController extends AbstractActionController {
             return $this->redirect()->toRoute('stuff', array('action' => 'user', 'id' => $user->user_id));
         }
         
+        //Check that user has all contact information filled
+        if (($this->identity()->contact->address == "") || ($this->identity()->contact->city == "")
+             || ($this->identity()->contact->state == "") || ($this->identity()->contact->zipcode == "")
+             || ($this->identity()->contact->country == "") || ($this->identity()->contact->phone == "")) {
+            $this->flashMessenger()->addErrorMessage("You need more contact information to request trading.");
+            return $this->redirect()->toRoute('user', array('action' => 'edit', 'id' => $user->user_id));
+        }            
+        
         $filter = new TradeFilter();
         $form = new TradeForm();
         $form->setInputFilter($filter->getInputFilter());
@@ -446,7 +462,7 @@ class StuffController extends AbstractActionController {
                 $data['exchange_id']   = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff')->findOneBy(array('stuff_id' => $formdata['exchangeStuff']));
                 $data['type']          = $stuff->purpose;
                 $data['stuff']         = $stuff;
-                $data['state']         = 1;               
+                $data['state']         = 0;               
                 $traderequest->populate($data);
                 $duplicateTest = $this->getEntityManager()->getRepository('Stuff\Entity\Request')->findOneBy(array('stuff' => $stuff,'requesting'=>$user));   
                 if (is_null($duplicateTest))                
@@ -486,7 +502,7 @@ class StuffController extends AbstractActionController {
         $stuff_id = $_GET['stuff'];  $requesting_id = $_GET['requester'];
         $request = $this->getEntityManager()->getRepository('Stuff\Entity\Request')->findOneBy(array('stuff' => $stuff_id, 'requesting' => $requesting_id));
         $data = $request->getArrayCopy();
-        $data['state'] = 2;
+        $data['state'] = -1;
         $request->populate($data);
         $this->getEntityManager()->flush();
         $stuff = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff')->findOneBy(array('stuff_id' => $stuff_id));  
@@ -496,25 +512,29 @@ class StuffController extends AbstractActionController {
     }
     
      public function acceptAction()
-    {
-         // TODO : receiving contact from requestor
+    {         
         $stuff_id = $_GET['stuff'];  $requesting_id = $_GET['requester'];
-        $request = $this->getEntityManager()->getRepository('Stuff\Entity\Request')->findOneBy(array('stuff' => $stuff_id, 'requesting' => $requesting_id));
-        $exchange_id = $request->exchange_id;
-        $data = $request->getArrayCopy();
-        $data['state'] = 3;
-        $request->populate($data);
+        
+        $requests = $this->getEntityManager()->getRepository('Stuff\Entity\Request')->findBy(array('stuff' => $stuff_id));        
+        foreach ($requests as $request) $request->state = -1;        
         $this->getEntityManager()->flush();
         
+        $request = $this->getEntityManager()->getRepository('Stuff\Entity\Request')->findOneBy(array('stuff' => $stuff_id, 'requesting' => $requesting_id));
+        $exchange_id = $request->exchange_id;   
+        $data = $request->getArrayCopy();
+        $data['state'] = 1;
+        $request->populate($data);
+        $this->getEntityManager()->flush();      
+               
         $stuff = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff')->findOneBy(array('stuff_id' => $stuff_id));      
         $data = $stuff->getArrayCopy();
-        $data['state'] = 2;
+        $data['state'] = 3;
         $stuff->populate($data);
         $this->getEntityManager()->flush();
         
         $stuff = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff')->findOneBy(array('stuff_id' => $exchange_id));      
         $data = $stuff->getArrayCopy();
-        $data['state'] = 2;
+        $data['state'] = 3;
         $stuff->populate($data);
         $this->getEntityManager()->flush();
         
