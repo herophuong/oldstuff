@@ -10,7 +10,7 @@
     <?php echo $this->partial('stuff/partial/user-profile.phtml', array('user' => $stuff->user)); ?>
 </div>
 <div class="gallery content-block span7">
-<h1 class="text-center"><i class="iconbig-note-write"></i>&nbsp;<?php echo $this->translate('Stuff Info'); ?></h1>
+<h1 class="text-center"><?php echo $stuff->stuff_name; ?></h1>
     <div class="row-fluid stuff-item">
         <div class="span3 stuff-image">
             <?php if ($stuff->image !== "") { ?>
@@ -21,23 +21,44 @@
             <img src="holder.js/225x210/gray/text:[<?php echo $this->translate("Old Stuff Trade System"); ?>]">
             <?php } ?>
         </div>
-        <div class="span7 stuff-info">
+        <div class="span9 stuff-info">
             <div class="stuff-value">
-                <h4>Name: <?php echo $stuff->stuff_name; ?></h4>
-                <h4>Owner: <?php echo $stuff->user->display_name; ?></h4>
-                <h4>Description: <?php echo $stuff->description; ?></h4>
-                <h4>Purpose: <?php echo strtoupper($stuff->purpose); ?></h4>
-                <h4>Price: <?php echo $stuff->price ?> VND</h4>
-                <h4>Desired Stuff: <?php echo $stuff->desired_stuff ?></h4>
-                <h4>State:
-                    <?php if($stuff->state == 0) echo "Unpublished";
-                          else echo "Published";
-                    ?>
-                </h4>   
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th><?php echo $this->translate('Owner'); ?></th>
+                            <td><?php echo $stuff->user->display_name; ?></td>
+                        </tr>
+                        <tr>
+                            <th><?php echo $this->translate('Description'); ?></th>
+                            <td><?php echo $stuff->description; ?></td>
+                        </tr>
+                        <tr>
+                            <th><?php echo $this->translate('Purpose'); ?></th>
+                            <td><?php echo strtoupper($stuff->purpose); ?></td>
+                        </tr>
+                        <?php if (strpos($stuff->purpose, 'sell') !== false) { ?>
+                        <tr>
+                            <th><?php echo $this->translate('Price'); ?></th>
+                            <td><?php echo $stuff->price; ?></td>
+                        </tr>
+                        <?php } ?>
+                        <?php if (strpos($stuff->purpose, 'trade') !== false) { ?>
+                        <tr>
+                            <th><?php echo $this->translate('Desired Stuff'); ?></th>
+                            <td><?php echo $stuff->desired_stuff; ?></td>
+                        </tr>
+                        <?php } ?>
+                        <tr>
+                            <th><?php echo $this->translate('State'); ?></th>
+                            <td><?php echo $this->partial('stuff/partial/state-badge.phtml', array('state' => $stuff->state)); ?></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
        </div>
     </div>
-    <?php if($authorized){?>
+    <?php if($authorized && $stuff->state <= 1) {?>
     <a href="<?php echo $this->stuffEditLink($stuff->stuff_id);?>" 
         class="btn btn-primary">
         <?php echo $this->translate('Edit'); ?>
@@ -46,12 +67,13 @@
         class="btn btn-link delete-link">
         <?php echo $this->translate('Delete'); ?>
     </a>    
-    <?php } else { ?>
+    <?php } else if (!$authorized) { ?>
     <a href="#" class="btn btn-success"><i class="icon-shopping-cart"></i>&nbsp;<?php echo $this->translate("Buy"); ?></a>
     <a href="#" class="btn btn-info"><i class="icon-random"></i>&nbsp;<?php echo $this->translate("Trade"); ?></a>
     <?php } ?>
 </div>
 </div>
+<?php if ($authorized) { ?>
 <hr class="alt"/>
 <div class="row">
     <div class="gallery span8 offset2 user-stuff-list">
@@ -80,4 +102,5 @@
         </ul>
     </div>
 </div>
- <?php } ?> 
+<?php } ?> 
+<?php } ?>

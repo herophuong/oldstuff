@@ -34,7 +34,7 @@
         <div class="stuff-description"><?php echo $stuff->description ?></div>
     </div>
     <div class="span2 stuff-buttons">
-        <?php if ($authorized) { ?>
+        <?php if ($authorized && $stuff->state <= 1) { ?>
         <a href="<?php echo $this->stuffEditLink($stuff->stuff_id);?>" 
             class="btn btn-primary span12">
             <?php echo $this->translate('Edit'); ?>
@@ -43,7 +43,7 @@
             class="btn btn-link span12 delete-link">
             <?php echo $this->translate('Delete'); ?>
         </a>
-        <?php } else { ?>
+        <?php } else if (!$authorized) { ?>
         <?php if (strpos($stuff->purpose, 'sell') !== false) { ?>
         <a href="<?php echo $this->stuffBuyLink($stuff->stuff_id); ?>" class="btn span12 btn-success"><i class="icon-shopping-cart"></i>&nbsp;<?php echo $this->translate("Buy"); ?></a>
         <?php } ?>
