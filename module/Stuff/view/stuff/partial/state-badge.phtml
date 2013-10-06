@@ -10,6 +10,16 @@ switch (true) {
 <label class="label label-inverse"><?php echo $this->translate('unpublished'); ?></label>
 <?php
         break;
+    case ($this->state === 2):
+?>
+<label class="label label-important"><?php echo $this->translate('sold'); ?></label>
+<?php
+        break;
+    case ($this->state === 3):
+?>
+<label class="label label-important"><?php echo $this->translate('traded'); ?></label>
+<?php
+        break;
     default:
         break;
 }
