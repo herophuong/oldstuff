@@ -27,7 +27,7 @@ class TradeFilter implements InputFilterAwareInterface {
 
     protected function getExchangeStuffFilter(){
         return array(
-            'name' => 'exchangeStuff',
+            'name' => 'proposed_stuff',
             'required' => true,
         );
     }

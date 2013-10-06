@@ -27,7 +27,7 @@ class BuyFilter implements InputFilterAwareInterface {
 
     protected function getPaymentMethodFilter(){
         return array(
-            'name' => 'paymentmethod',
+            'name' => 'payment_method',
             'required' => true,
         );
     }

@@ -19,23 +19,33 @@ class Request
 {
     /**
      * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    protected $request_id;
+    
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    protected $created_time;
+    
+    /**
      * @ORM\ManyToOne(targetEntity="User\Entity\User")
-     * @ORM\JoinColumn(name="requesting_id", referencedColumnName="user_id")
+     * @ORM\JoinColumn(name="requestor_id", referencedColumnName="user_id")
      */
-    protected $requesting;
-    
-    /**
-     * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="Stuff\Entity\Stuff")
-     * @ORM\JoinColumn(name="stuff_id", referencedColumnName="stuff_id")
-     */
-    protected $stuff;
+    protected $requestor;
     
     /**
      * @ORM\ManyToOne(targetEntity="Stuff\Entity\Stuff")
-     * @ORM\JoinColumn(name="exchange_id", referencedColumnName="stuff_id", nullable = true)
+     * @ORM\JoinColumn(name="requested_id", referencedColumnName="stuff_id")
      */
-    protected $exchange_id;
+    protected $requested_stuff;
+    
+    /**
+     * @ORM\ManyToOne(targetEntity="Stuff\Entity\Stuff")
+     * @ORM\JoinColumn(name="proposed_id", referencedColumnName="stuff_id", nullable = true)
+     */
+    protected $proposed_stuff;
     
     /**
      * @ORM\Column(type="string")
@@ -91,11 +101,21 @@ class Request
      */
     public function populate($data = array()) 
     {
-        $this->requesting = $data['requesting'];
-        $this->stuff = $data['stuff'];
-        $this->type = $data['type'];
-        $this->exchange_id = $data['exchange_id'];
-        $this->payment_method = $data['payment_method'];
-        $this->state = $data['state'];
+        if (isset($data['request_id']))
+            $this->request_id = $data['request_id'];
+        if (isset($data['created_time']))
+            $this->created_time = $data['created_time'];
+        if (isset($data['requestor']))
+            $this->requestor = $data['requestor'];
+        if (isset($data['requested_stuff']))
+            $this->requested_stuff = $data['requested_stuff'];
+        if (isset($data['proposed_stuff']))
+            $this->proposed_stuff = $data['proposed_stuff'];
+        if (isset($data['type']))
+            $this->type = $data['type'];
+        if (isset($data['payment_method']))
+            $this->payment_method = $data['payment_method'];
+        if (isset($data['state']))
+            $this->state = $data['state'];
     }
 }

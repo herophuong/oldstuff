@@ -376,25 +376,26 @@ class StuffController extends AbstractActionController {
             $form->setData($request->getPost());
             if($form->isValid()){
                 $formdata = $form->getData();
-                //Copy form to entity
-                $buyrequest = new Request();
-                $data = $buyrequest->getArrayCopy();
-                $data['payment_method']= $formdata['paymentmethod'];
-                $data['requesting']    = $user;
-                $data['exchange_id']   = null;
-                $data['type']          = $stuff->purpose;
-                $data['stuff']         = $stuff;
-                $data['state']         = 1;
+                // Create a new request
+                $request = new Request();
+                $request->payment_method    = $formdata['payment_method'];
+                $request->requestor         = $user;
+                $request->type              = 'sell';
+                $request->requested_stuff   = $stuff;
+                $request->state             = 1;
+                $request->created_time      = new \DateTime("now");
+                
+                // Change the state of stuff to "sold"
                 $stuff->state = 2;
-                $buyrequest->populate($data);
+                
                 try{
-                    $this->getEntityManager()->persist($buyrequest);
+                    $this->getEntityManager()->persist($request);
                     $this->getEntityManager()->persist($stuff);
                     $this->getEntityManager()->flush();
                     $this->flashMessenger()->addSuccessMessage("Buy completed");
+                    
                     return $this->redirect()->toRoute('stuff',array('action' => 'user', 'id' => $user->user_id));
-                }
-                catch(DBALException $e){
+                } catch(DBALException $e){
                     $this->flashMessenger()->addErrorMessage($e->getMessage());
                 }
             }
@@ -425,33 +426,30 @@ class StuffController extends AbstractActionController {
         $form = new TradeForm();
         $form->setInputFilter($filter->getInputFilter());
         
+        // Inject current user's stuff into stuff list select
         $Ddlstuffs = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff')->findBy(array('user' => $this->identity(), 'state' => 1));
-       
         $Ddlstuff_list = array();
-        foreach ($Ddlstuffs as $Ddlstuff)
-        {            
+        foreach ($Ddlstuffs as $Ddlstuff) {            
             $Ddlstuff_list[$Ddlstuff->stuff_id] = $Ddlstuff->stuff_name;            
         }
-        $option = $form->get('exchangeStuff')->setValueOptions($Ddlstuff_list);             
+        $option = $form->get('proposed_stuff')->setValueOptions($Ddlstuff_list);
+        
         $request = $this->getRequest();
         if($request->isPost()){
             $form->setData($request->getPost());
             if($form->isValid()){
-                $formdata = $form->getData();
+                $validData = $form->getData();
                 //Copy form to entity
-                $traderequest = new Request();
-                $data = $traderequest->getArrayCopy();
-                $data['payment_method']= 'exchange';
-                $data['requesting']    = $user;
-                $data['exchange_id']   = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff')->findOneBy(array('stuff_id' => $formdata['exchangeStuff']));
-                $data['type']          = $stuff->purpose;
-                $data['stuff']         = $stuff;
-                $data['state']         = 1;               
-                $traderequest->populate($data);
-                $duplicateTest = $this->getEntityManager()->getRepository('Stuff\Entity\Request')->findOneBy(array('stuff' => $stuff,'requesting'=>$user));   
-                if (is_null($duplicateTest))                
+                $request = new Request();
+                $request->payment_method    = 'exchange';
+                $request->requestor         = $user;
+                $request->requested_stuff   = $stuff;
+                $request->proposed_stuff    = $validData['proposed_stuff'];
+                $request->type              = 'trade';
+                $request->state             = 0; // Pending state
+                
                 try{
-                    $this->getEntityManager()->persist($traderequest);
+                    $this->getEntityManager()->persist($request);
                     $this->getEntityManager()->persist($stuff);
                     $this->getEntityManager()->flush();
                     $this->flashMessenger()->addSuccessMessage("Request for trade sent.");
@@ -459,9 +457,7 @@ class StuffController extends AbstractActionController {
                 }                            
                 catch(DBALException $e){
                     $this->flashMessenger()->addErrorMessage($e->getMessage());
-                }
-                else $this->flashMessenger()->addErrorMessage("You've already sent request for this item.");
-                
+                }                
             }
         }
         return array('form' => $form, 'stuff' => $stuff);     

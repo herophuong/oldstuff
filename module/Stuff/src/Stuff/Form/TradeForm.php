@@ -9,7 +9,7 @@ class TradeForm extends Form {
     public function __construct($name = null) {
         parent::__construct($name);
         $this->add(array(
-            'name' => 'exchangeStuff',
+            'name' => 'proposed_stuff',
             'type' => 'Select',
             'options' => array(
                 'label' => 'Propose stuff',

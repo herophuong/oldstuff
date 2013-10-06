@@ -9,7 +9,7 @@ class BuyForm extends Form {
     public function __construct($name = null) {
         parent::__construct($name);
         $this->add(array(
-            'name' => 'paymentmethod',
+            'name' => 'payment_method',
             'type' => 'Select',
             'options' => array(
                 'label' => 'Payment Method',
