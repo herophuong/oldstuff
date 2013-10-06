@@ -380,7 +380,7 @@ class StuffController extends AbstractActionController {
                 $data = $buyrequest->getArrayCopy();
                 $data['payment_method']= $formdata['paymentmethod'];
                 $data['requesting']    = $user;
-                $data['exchange_id']   = 0;
+                $data['exchange_id']   = null;
                 $data['type']          = $stuff->purpose;
                 $data['stuff']         = $stuff;
                 $data['state']         = 1;
