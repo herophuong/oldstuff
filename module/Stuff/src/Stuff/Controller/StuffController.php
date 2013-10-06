@@ -531,43 +531,15 @@ class StuffController extends AbstractActionController {
         $filter_search      = $this->_getStateFromPostRequest('filter.search', 'filter_search');
 
         // Get stuffs
-        $repository = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff');
-        $queryBuilder = $this->getEntityManager()->createQueryBuilder();
-        $queryBuilder->select('s')
-                     ->from('Stuff\Entity\Stuff', 's')
-                     ->orderBy('s.stuff_id', 'DESC');
-        
-        // Build the filter expression
-        $and = $queryBuilder->expr()->andX();
-        $parameters = new ArrayCollection();
-        if ($filter_category) {
-            $and->add($queryBuilder->expr()->eq('s.category', ':cat_id'));
-            $parameters->add(new Parameter('cat_id', $filter_category, 'integer'));
-        }
-        if ($filter_purpose) {
-            $and->add($queryBuilder->expr()->like('s.purpose', ':purpose'));
-            $parameters->add(new Parameter('purpose', '%'.$filter_purpose.'%', 'string'));
-        }
-        if ($filter_search) {
-            $or = $queryBuilder->expr()->orX();
-            $or->add($queryBuilder->expr()->like('s.stuff_name', ':search'));
-            $or->add($queryBuilder->expr()->like('s.description', ':search'));
-            $and->add($or);
-            $parameters->add(new Parameter('search', '%'.$filter_search.'%', 'string'));
-        }
-        
-        // Only show published stuffs
-        $and->add($queryBuilder->expr()->like('s.state', ':state'));
-        $parameters->add(new Parameter('state', 1, 'integer'));
-        
-        $queryBuilder->where($and)->setParameters($parameters);
+        $queryBuilder = $this->_buildQuery(array(
+            'category' => $filter_category,
+            'purpose' => $filter_purpose,
+            'keyword' => $filter_search,
+            'states' => 1,
+        ));
         
         // Create a paginator
-        $paginator = new Paginator(new PaginatorAdapter(new ORMPaginator($queryBuilder)));
-        $paginator->setItemCountPerPage(11);
-        $page = (int) $this->params()->fromQuery('page');
-        if ($page) 
-            $paginator->setCurrentPageNumber($page);
+        $paginator = $this->_buildPaginator($queryBuilder, 11);
         
         // Get categories
         $categories = $this->getEntityManager()->getRepository('Category\Entity\Category')->findBy(array(), array('cat_name' => 'ASC'));
@@ -605,5 +577,82 @@ class StuffController extends AbstractActionController {
         }
         
         return $value;
+    }
+    
+    /**
+     * Helper function to build query for listing stuffs
+     *
+     * @param array $filters Array of filters
+     *
+     * @return QueryBuilder
+     */
+    private function _buildQuery(array $filters = null)
+    {
+        $queryBuilder = $this->getEntityManager()->createQueryBuilder();
+        $queryBuilder->select('s')
+                     ->from('Stuff\Entity\Stuff', 's')
+                     ->orderBy('s.stuff_id', 'DESC');
+        
+        // Call helper methods to add filter to this query builder
+        if (is_array($filters)) {
+            foreach ($filters as $criterion => $value) {
+                if (!empty($value))
+                    call_user_func_array(array($this, '_filterStuff' . $criterion), array(&$queryBuilder, $value));
+            }
+        }
+        
+        return $queryBuilder;
+    }
+    
+    private function _filterStuffCategory(&$queryBuilder, $value)
+    {
+        $queryBuilder->andWhere('s.category = :category')
+                     ->setParameter('category', $value, 'integer');
+    }
+    
+    private function _filterStuffPurpose(&$queryBuilder, $value)
+    {
+        $queryBuilder->andWhere('s.purpose LIKE :purpose')
+                     ->setParameter('purpose', '%'.$value.'%', 'string');
+    }
+    
+    private function _filterStuffKeyword(&$queryBuilder, $value)
+    {
+        $or = $queryBuilder->expr()->orX();
+        $or->add($queryBuilder->expr()->like('s.stuff_name', ':search'));
+        $or->add($queryBuilder->expr()->like('s.description', ':search'));
+        $queryBuilder->andWhere($or);
+        $queryBuilder->setParameter('search', '%'.$value.'%', 'string');
+    }
+    
+    private function _filterStuffUser(&$queryBuilder, $value)
+    {
+        $queryBuilder->andWhere('s.user_id = :user_id');
+        $queryBuilder->setParameter('user_id', $value, 'integer');
+    }
+    
+    private function _filterStuffStates(&$queryBuilder, $value)
+    {
+        $queryBuilder->andWhere('s.state IN (:state)');
+        $queryBuilder->setParameter('state', $value);        
+    }
+    
+    /**
+     * Helper to build paginator
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param integer $count Item count per page
+     * 
+     * @return Paginator
+     */
+    private function _buildPaginator($queryBuilder, $count = 10)
+    {
+        $paginator = new Paginator(new PaginatorAdapter(new ORMPaginator($queryBuilder)));
+        $paginator->setItemCountPerPage($count);
+        $page = (int) $this->params()->fromQuery('page');
+        if ($page) 
+            $paginator->setCurrentPageNumber($page);
+            
+        return $paginator;
     }
 }
