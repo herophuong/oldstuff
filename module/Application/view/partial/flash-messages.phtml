@@ -6,6 +6,7 @@ $this->flashMessenger()->setMessageSeparatorString('<br />');
 $this->flashMessenger()->setMessageCloseString('</div>');
 
 // Render flash messenger
-echo $this->flashMessenger()->render(PluginFlashMessenger::NAMESPACE_SUCCESS, array('alert', 'alert-success'));
-echo $this->flashMessenger()->render(PluginFlashMessenger::NAMESPACE_ERROR, array('alert', 'alert-danger'));
+echo $this->flashMessenger()->render(PluginFlashMessenger::NAMESPACE_SUCCESS, array('alert fade in', 'alert-success'));
+echo $this->flashMessenger()->render(PluginFlashMessenger::NAMESPACE_ERROR, array('alert fade in', 'alert-danger'));
+echo $this->flashMessenger()->render(PluginFlashMessenger::NAMESPACE_INFO, array('alert fade in', 'alert-info'));
 ?>

@@ -57,6 +57,13 @@ class ContactFilter implements InputFilterAwareInterface
                     array('name' => 'PhoneNumber', 'options' => array('country' => 'VN')),
                 ),
             ));
+            $this->inputFilter->add(array(
+                'name' => 'country',
+                'required' => false,
+                'filters' => array(
+                    array('name' => 'StripTags'),
+                ),
+            ));
         }
         
         return $this->inputFilter;

@@ -1,5 +1,5 @@
 <?php
-namespace Stuff\View\Helper;
+namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
 

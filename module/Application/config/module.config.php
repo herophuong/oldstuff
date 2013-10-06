@@ -104,6 +104,11 @@ return array(
             __DIR__ . '/../view',
         ),
     ),
+    'view_helpers' => array(
+        'invokables' => array(
+            'alertBlock' => 'Application\View\Helper\AlertBlock',
+        ),
+    ),
     // Placeholder for console routes
     'console' => array(
         'router' => array(

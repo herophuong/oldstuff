@@ -31,7 +31,6 @@ return array(
 	),
 	'view_helpers' => array(
         'invokables' => array(
-            'alertBlock' => 'Stuff\View\Helper\AlertBlock',
             'deleteConfirmationScript' => 'Stuff\View\Helper\DeleteConfirmationScript',
             'stuffAddLink' => 'Stuff\View\Helper\StuffAddLink',
             'stuffEditLink' => 'Stuff\View\Helper\StuffEditLink',
