@@ -14,7 +14,7 @@ return array(
 					'route' => '/stuff[/][:action][/:id]',
 					'constraints' => array(
 						'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
-						'stuff_id' => '[0-9]+',
+						'id' => '[0-9]+',
 					),
 					'defaults' => array(
 						'controller' => 'Stuff\Controller\Stuff',
@@ -32,13 +32,16 @@ return array(
 	'view_helpers' => array(
         'invokables' => array(
             'deleteConfirmationScript' => 'Stuff\View\Helper\DeleteConfirmationScript',
-            'stuffAddLink' => 'Stuff\View\Helper\StuffAddLink',
-            'stuffEditLink' => 'Stuff\View\Helper\StuffEditLink',
-            'stuffDeleteLink' => 'Stuff\View\Helper\StuffDeleteLink',
-            'stuffUserLink' => 'Stuff\View\Helper\StuffUserLink',
-            'stuffItemLink' => 'Stuff\View\Helper\StuffItemLink',
-            'stuffBuyLink' => 'Stuff\View\Helper\StuffBuyLink',
-            'stuffTradeLink' => 'Stuff\View\Helper\StuffTradeLink',
+            'stuffAddLink'      => 'Stuff\View\Helper\StuffAddLink',
+            'stuffEditLink'     => 'Stuff\View\Helper\StuffEditLink',
+            'stuffDeleteLink'   => 'Stuff\View\Helper\StuffDeleteLink',
+            'stuffUserLink'     => 'Stuff\View\Helper\StuffUserLink',
+            'stuffItemLink'     => 'Stuff\View\Helper\StuffItemLink',
+            'stuffBuyLink'      => 'Stuff\View\Helper\StuffBuyLink',
+            'stuffTradeLink'    => 'Stuff\View\Helper\StuffTradeLink',
+            'requestLink'       => 'Stuff\View\Helper\RequestLink',
+            'requestAcceptLink' => 'Stuff\View\Helper\RequestAcceptLink',
+            'requestRejectLink' => 'Stuff\View\Helper\RequestRejectLink',
         ),
     ),
 	'doctrine' => array(

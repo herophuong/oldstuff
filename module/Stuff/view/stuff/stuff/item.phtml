@@ -22,6 +22,7 @@
             <?php } ?>
         </div>
         <div class="span9 stuff-info">
+            <?php echo $this->partial('partial/flash-messages.phtml'); ?>
             <div class="stuff-value">
                 <table class="table table-bordered">
                     <tbody>
@@ -67,7 +68,7 @@
         class="btn btn-link delete-link">
         <?php echo $this->translate('Delete'); ?>
     </a>    
-    <?php } else if (!$authorized) { ?>
+    <?php } else if (!$authorized && $stuff->state == 1) { ?>
     <a href="#" class="btn btn-success"><i class="icon-shopping-cart"></i>&nbsp;<?php echo $this->translate("Buy"); ?></a>
     <a href="#" class="btn btn-info"><i class="icon-random"></i>&nbsp;<?php echo $this->translate("Trade"); ?></a>
     <?php } ?>
@@ -77,10 +78,10 @@
 <hr class="alt"/>
 <div class="row">
     <div class="gallery span8 offset2 user-stuff-list">
-        <?php if (count($this->results) > 0) { ?>
+        <?php if (count($this->requests) > 0) { ?>
         <?php 
             $this->partialLoop()->setObjectKey('object');
-            echo $this->partialLoop('partial/request.phtml', $this->results); ?>
+            echo $this->partialLoop('partial/request.phtml', $this->requests); ?>
         <?php } else { ?>
         <div class="text-center">
             <h2 class="muted"><?php echo $this->translate('No request for this item'); ?></h2>            
@@ -88,18 +89,45 @@
         <?php } ?>
     </div>
 </div>
-<?php if ($stuff->state == 2 && !is_null($contact)) { ?> 
+<?php if ($stuff->state > 1 && isset($this->acceptedRequest)) { ?>
+<?php $requestor = $this->acceptedRequest->requestor; ?>
 <div class="row">
-    <div class="gallery span6 offset3 user-stuff-list"> 
-        <h2 class="text-center"><i class="iconbig-note-write"></i>&nbsp;<?php echo $this->translate('Contact Info'); ?></h1>
-        <ul>
-               <li> <b> Address: </b>    <?php echo $contact->contact->address;?></li>
-               <li> <b> City: </b>     <?php echo $contact->contact->city;?></li>       
-               <li> <b> State: </b>    <?php echo $contact->contact->state;?></li>
-               <li> <b> Zip code:</b>   <?php echo $contact->contact->zipcode;?></li>  
-               <li> <b> Country:</b>   <?php echo $contact->contact->country;?></li>
-               <li> <b> Phone:</b>   <?php echo $contact->contact->phone;?></li>     
-        </ul>
+    <div class="gallery span8 offset2 content-block"> 
+        <h2 class="text-center"><?php echo $this->translate('Requestor Contact'); ?></h1>
+        <table class="table">
+            <tr>
+                <th><?php echo $this->translate('Name'); ?></th>
+                <td><?php echo $requestor->display_name; ?></td>
+            </tr>
+            <tr>
+                <th><?php echo $this->translate('Email'); ?></th>
+                <td><?php echo $requestor->email; ?></td>
+            </tr>
+             <tr>
+                <th><?php echo $this->translate('Phone'); ?></th>
+                <td><?php echo $requestor->contact->phone; ?></td>
+            </tr>
+            <tr>
+                <th><?php echo $this->translate('Address'); ?></th>
+                <td><?php echo $requestor->contact->address; ?></td>
+            </tr>
+            <tr>
+                <th><?php echo $this->translate('City'); ?></th>
+                <td><?php echo $requestor->contact->city; ?></td>
+            </tr>
+            <tr>
+                <th><?php echo $this->translate('State'); ?></th>
+                <td><?php echo $requestor->contact->state; ?></td>
+            </tr>
+            <tr>
+                <th><?php echo $this->translate('Zipcode'); ?></th>
+                <td><?php echo $requestor->contact->zipcode; ?></td>
+            </tr>
+            <tr>
+                <th><?php echo $this->translate('Country'); ?></th>
+                <td><?php echo $requestor->contact->country; ?></td>
+            </tr>
+        </table>        
     </div>
 </div>
 <?php } ?> 

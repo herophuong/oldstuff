@@ -1,10 +1,10 @@
 <?php $request = $this->object; ?>
-<?php $authorized = ($this->identity() == $request->stuff->user); ?>
+<?php if (!$request->proposed_stuff) return; ?>
 <div class="row-fluid stuff-item">
     <div class="span3 stuff-image">
-        <?php if ($request->exchange_id->image !== "") { ?>
-        <a class="group" rel="group1" href="<?php echo $this->basePath() . '/' . $request->exchange_id->image[0]; ?>">
-            <img src="<?php echo $this->basePath() . '/' . $request->exchange_id->image[0]; ?>">
+        <?php if ($request->proposed_stuff->image !== "") { ?>
+        <a class="group" rel="group1" href="<?php echo $this->basePath() . '/' . $request->proposed_stuff->image[0]; ?>">
+            <img src="<?php echo $this->basePath() . '/' . $request->proposed_stuff->image[0]; ?>">
         </a>
         <?php } else { ?>
         <img src="holder.js/225x210/gray/text:[<?php echo $this->translate("Old Stuff Trade System"); ?>]">
@@ -12,39 +12,36 @@
     </div>
     <div class="span7 stuff-info">
         <h4>
-            <a href="<?php echo $this->stuffItemLink($request->exchange_id->stuff_id); ?>"><?php echo $request->exchange_id->stuff_name; ?></a>
-            <?php if ($authorized) { 
-                echo $this->partial('stuff/partial/state-badge.phtml', array('state' => $request->exchange_id->state));
-            } ?>
+            <a href="<?php echo $this->stuffItemLink($request->proposed_stuff->stuff_id); ?>"><?php echo $request->proposed_stuff->stuff_name; ?></a>
         </h4>
         <div class="stuff-description">
             <span style="font-weight: bold"> Asker: </span>
-                    <?php echo $request->exchange_id->user->email ?></div>
+                    <?php echo $request->proposed_stuff->user->email ?></div>
         <div class="stuff-description">
             <span style="font-weight: bold"> Description: </span>
-                    <?php echo $request->exchange_id->description ?></div>
+                    <?php echo $request->proposed_stuff->description ?></div>
     </div>
     <div class="span2 stuff-buttons">
-        <?php if ($authorized) { ?>
-         <?php if ($request->stuff->state == 1) { ?>
-        <a href="<?php echo $this->url('stuff', array('action' => 'viewrequest')) 
-                        .'?stuff='.$request->stuff->stuff_id .'&exchange='.$request->exchange_id->stuff_id ?>"
-                        class="btn btn-primary"> 
-                        <?php echo $this->translate('View'); ?>  </a>
-        
-        <a href="<?php echo $this->url('stuff', array('action' => 'accept')) 
-                        .'?stuff='.$request->stuff->stuff_id .'&requester='.$request->requesting->user_id ?>" 
-                        class="btn"> 
-                        <?php echo $this->translate('Accept'); ?> </a>
-        
-        <a href="<?php echo $this->url('stuff', array('action' => 'reject')) 
-                        .'?stuff='.$request->stuff->stuff_id .'&requester='.$request->requesting->user_id ?>" 
-                        class="btn"> 
-                        <?php echo $this->translate('Reject'); ?>  </a>
-        <?php } else {?>       
-            <a href="javascript:void()" class="btn btn-success"> 
-                        <?php echo $this->translate('Accepted'); ?> </a>
-            <?php } ?>       
-        <?php } ?>       
+         <?php if ($request->state == 0) { ?>
+        <a 
+            href="<?php echo $this->requestLink($request->request_id); ?>"
+            class="btn btn-primary span12"> 
+            <?php echo $this->translate('View'); ?>
+        </a>
+        <a 
+            href="<?php echo $this->requestAcceptLink($request->request_id); ?>"
+            class="btn span12"> 
+            <?php echo $this->translate('Accept'); ?>
+        </a>
+        <a 
+            href="<?php echo $this->requestRejectLink($request->request_id);?>"
+            class="btn span12"> 
+            <?php echo $this->translate('Reject'); ?>
+        </a>     
+        <?php } else if ($request->state == 1) { ?>
+        <button class="btn btn-success"><?php echo $this->translate('Accepted'); ?></button>
+        <?php } else if ($request->state == -1) { ?>
+        <button class="btn btn-inverse"><?php echo $this->translate('Rejected'); ?></button>
+        <?php } ?>
     </div>
 </div>

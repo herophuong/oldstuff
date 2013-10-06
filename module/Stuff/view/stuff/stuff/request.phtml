@@ -1,0 +1,82 @@
+<?php $this->headTitle($this->translate('Trade Request'), 'PREPEND');
+    $user = $this->identity();
+    $stuff = $this->request->requested_stuff; 
+    $exchange = $this->request->proposed_stuff;
+?>
+<div class="row">
+<div class="gallery content-block span8 offset2">
+<h1 class="text-center"><?php echo $this->translate('Trade Request'); ?></h1>
+    <div class="row-fluid stuff-item">
+        <?php echo $this->partial('partial/current-flash-messages.phtml'); ?>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th><?php echo $this->translate('Your Stuff'); ?></th>
+                    <th><?php echo $this->translate('Proposed Stuff'); ?></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th><?php echo $this->translate('Preview'); ?></th>
+                    <td>
+                    <?php if ($stuff->image !== "") { ?>
+                        <a class="group" rel="group1" href="<?php echo $this->basePath() . '/' . $stuff->image[0]; ?>">
+                            <img src="<?php echo $this->basePath() . '/' . $stuff->image[0]; ?>">
+                        </a>
+                        <?php } else { ?>
+                        <img src="holder.js/225x210/gray/text:[<?php echo $this->translate("Old Stuff Trade System"); ?>]">
+                    <?php } ?>
+                    </td>
+                    <td>
+                    <?php if ($exchange->image !== "") { ?>
+                        <a class="group" rel="group1" href="<?php echo $this->basePath() . '/' . $exchange->image[0]; ?>">
+                            <img src="<?php echo $this->basePath() . '/' . $exchange->image[0]; ?>">
+                        </a>
+                        <?php } else { ?>
+                        <img src="holder.js/225x210/gray/text:[<?php echo $this->translate("Old Stuff Trade System"); ?>]">
+                    <?php } ?>
+                    </td>
+                </tr>
+                <tr>
+                    <th><?php echo $this->translate('Stuff Name'); ?></th>
+                    <td><?php echo $stuff->stuff_name;?></td>
+                    <td><?php echo $exchange->stuff_name;?></td>
+                </tr>
+                <tr>
+                    <th><?php echo $this->translate('Price'); ?></th>
+                    <td><?php echo $stuff->price;?></td>
+                    <td><?php echo $exchange->price;?></td>
+                </tr>
+                <tr>
+                    <th><?php echo $this->translate('Owner'); ?></th>
+                    <td><?php echo $stuff->user->display_name;?></td>
+                    <td><?php echo $exchange->user->display_name;?></td>
+                </tr>
+                <tr>
+                    <th><?php echo $this->translate('Description'); ?></th>
+                    <td><?php echo $stuff->description;?></td>
+                    <td><?php echo $exchange->description;?></td>
+                </tr>
+            </tbody>
+        </table>
+     
+        <a 
+            href="<?php echo $this->stuffItemLink($stuff->stuff_id);?>" 
+            class="btn">
+            <?php echo $this->translate('Cancel'); ?>
+        </a>  
+        <div class="pull-right">
+        <a 
+            href="<?php echo $this->requestRejectLink($this->request->request_id); ?>"
+            class="btn btn-danger">
+            <?php echo $this->translate('Reject'); ?>
+        </a>
+        <a 
+            href="<?php echo $this->requestAcceptLink($this->request->request_id); ?>" 
+            class="btn btn-primary">
+            <?php echo $this->translate('Accept'); ?>
+        </a>
+        </div>
+</div>
+</div>

@@ -48,9 +48,10 @@
                                 echo $this->alertBlock(implode('<br />', $messages['payment_method']));
                         ?>
                         </td>
+                    </tr>
                 </tbody>
             </table>
-             <a href="<?php echo $this->stuffUserLink($this->identity()->user_id);?>" 
+            <a href="<?php echo $this->stuffUserLink($this->identity()->user_id);?>" 
                 class="btn">
                 <?php echo $this->translate('Cancel'); ?>
             </a>

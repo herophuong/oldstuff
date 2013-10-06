@@ -76,6 +76,11 @@ class Stuff
     protected $state;
     
     /**
+     * @ORM\OneToMany(targetEntity="Stuff\Entity\Request",mappedBy="requested_stuff")
+     */
+    protected $requests;
+    
+    /**
      * Magic getter to expose protected properties.
      *
      * @param string $property

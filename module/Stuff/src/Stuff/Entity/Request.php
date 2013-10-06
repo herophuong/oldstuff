@@ -36,7 +36,7 @@ class Request
     protected $requestor;
     
     /**
-     * @ORM\ManyToOne(targetEntity="Stuff\Entity\Stuff")
+     * @ORM\ManyToOne(targetEntity="Stuff\Entity\Stuff",inversedBy="requests")
      * @ORM\JoinColumn(name="requested_id", referencedColumnName="stuff_id")
      */
     protected $requested_stuff;

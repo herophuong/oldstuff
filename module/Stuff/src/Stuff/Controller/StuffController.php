@@ -56,82 +56,54 @@ class StuffController extends AbstractActionController {
 	
 	public function userAction()
     {                 
-        $user_id = (int) $this->params()->fromroute('id', 0);
-        if (!$user_id) {
-            // Redirect on invalid request
+        $user_id = (int) $this->params()->fromroute('id', 0);        
+        // Get this user
+        $user = $this->getEntityManager()->getRepository('User\Entity\User')->findOneBy(array('user_id' => $user_id));
+        if (!$user) {
             $this->redirect()->toRoute('home');
         }
-        
-        // Init query builder
-        $user = $this->getEntityManager()->getRepository('User\Entity\User')->findOneBy(array('user_id' => $user_id));       
-        $repository = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff');
-        $queryBuilder = $this->getEntityManager()->createQueryBuilder();
-        $queryBuilder->select('s');
-        $queryBuilder->from('Stuff\Entity\Stuff', 's');
         
         // Get filter criteria from request or session
         $filter_category = $this->_getStateFromPostRequest('filter.category', 'filter_category', 0, 'stuff\user\\'.$user_id);
         $filter_purpose = $this->_getStateFromPostRequest('filter.purpose', 'filter_purpose', '', 'stuff\user\\'.$user_id);
         $filter_search = $this->_getStateFromPostRequest('filter.search', 'filter_search', '', 'stuff\user\\'.$user_id);
         
-        // Build the filter expression
-        $and = $queryBuilder->expr()->andX();
-        $parameters = new ArrayCollection();
-        
-        // Only show stuffs from this user
-        $and->add($queryBuilder->expr()->eq('s.user', ':user_id'));
-        $parameters->add(new Parameter('user_id', $user_id, 'integer'));
-        
-        /*--- Filter by searching ---*/
-        if ($filter_category) {
-            $and->add($queryBuilder->expr()->eq('s.category', ':cat_id'));
-            $parameters->add(new Parameter('cat_id', $filter_category, 'integer'));
-        }
-        if ($filter_purpose) {
-            $and->add($queryBuilder->expr()->like('s.purpose', ':purpose'));
-            $parameters->add(new Parameter('purpose', '%'.$filter_purpose.'%', 'string'));
-        }
-        if ($filter_search) {
-            $or = $queryBuilder->expr()->orX();
-            $or->add($queryBuilder->expr()->like('s.stuff_name', ':search'));
-            $or->add($queryBuilder->expr()->like('s.description', ':search'));
-            $and->add($or);
-            $parameters->add(new Parameter('search', '%'.$filter_search.'%', 'string'));
-        }
-        
         /*--- Filter by user tabs ---*/
         if ($user == $this->identity()) {
             $filter_tab = $this->_getStateFromPostRequest('filter.tab', 'filter_tab', 'inventory', 'stuff\user\\'.$user_id);
             switch ($filter_tab) {
                 case 'inventory':
-                    $and->add($queryBuilder->expr()->in('s.state', array(0, 1)));
+                    $filter_states = array(0, 1);
                     break;
                 case 'done':                
-                    $and->add($queryBuilder->expr()->eq('s.state', 2));
+                    $filter_states = array(2, 3);
                     break;
                 case 'request':
-                    // TODO Implement what stuffs from this user are requested
-                    $queryBuilder->innerJoin('s.requests', 'r', 'WITH', 'r.state = 1');
-//                    $and->add($queryBuilder->expr()->eq('r.state', 1));
+                    // Get stuffs having pending requests
+                    $filter_requests = 0;
+                    $filter_states = 1;
                     break;
                 default:
-                    // Prevent error by select nothing in query builder
-                    $and->add($queryBuilder->expr()->eq('s.stuff_id', 0));
                     break;
             }
         } else {
-            $and->add($queryBuilder->expr()->eq('s.state', 1));
+            $filter_states = 1;
         }
         /*--- End filter ---*/
         
-        $queryBuilder->where($and)->setParameters($parameters)->orderBy('s.stuff_id', 'DESC');
-        /*--- End filter ---*/
-//        echo $queryBuilder; die;
-        $paginator = new Paginator(new PaginatorAdapter(new ORMPaginator($queryBuilder)));
-        $paginator->setItemCountPerPage(10);
-        $page = (int) $this->params()->fromQuery('page');
-        if ($page) 
-            $paginator->setCurrentPageNumber($page);
+        // Get the query
+        $queryBuilder = $this->_buildQuery(array(
+            'category' => $filter_category,
+            'purpose' => $filter_purpose,
+            'keyword' => $filter_search,
+            'states' => isset($filter_states) ? $filter_states : null,
+            'requests' => isset($filter_requests) ? $filter_requests : null,
+            'user' => $user_id,
+        ));
+
+        // Get the paginator
+        $paginator = $this->_buildPaginator($queryBuilder);
+        
         $categories = $this->getEntityManager()->getRepository('Category\Entity\Category')->findBy(array(), array('cat_name' => 'ASC'));
         return array(
             'user' => $user,       
@@ -330,22 +302,19 @@ class StuffController extends AbstractActionController {
         if(!$stuff){
             return $this->redirect()->toRoute('home');
         }
-        $request = $this->getEntityManager()->getRepository('Stuff\Entity\Request');
         
-        $queryBuilder = $this->getEntityManager()->createQueryBuilder()
-                ->select('r')
-                ->from('Stuff\Entity\Request', 'r')
-                ->where('r.stuff = '.$stuff_id);
-        $results = $queryBuilder->getQuery()->execute();        
+        // Request repository
+        $repository = $this->getEntityManager()->getRepository('Stuff\Entity\Request');
+        $requests = $repository->findBy(array('requested_stuff' => $stuff));
         
-        $accepted = 0;
-        foreach ($results as $result) $accepted = $result->requesting;       
-       
-        $usercontact = $this->getEntityManager()->getRepository('User\Entity\User')->find($accepted); 
+        // Get accepted user for sold/traded item
+        if ($stuff->state > 2) {
+            $acceptedRequest = $repository->findOneBy(array('state' => 1, 'requested_stuff' => $stuff_id));
+        }
         return array(
             'stuff' => $stuff,       
-            'results' => $results,
-            'contact' => $usercontact,
+            'requests' => $requests,
+            'acceptedRequest' => isset($acceptedRequest) ? $acceptedRequest : null,
         );           
     }
     
@@ -427,7 +396,8 @@ class StuffController extends AbstractActionController {
         $form->setInputFilter($filter->getInputFilter());
         
         // Inject current user's stuff into stuff list select
-        $Ddlstuffs = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff')->findBy(array('user' => $this->identity(), 'state' => 1));
+        $repository = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff');
+        $Ddlstuffs = $repository->findBy(array('user' => $this->identity(), 'state' => 1));
         $Ddlstuff_list = array();
         foreach ($Ddlstuffs as $Ddlstuff) {            
             $Ddlstuff_list[$Ddlstuff->stuff_id] = $Ddlstuff->stuff_name;            
@@ -444,10 +414,10 @@ class StuffController extends AbstractActionController {
                 $request->payment_method    = 'exchange';
                 $request->requestor         = $user;
                 $request->requested_stuff   = $stuff;
-                $request->proposed_stuff    = $validData['proposed_stuff'];
+                $request->proposed_stuff    = $repository->find($validData['proposed_stuff']);
                 $request->type              = 'trade';
                 $request->state             = 0; // Pending state
-                
+                $request->created_time      = new \DateTime("now");
                 try{
                     $this->getEntityManager()->persist($request);
                     $this->getEntityManager()->persist($stuff);
@@ -463,22 +433,22 @@ class StuffController extends AbstractActionController {
         return array('form' => $form, 'stuff' => $stuff);     
     }
     
-    public function viewrequestAction(){       
+    public function requestAction(){       
         if(!($user = $this->identity())){
             return $this->redirect()->toRoute('login');
         }    
-        $stuff_id = $_GET['stuff'];  $exchange_id = $_GET['exchange'];
-        
-        if (($stuff_id == "")||($exchange_id == "")) {
+        $request_id = $this->params()->fromRoute('id', 0);
+        $repository = $this->getEntityManager()->getRepository('Stuff\Entity\Request');
+        $request = $repository->find($request_id);
+        if (!$request) {
             return $this->redirect()->toRoute('stuff', array('action' => 'user', 'id' => $user->user_id));
-        } 
-        $stuff = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff')->findOneBy(array('stuff_id' => $stuff_id));       
-        $exchange = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff')->findOneBy(array('stuff_id' => $exchange_id));       
-        return array('stuff' => $stuff, 'exchange' => $exchange);     
+        }
+        return array('request' => $request);
     }
     
     public function rejectAction()
     {
+        // TODO Rewrite this code
         $stuff_id = $_GET['stuff'];  $requesting_id = $_GET['requester'];
         $request = $this->getEntityManager()->getRepository('Stuff\Entity\Request')->findOneBy(array('stuff' => $stuff_id, 'requesting' => $requesting_id));
         $data = $request->getArrayCopy();
@@ -493,30 +463,37 @@ class StuffController extends AbstractActionController {
     
      public function acceptAction()
     {
-         // TODO : receiving contact from requestor
-        $stuff_id = $_GET['stuff'];  $requesting_id = $_GET['requester'];
-        $request = $this->getEntityManager()->getRepository('Stuff\Entity\Request')->findOneBy(array('stuff' => $stuff_id, 'requesting' => $requesting_id));
-        $exchange_id = $request->exchange_id;
-        $data = $request->getArrayCopy();
-        $data['state'] = 3;
-        $request->populate($data);
-        $this->getEntityManager()->flush();
+        $request_id = $this->params()->fromRoute('id', 0);
+        $repository = $this->getEntityManager()->getRepository('Stuff\Entity\Request');
+        $request = $repository->find($request_id);
+        if (!$request) {
+            return $this->redirect()->toRoute('home');
+        }
         
-        $stuff = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff')->findOneBy(array('stuff_id' => $stuff_id));      
-        $data = $stuff->getArrayCopy();
-        $data['state'] = 2;
-        $stuff->populate($data);
-        $this->getEntityManager()->flush();
+        // Prevent anonymous or other user from accessing this
+        if (!($user = $this->identity()) || $user != $request->requested_stuff->user) {
+            return $this->redirect()->toRoute('home');
+        }
         
-        $stuff = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff')->findOneBy(array('stuff_id' => $exchange_id));      
-        $data = $stuff->getArrayCopy();
-        $data['state'] = 2;
-        $stuff->populate($data);
-        $this->getEntityManager()->flush();
+        // Accept the request
+        $request->state = 1;
         
-        $user = $this->getEntityManager()->getRepository('User\Entity\User')->findOneBy(array('user_id' => $requesting_id));  
-        $this->flashMessenger()->addSuccessMessage("You've accepted an offer on item '". $stuff->stuff_name. "' from '" . $user->email. "'.");
-        return $this->redirect()->toRoute('stuff', array('action' => 'item', 'id' => $stuff_id));
+        // Change the state for the requested stuff and proposed stuff to "traded"
+        $request->requested_stuff->state = 3;
+        $request->proposed_stuff->state = 3;
+            
+        // TODO REJECT ALL OTHER REQUESTS TO THE REQUESTED STUFF HERE
+        
+        // TODO REJECT ALL OTHER REQUESTS TO THE PROPOSED STUFF HERE
+        
+        // Persist the changes
+        $this->getEntityManager()->persist($request);
+        $this->getEntityManager()->persist($request->requested_stuff);
+        $this->getEntityManager()->persist($request->proposed_stuff);
+        $this->getEntityManager()->flush();
+          
+        $this->flashMessenger()->addSuccessMessage("You've accepted an offer on item '". $request->requested_stuff->stuff_name. "' from '" . $request->requestor->display_name . "'.");
+        return $this->redirect()->toRoute('stuff', array('action' => 'item', 'id' => $request->requested_stuff->stuff_id));
     }
     
     public function homeAction()
@@ -623,7 +600,7 @@ class StuffController extends AbstractActionController {
     
     private function _filterStuffUser(&$queryBuilder, $value)
     {
-        $queryBuilder->andWhere('s.user_id = :user_id');
+        $queryBuilder->andWhere('s.user = :user_id');
         $queryBuilder->setParameter('user_id', $value, 'integer');
     }
     
@@ -631,6 +608,12 @@ class StuffController extends AbstractActionController {
     {
         $queryBuilder->andWhere('s.state IN (:state)');
         $queryBuilder->setParameter('state', $value);        
+    }
+    
+    private function _filterStuffRequests(&$queryBuilder, $value)
+    {
+        $queryBuilder->innerJoin('s.requests', 'r', 'WITH', 'r.state IN :req_state');
+        $queryBuilder->setParameter('req_state', $value);
     }
     
     /**
