@@ -453,10 +453,46 @@ class StuffController extends AbstractActionController {
         return array('request' => $request);
     }
     
+    public function listRequestAction(){
+         if (!($user = $this->identity())) {
+            return $this->redirect()->toRoute('home');
+        }    
+        
+        // Request repository
+        $repository = $this->getEntityManager()->getRepository('Stuff\Entity\Request');
+        $requests = $repository->findBy(array('requestor' => $this->identity()->user_id));        
+       
+        return array(       
+            'user' => $this->identity(),
+            'requests' => $requests,            
+        );           
+    }
+    
+    public function cancelAction()
+    {
+        $request_id = $this->params()->fromRoute('id', 0); 
+        $request = $this->getEntityManager()->getRepository('Stuff\Entity\Request')->findOneBy(array('request_id' => $request_id));
+         // Prevent anonymous or other user from accessing this
+        if (!($user = $this->identity()) || $user != $request->proposed_stuff->user) {
+            return $this->redirect()->toRoute('home');
+        }
+        $data = $request->getArrayCopy();
+        $data['state'] = -2;
+        $request->populate($data);
+        $this->getEntityManager()->flush();
+        $stuff = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff')->findOneBy(array('stuff_id' => $request->requested_stuff));          
+        $this->flashMessenger()->addSuccessMessage("You've canceled an offer on item '". $stuff->stuff_name. "' to '" . $request->requested_stuff->user->email. "'.");
+        return $this->redirect()->toRoute('stuff', array('action' => 'listRequest'));
+    }
+    
     public function rejectAction()
     {
-        $request_id = $this->params()->fromRoute('id', 0);        
+        $request_id = $this->params()->fromRoute('id', 0); 
         $request = $this->getEntityManager()->getRepository('Stuff\Entity\Request')->findOneBy(array('request_id' => $request_id));
+        // Prevent anonymous or other user from accessing this
+        if (!($user = $this->identity()) || $user != $request->requested_stuff->user) {             
+            return $this->redirect()->toRoute('home');
+        }
         $data = $request->getArrayCopy();
         $data['state'] = -1;
         $request->populate($data);

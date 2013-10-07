@@ -42,6 +42,7 @@ return array(
             'requestLink'       => 'Stuff\View\Helper\RequestLink',
             'requestAcceptLink' => 'Stuff\View\Helper\RequestAcceptLink',
             'requestRejectLink' => 'Stuff\View\Helper\RequestRejectLink',
+            'requestCancelLink' => 'Stuff\View\Helper\RequestCancelLink',
         ),
     ),
 	'doctrine' => array(

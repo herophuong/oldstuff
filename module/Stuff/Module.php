@@ -88,6 +88,15 @@ class Module{
                     $routeMatch = $sm->get('Application')->getMvcEvent()->getRouteMatch();
                     if ($user = $authService->getIdentity()) {
                         $container->addPages(array(
+                             array(
+                                'label' => 'My Requests',
+                                'route' => 'stuff',
+                                'route_match' => $routeMatch,
+                                'params' => array(                                    
+                                    'action' => 'listRequest',
+                                ),
+                                'icon' => 'envelope',
+                            ),
                             array(
                                 'label' => 'My Stuff',
                                 'route' => 'stuff',

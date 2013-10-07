@@ -66,6 +66,7 @@
             class="btn">
             <?php echo $this->translate('Cancel'); ?>
         </a>  
+      <?php if ($user == $stuff->user) { ?>
         <div class="pull-right">
         <a 
             href="<?php echo $this->requestRejectLink($this->request->request_id); ?>"
@@ -77,6 +78,7 @@
             class="btn btn-primary">
             <?php echo $this->translate('Accept'); ?>
         </a>
+      <?php } ?>      
         </div>
 </div>
 </div>
