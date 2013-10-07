@@ -11,6 +11,9 @@ use Category\Entity\Category;
 use Stuff\Entity\Stuff;
 use Stuff\Entity\Request;
 
+// Service
+use Payment\Service\PaymentServiceManager;
+
 // Form, filters
 use Stuff\Form\StuffForm;
 use Stuff\Form\BuyForm;
@@ -43,6 +46,8 @@ class StuffController extends AbstractActionController {
      */
 	protected $em;    
 	
+    protected $pm;
+    
 	public function getEntityManager(){
 		if (null === $this->em) {
             $this->em = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
@@ -54,6 +59,17 @@ class StuffController extends AbstractActionController {
 		$this->em = $em;
 	}
 	
+    public function getPaymentManager(){
+        if(null === $this->pm){
+            $this->pm = $this->getServiceLocator()->get('Payment\Service\Manager');
+        }
+        return $this->pm;
+    }
+    
+    public function setPaymentManager(PaymentServiceManager $pm){
+        $this->pm = $pm;
+    }
+    
 	public function userAction()
     {                 
         $user_id = (int) $this->params()->fromroute('id', 0);        
@@ -347,30 +363,39 @@ class StuffController extends AbstractActionController {
             $form->setData($request->getPost());
             if($form->isValid()){
                 $formdata = $form->getData();
-                // Create a new request
-                $request = new Request();
-                $request->payment_method    = $formdata['payment_method'];
-                $request->requestor         = $user;
-                $request->type              = 'sell';
-                $request->requested_stuff   = $stuff;
-                $request->state             = 1;
-                $request->created_time      = new \DateTime("now");
-                
-                // Change the state of stuff to "sold"
-                $stuff->state = 2;
-                
-                try{
-                    $this->getEntityManager()->persist($request);
-                    $this->getEntityManager()->persist($stuff);
-                    $this->getEntityManager()->flush();
-                    $this->flashMessenger()->addSuccessMessage("Buy completed");
+                // Pay
+                $paymentService = $this->getPaymentManager()->get($formdata['payment_method']);
+                if (!$paymentService->pay($formdata)){
+                    $this->flashMessenger()->addErrorMessage($paymentService->getMessage());
+                }else{
+                    // Create a new request
+                    $request = new Request();
+                    $request->payment_method    = $formdata['payment_method'];
+                    $request->requestor         = $user;
+                    $request->type              = 'sell';
+                    $request->requested_stuff   = $stuff;
+                    $request->state             = 1;
+                    $request->created_time      = new \DateTime("now");
                     
-                    return $this->redirect()->toRoute('stuff',array('action' => 'user', 'id' => $user->user_id));
-                } catch(DBALException $e){
-                    $this->flashMessenger()->addErrorMessage($e->getMessage());
+                    // Change the state of stuff to "sold"
+                    $stuff->state = 2;
+                    
+                    try{
+                        $this->getEntityManager()->persist($request);
+                        $this->getEntityManager()->persist($stuff);
+                        $this->getEntityManager()->flush();
+                        $this->flashMessenger()->addSuccessMessage("Buy completed");
+                        
+                        return $this->redirect()->toRoute('stuff',array('action' => 'user', 'id' => $user->user_id));
+                    } catch(DBALException $e){
+                        $this->flashMessenger()->addErrorMessage($e->getMessage());
+                    }   
                 }
+                
             }
         }
+        $form->get('payment_method')->setValueOptions($this->getPaymentManager()->getList());
+       
         return array('form' => $form, 'stuff' => $stuff);        
     }
     

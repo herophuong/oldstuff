@@ -1,6 +1,8 @@
 <?php
 namespace Payment;
 
+use Payment\Service\PaymentServiceManager;
+
 class Module{
 	public function getAutoloaderConfig(){
 		return array(
@@ -18,4 +20,15 @@ class Module{
 	public function getConfig(){
 		return include __DIR__.'/config/module.config.php';
 	}
+    
+    public function getServiceConfig(){
+        return array(
+            'factories' => array(
+                'Payment\Service\Manager' => function($sm){
+                    $pm = new PaymentServiceManager();
+                    return $pm;
+                }
+            )
+        );
+    }
 }

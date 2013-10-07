@@ -8,6 +8,7 @@ return array(
         'User',
         'Stuff',
         'Category',
+        'Payment',
     ),
 
     // These are various options for the listeners attached to the ModuleManager

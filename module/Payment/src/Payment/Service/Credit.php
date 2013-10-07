@@ -3,18 +3,19 @@ namespace Payment\Service;
 
 use Payment\Service\PaymentServiceInterface;
 
-class Credit implements PaymentServiceInteface{
+class Credit implements PaymentServiceInterface{
     private $error = array();
     
     protected $form;
     
     public function pay($data = array()){
-        if(count($data) <= 3){
-            array_push($error,"Not enough information to process");
+        
+        if(!isset($data)){
+            array_push($this->error,"Not enough information to process");
             return false;
         }
-        if(strlen($data['cardNumber']) < 16){
-            array_push($error,"Card number is not valid");
+        if(isset($data['cardNumber'])){
+            array_push($this->error,"Card number is not valid");
             return false;
         }
         
@@ -22,7 +23,7 @@ class Credit implements PaymentServiceInteface{
     }    
     
     public function getMessage(){
-        return $error;
+        return $this->error;
     }
     
     public function getForm()
