@@ -80,20 +80,22 @@
 </div>
 <?php if ($authorized) { ?>
 <hr class="alt"/>
+<?php if ($stuff->state != 2) { ?>
 <div class="row">
     <div class="gallery span8 offset2 user-stuff-list">
-        <?php if (count($this->requests) > 0) { ?>
+        <?php if (count($this->requests) > 0 && $stuff->state == 3) { ?>
         <?php 
             $this->partialLoop()->setObjectKey('object');
             echo $this->partialLoop('partial/request.phtml', $this->requests); ?>
-        <?php } else { ?>
+        <?php } else if ($stuff->state == 1) { ?>
         <div class="text-center">
             <h2 class="muted"><?php echo $this->translate('No request for this item'); ?></h2>            
         </div>
         <?php } ?>
     </div>
 </div>
-<?php if ($stuff->state > 1 && isset($this->acceptedRequest)) { ?>
+<?php } ?>
+<?php if ($stuff->state > 1 && isset($this->acceptedRequest) && $this->acceptedRequest->requestor != $this->identity()) { ?>
 <?php $requestor = $this->acceptedRequest->requestor; ?>
 <div class="row">
     <div class="gallery span8 offset2 content-block"> 

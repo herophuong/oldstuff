@@ -307,8 +307,11 @@ class StuffController extends AbstractActionController {
         $requests = $repository->findBy(array('requested_stuff' => $stuff));
         
         // Get accepted user for sold/traded item
-        if ($stuff->state > 2) {
+        if ($stuff->state > 1) {
             $acceptedRequest = $repository->findOneBy(array('state' => 1, 'requested_stuff' => $stuff_id));
+            if (empty($requests) && $stuff->state == 3) {
+                $requests = $repository->findBy(array('proposed_stuff' => $stuff, 'state' => 1));
+            }
         }
         return array(
             'stuff' => $stuff,       
