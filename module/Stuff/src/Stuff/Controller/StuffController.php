@@ -455,17 +455,16 @@ class StuffController extends AbstractActionController {
     
     public function rejectAction()
     {
-        // TODO Rewrite this code
-        $stuff_id = $_GET['stuff'];  $requesting_id = $_GET['requester'];
-        $request = $this->getEntityManager()->getRepository('Stuff\Entity\Request')->findOneBy(array('stuff' => $stuff_id, 'requesting' => $requesting_id));
+        $request_id = $this->params()->fromRoute('id', 0);        
+        $request = $this->getEntityManager()->getRepository('Stuff\Entity\Request')->findOneBy(array('request_id' => $request_id));
         $data = $request->getArrayCopy();
         $data['state'] = -1;
         $request->populate($data);
         $this->getEntityManager()->flush();
-        $stuff = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff')->findOneBy(array('stuff_id' => $stuff_id));  
-        $user = $this->getEntityManager()->getRepository('User\Entity\User')->findOneBy(array('user_id' => $requesting_id));  
+        $stuff = $this->getEntityManager()->getRepository('Stuff\Entity\Stuff')->findOneBy(array('stuff_id' => $request->requested_stuff));  
+        $user = $this->getEntityManager()->getRepository('User\Entity\User')->findOneBy(array('user_id' => $request->requestor));  
         $this->flashMessenger()->addSuccessMessage("You've rejected an offer on item '". $stuff->stuff_name. "' from '" . $user->email. "'.");
-        return $this->redirect()->toRoute('stuff', array('action' => 'item', 'id' => $stuff_id));
+        return $this->redirect()->toRoute('stuff', array('action' => 'item', 'id' => $request->requested_stuff->stuff_id));
     }
     
      public function acceptAction()
@@ -482,21 +481,21 @@ class StuffController extends AbstractActionController {
             return $this->redirect()->toRoute('home');
         }
         
+        // REJECT ALL OTHER REQUESTS TO THE REQUESTED STUFF 
+        $rejects = $repository->findBy(array('requested_stuff' => $request->requested_stuff->stuff_id));
+        foreach ($rejects as $reject) $reject->state = -1;  
+        
         // Accept the request
         $request->state = 1;
         
         // Change the state for the requested stuff and proposed stuff to "traded"
         $request->requested_stuff->state = 3;
-        $request->proposed_stuff->state = 3;
-            
-        // TODO REJECT ALL OTHER REQUESTS TO THE REQUESTED STUFF HERE
+        $request->proposed_stuff->state = 3;       
         
-        // TODO REJECT ALL OTHER REQUESTS TO THE PROPOSED STUFF HERE
-        
-        // Persist the changes
+        // Persist the changes       
         $this->getEntityManager()->persist($request);
         $this->getEntityManager()->persist($request->requested_stuff);
-        $this->getEntityManager()->persist($request->proposed_stuff);
+        $this->getEntityManager()->persist($request->proposed_stuff);        
         $this->getEntityManager()->flush();
           
         $this->flashMessenger()->addSuccessMessage("You've accepted an offer on item '". $request->requested_stuff->stuff_name. "' from '" . $request->requestor->display_name . "'.");
