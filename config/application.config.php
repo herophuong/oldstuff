@@ -9,6 +9,7 @@ return array(
         'Stuff',
         'Category',
         'Payment',
+        'Vote',
     ),
 
     // These are various options for the listeners attached to the ModuleManager
