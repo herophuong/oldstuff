@@ -19,7 +19,7 @@
                         ->prependStylesheet($this->basePath() . '/css/style.css')
                         ->prependStylesheet($this->basePath() . '/css/bootstrap.css')
                         ->prependStylesheet($this->basePath() . '/css/open-sans.css')
-                        ->prependStylesheet($this->basePath() . '/css/jquery.rating.css') ;?>
+                        ->appendStylesheet($this->basePath() . '/css/jquery.rating.css') ;?>
 
         <!-- Scripts -->
         <?php echo $this->headScript()
@@ -30,11 +30,10 @@
             ->prependFile($this->basePath() . '/js/jquery.isotope.min.js')
             ->prependFile($this->basePath() . '/js/holder.min.js')
             ->prependFile($this->basePath() . '/js/jquery-1.7.2.min.js')
-            ->prependFile($this->basePath() . '/js/jquery.js')
-            ->prependFile($this->basePath() . '/js/jquery.form.js')
-            ->prependFile($this->basePath() . '/js/jquery.MetaData.js')
-            ->prependFile($this->basePath() . '/js/jquery.rating.js')
-            ->prependFile($this->basePath() . '/js/jquery.rating.pack.js')
+            ->appendFile($this->basePath() . '/js/jquery.form.js')
+            ->appendFile($this->basePath() . '/js/jquery.MetaData.js')
+            ->appendFile($this->basePath() . '/js/jquery.rating.js')
+            ->appendFile($this->basePath() . '/js/jquery.rating.pack.js')
         ; ?>
 
     </head>

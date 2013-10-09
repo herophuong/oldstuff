@@ -1,15 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<link type="text/css" rel="stylesheet" href="demo/css/application.css">
-
-  	<script type="text/javascript" src="demo/js/jquery.min.js"></script>
-  	<script type="text/javascript" src="lib/jquery.raty.min.js"></script>
-
-  	<link href="/favicon.ico" rel="shortcut icon" type="image/x-icon">
-</head>
-<body>
 <?php $this->headTitle($this->translate('Vote This User'), 'PREPEND'); ?>
+<div class="row">
+<div class="span8 offset2 content-block gallery">
 <h1><i class="iconbig-note-write"></i>&nbsp;<?php echo $this->translate('Vote This User'); ?></h1>
 
 <?php $messages = $this->flashMessenger()->getCurrentSuccessMessages();?>
@@ -34,5 +25,5 @@ $this->flashMessenger()->clearCurrentMessagesFromNamespace(FlashMessenger::NAMES
 <?php echo $this->formRow($form->get('rate_box')); ?>
 <?php echo $this->formInput($form->get('submit')->setAttributes(array('value' => 'Vote', 'class' => 'btn btn-primary'))); ?>       
 <?php echo $this->form()->closeTag(); ?>
-</body>
-</html>
+</div>
+</div>
