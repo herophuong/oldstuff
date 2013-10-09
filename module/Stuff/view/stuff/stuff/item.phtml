@@ -83,7 +83,7 @@
 <?php if ($stuff->state != 2) { ?>
 <div class="row">
     <div class="gallery span8 offset2 user-stuff-list">
-        <?php if (count($this->requests) > 0 && $stuff->state == 3) { ?>
+        <?php if (count($this->requests) > 0 && ($stuff->state == 3 || $stuff->state == 1)) { ?>
         <?php 
             $this->partialLoop()->setObjectKey('object');
             echo $this->partialLoop('partial/request.phtml', $this->requests); ?>
