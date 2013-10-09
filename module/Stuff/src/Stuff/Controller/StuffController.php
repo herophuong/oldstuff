@@ -10,6 +10,8 @@ use Zend\View\Model\ViewModel;
 use Category\Entity\Category;
 use Stuff\Entity\Stuff;
 use Stuff\Entity\Request;
+use Vote\Entity\Userrate;
+use Vote\Entity\Vote;
 
 // Service
 use Payment\Service\PaymentServiceManager;
@@ -120,10 +122,14 @@ class StuffController extends AbstractActionController {
         $paginator = $this->_buildPaginator($queryBuilder);
         
         $categories = $this->getEntityManager()->getRepository('Category\Entity\Category')->findBy(array(), array('cat_name' => 'ASC'));
+
+        $vote_result =  $this->getEntityManager()->getRepository('Vote\Entity\Userrate')->findOneBy(array('user_id' => $user_id));
+        
         return array(
             'user' => $user,       
             'paginator' => $paginator,
             'categories' => $categories,
+            'vote_result' => $vote_result,
         );
 	}
 	

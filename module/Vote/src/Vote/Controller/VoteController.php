@@ -95,8 +95,9 @@ class VoteController extends AbstractActionController
         {
             $this->getEntityManager()->persist($userrate);
             $this->getEntityManager()->flush();
-            return $this->redirect()->toRoute('home',array('user_id' => $user_id,
-                                                            'action' => 'home',
+            $this->flashMessenger()->addSuccessMessage("Thank you for your vote");
+            return $this->redirect()->toRoute('stuff',array('id' => $voted_user_id,
+                                                            'action' => 'user',
             ));
         }
         catch (DBALException $e)
@@ -138,7 +139,6 @@ class VoteController extends AbstractActionController
                     {
                         $this->getEntityManager()->persist($vote);
                         $this->getEntityManager()->flush();
-                        $this->flashMessenger()->addSuccessMessage("Thank you for your vote");
                         return $this->redirect()->toRoute('vote',array('user_id' => $user_id,
                                                                     'voted_user_id' => $voted_user_id,
                                                                   'action' => 'avgvote',
