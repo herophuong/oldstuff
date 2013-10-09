@@ -49,48 +49,23 @@ class VoteController extends AbstractActionController
         
         $voted_user_id = (int) $this->params()->fromroute('voted_user_id',0);
         
-        $con=mysqli_connect("localhost","root","mysql","oldstuff");
-
-        // Check connection
-        if (mysqli_connect_errno($con))
-        {
-            echo "Failed to connect to MySQL: " . mysqli_connect_error();
-        }
-
-        $result = mysqli_query($con, "SELECT * FROM vote WHERE voted_user_id=$voted_user_id");
-        while($row = mysqli_fetch_array($result))
-        {
-            $sumRate += $row['ratescore'];
-            $numOfVote++;
-        }
-        if ($numOfVote != 0) 
-        {
-            $avgRate = (float) $sumRate / $numOfVote;
-        }
-        else
-        {
-            $avgRate = 0;
-        }
-        echo "avgRate = " . $avgRate;
-        $userrate = $this->getEntityManager()->find('Vote\Entity\Userrate', $voted_user_id);
-        if (!$userrate)
-        {
-            $userrate = new Userrate();
-            $data = $userrate->getArrayCopy();
-            $data['user_id'] = $voted_user_id;
-            $data['avgrate'] = $avgRate;
-            $data['numofvote'] = $numOfVote;
-        }
-        else
-        {
-            $data = $userrate->getArrayCopy();
-            $data['user_id'] = $voted_user_id;
-            $data['avgrate'] = $avgRate;
-            $data['numofvote'] = $numOfVote;
-        }
+        $queryBuilder = $this->getEntityManager()->createQueryBuilder();
+        $queryBuilder->select("avg(v.ratescore) as average_rate, count(v.user_id) as rate_count")
+                     ->from("Vote\Entity\Vote", 'v')
+                     ->where("v.voted_user_id = :id")
+                     ->groupBy("v.voted_user_id")
+                     ->setParameter('id', $voted_user_id);
+        $query = $queryBuilder->getQuery();
+        $result = $query->getSingleResult();
         
-
-        $userrate->populate($data);
+        $userrate = $this->getEntityManager()->find('Vote\Entity\Userrate', $voted_user_id);
+        if (!$userrate) {
+            $userrate = new Userrate();
+            $userrate->user_id = $voted_user_id;
+        }
+        $userrate->avgrate = $result['average_rate'];
+        $userrate->numofvote = $result['rate_count'];
+        
         try
         {
             $this->getEntityManager()->persist($userrate);
@@ -156,7 +131,7 @@ class VoteController extends AbstractActionController
             {
                 echo "<div style='color: #4FDBBB; font-size:22px; text-align:center'>". "You rated this user before" ."</div>";
                 $form = new VoteForm();
-
+                $form->setData(array('rate_box' => $vote->ratescore));
                 $request = $this->getRequest();
                 if ($request->isPost())
                 {
