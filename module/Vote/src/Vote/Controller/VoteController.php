@@ -86,82 +86,22 @@ class VoteController extends AbstractActionController
         //Authenticate user
 		$user_id = (int) $this->params()->fromroute('user_id',0);
         $user = $this->identity();
-		if($user->user_id != $user_id){
+		if($user->user_id != $user_id) {
 			return $this->redirect()->toRoute('user',array('action' => 'login'));
 		}
         
         $voted_user_id = (int) $this->params()->fromroute('voted_user_id',0);
-        $vote = $this->getEntityManager()->getRepository('Vote\Entity\Vote')->findOneBy(array('voted_user_id' => $voted_user_id, 'user_id' => $user_id));
-        if ($vote == null)
+        if ($user_id == $voted_user_id)
         {
-            $form = new VoteForm();
-
-            $request = $this->getRequest();
-            if ($request->isPost())
-            {
-                $form->setData($request->getPost());
-                if ($form->isValid())
-                {
-                    $formdata = $form->getData();
-                    $vote = new Vote();
-                    $data = $vote->getArrayCopy();
-                    $data['user_id'] = $user_id;
-                    $data['voted_user_id'] = $voted_user_id;
-                    $data['ratescore'] = $formdata['rate_box'];
-
-                    $vote->populate($data);
-                    try
-                    {
-                        $this->getEntityManager()->persist($vote);
-                        $this->getEntityManager()->flush();
-                        return $this->redirect()->toRoute('vote',array('user_id' => $user_id,
-                                                                    'voted_user_id' => $voted_user_id,
-                                                                  'action' => 'avgvote',
-                        ));
-                    }
-                    catch(DBALException $e){
-                        $this->flashMessenger()->addErrorMessage($e->getMessage());          
-                    }
-                }
-            }
+            $this->flashMessenger()->addErrorMessage("You can not rate yourself!");
+            return $this->redirect()->toRoute('stuff',array('id' => $user_id,
+                                                            'action' => 'user',
+            ));
         }
         else
         {
-            if ($vote->user_id == $user_id)
-            {
-                echo "<div style='color: #4FDBBB; font-size:22px; text-align:center'>". "You rated this user before" ."</div>";
-                $form = new VoteForm();
-                $form->setData(array('rate_box' => $vote->ratescore));
-                $request = $this->getRequest();
-                if ($request->isPost())
-                {
-                    $form->setData($request->getPost());
-                    if ($form->isValid())
-                    {
-                        $formdata = $form->getData();
-                        $data = $vote->getArrayCopy();
-                        $data['user_id'] = $vote->user_id;
-                        $data['voted_user_id'] = $vote->voted_user_id;
-                        $data['ratescore'] = $formdata['rate_box'];
-
-                        $vote->populate($data);
-                        try
-                        {
-                            $this->getEntityManager()->persist($vote);
-                            $this->getEntityManager()->flush();
-                            $this->flashMessenger()->addSuccessMessage("Thank you for your vote");
-                            return $this->redirect()->toRoute('vote',array('user_id' => $user_id,
-                                                                    'voted_user_id' => $voted_user_id,
-                                                                  'action' => 'avgvote',
-                        ));
-                        }
-                        catch(DBALException $e){
-                            $this->flashMessenger()->addErrorMessage($e->getMessage());        
-                        }
-                    }
-                }
-            }
-            elseif ($vote->user_id != $user_id)
+            $vote = $this->getEntityManager()->getRepository('Vote\Entity\Vote')->findOneBy(array('voted_user_id' => $voted_user_id, 'user_id' => $user_id));
+            if ($vote == null)
             {
                 $form = new VoteForm();
 
@@ -183,14 +123,83 @@ class VoteController extends AbstractActionController
                         {
                             $this->getEntityManager()->persist($vote);
                             $this->getEntityManager()->flush();
-                            $this->flashMessenger()->addSuccessMessage("Thank you for your vote");
                             return $this->redirect()->toRoute('vote',array('user_id' => $user_id,
-                                                                    'voted_user_id' => $voted_user_id,
-                                                                  'action' => 'avgvote',
-                        ));
+                                                                        'voted_user_id' => $voted_user_id,
+                                                                      'action' => 'avgvote',
+                            ));
                         }
                         catch(DBALException $e){
-                            $this->flashMessenger()->addErrorMessage($e->getMessage());        
+                            $this->flashMessenger()->addErrorMessage($e->getMessage());          
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if ($vote->user_id == $user_id)
+                {
+                    $form = new VoteForm();
+                    $form->setData(array('rate_box' => $vote->ratescore));
+                    $request = $this->getRequest();
+                    if ($request->isPost())
+                    {
+                        $form->setData($request->getPost());
+                        if ($form->isValid())
+                        {
+                            $formdata = $form->getData();
+                            $data = $vote->getArrayCopy();
+                            $data['user_id'] = $vote->user_id;
+                            $data['voted_user_id'] = $vote->voted_user_id;
+                            $data['ratescore'] = $formdata['rate_box'];
+
+                            $vote->populate($data);
+                            try
+                            {
+                                $this->getEntityManager()->persist($vote);
+                                $this->getEntityManager()->flush();
+                                $this->flashMessenger()->addSuccessMessage("Thank you for your vote");
+                                return $this->redirect()->toRoute('vote',array('user_id' => $user_id,
+                                                                        'voted_user_id' => $voted_user_id,
+                                                                      'action' => 'avgvote',
+                            ));
+                            }
+                            catch(DBALException $e){
+                                $this->flashMessenger()->addErrorMessage($e->getMessage());        
+                            }
+                        }
+                    }
+                }
+                elseif ($vote->user_id != $user_id)
+                {
+                    $form = new VoteForm();
+
+                    $request = $this->getRequest();
+                    if ($request->isPost())
+                    {
+                        $form->setData($request->getPost());
+                        if ($form->isValid())
+                        {
+                            $formdata = $form->getData();
+                            $vote = new Vote();
+                            $data = $vote->getArrayCopy();
+                            $data['user_id'] = $user_id;
+                            $data['voted_user_id'] = $voted_user_id;
+                            $data['ratescore'] = $formdata['rate_box'];
+
+                            $vote->populate($data);
+                            try
+                            {
+                                $this->getEntityManager()->persist($vote);
+                                $this->getEntityManager()->flush();
+                                $this->flashMessenger()->addSuccessMessage("Thank you for your vote");
+                                return $this->redirect()->toRoute('vote',array('user_id' => $user_id,
+                                                                        'voted_user_id' => $voted_user_id,
+                                                                      'action' => 'avgvote',
+                            ));
+                            }
+                            catch(DBALException $e){
+                                $this->flashMessenger()->addErrorMessage($e->getMessage());        
+                            }
                         }
                     }
                 }

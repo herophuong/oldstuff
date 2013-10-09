@@ -8,10 +8,6 @@ $authorized = ($this->identity() == $user);
 if ($authorized) {
     $this->deleteConfirmationScript(); // Init confirmation popup upon stuff deletion
 }
-else
-{
-    $logged_user = $this->identity();
-}
 $session = new Zend\Session\Container('stuff\user\\'.$user->user_id);
 $filter_tab = $session->offsetGet('filter.tab');
 ?>
@@ -28,7 +24,7 @@ $filter_tab = $session->offsetGet('filter.tab');
                 <span class="icon-envelope"></span>&nbsp;<?php echo $user->email; ?>
                 <br>
                 <?php if ($this->identity())
-                      { ?>
+                      { $logged_user = $this->identity(); ?>
 
                 <a href="<?php echo $this->url('vote', array('action' => 'vote', 'user_id' => $logged_user->user_id, 'voted_user_id' => $user->user_id)); ?>" >Rate this user</a>
                 <br>
@@ -36,6 +32,7 @@ $filter_tab = $session->offsetGet('filter.tab');
                     <p style="color:red; font-size:20px">You must log in to rate</p>
                 <?php } ?>
                 <?php 
+                    if ($vote_result != null) {
                         echo "(Rating : " . round($vote_result->avgrate, 2) . " / " . $vote_result->numofvote . " votes)";
                         echo "<br>";
                         if ($vote_result->avgrate == 0)
@@ -181,7 +178,18 @@ $filter_tab = $session->offsetGet('filter.tab');
                             <input name="star1" type="radio" class="star {split:2}" disabled="disabled" />
                             <input name="star1" type="radio" class="star {split:2}" disabled="disabled" checked="checked" />
                         <?php }
-                ?>
+                        } else { ?>
+                            <input name="star1" type="radio" class="star {split:2}" disabled="disabled" />
+                            <input name="star1" type="radio" class="star {split:2}" disabled="disabled" />
+                            <input name="star1" type="radio" class="star {split:2}" disabled="disabled" />
+                            <input name="star1" type="radio" class="star {split:2}" disabled="disabled" />
+                            <input name="star1" type="radio" class="star {split:2}" disabled="disabled" />
+                            <input name="star1" type="radio" class="star {split:2}" disabled="disabled" />
+                            <input name="star1" type="radio" class="star {split:2}" disabled="disabled" />
+                            <input name="star1" type="radio" class="star {split:2}" disabled="disabled" />
+                            <input name="star1" type="radio" class="star {split:2}" disabled="disabled" />
+                            <input name="star1" type="radio" class="star {split:2}" disabled="disabled" />
+                        <?php } ?>
                 
                 <br /><br />
                 <?php if ($authorized) { ?>
